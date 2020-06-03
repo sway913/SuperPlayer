@@ -8,7 +8,22 @@ AudioEngine::AudioEngine(int sample_rate) : sample_rate(sample_rate) {}
 
 
 DataCallbackResult AudioEngine::onAudioReady(AudioStream *stream, void *data, int32_t numFrames) {
-    return DataCallbackResult ::Continue;
+    return DataCallbackResult::Continue;
+}
+
+bool AudioEngine::openStream() {
+    AudioStreamBuilder outBuilder;
+    (&outBuilder)->setCallback(this)
+            ->setAudioApi(AudioApi::Unspecified)
+            ->setSampleRate(sample_rate)
+            ->setFormat(AudioFormat::I16)
+            ->setChannelCount(oboe::ChannelCount::Stereo)
+            ->setPerformanceMode(PerformanceMode::LowLatency)
+            ->setSharingMode(SharingMode::Exclusive)
+            ->setDirection(Direction::Output);
+    Result outResult = outBuilder.openManagedStream(output_stream);
+    output_stream->setBufferSizeInFrames(output_stream->getFramesPerBurst() * 2);
+    return outResult == Result::OK;
 }
 
 

@@ -6,8 +6,8 @@
 #define SUPERPLAYER_AUDIO_ENGINE_H
 
 #include <oboe/Oboe.h>
-#include "observer.h"
-#include "source/source_factory.h"
+#include "../observer.h"
+#include "../source/source_factory.h"
 
 using namespace oboe;
 
@@ -26,6 +26,8 @@ protected:
 
     void onErrorAfterClose(AudioStream *oboeStream, Result error) override;
 
+    bool openStream();
+
 
 public:
 
@@ -33,9 +35,9 @@ public:
 
     void setObserver(Observer *observer);
 
-    virtual void prepare(SourceFactory *factory);
+    virtual void prepare(SourceFactory *factory) = 0;
 
-    virtual void start();
+    virtual void start() = 0;
 
     virtual void stop();
 

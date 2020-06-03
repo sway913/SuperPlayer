@@ -11,12 +11,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
 import android.widget.SeekBar
+import com.smzh.superplayer.player.PlayerJni
+import com.smzh.superplayer.player.SuperPlayer
 import kotlinx.android.synthetic.main.fragment_record.*
 
-class RecordFragment : Fragment(), View.OnClickListener, AudioJni.DataProcessListener, MusicSeekBar.PlayStatus
-        , SeekBar.OnSeekBarChangeListener, CompoundButton.OnCheckedChangeListener, FilterListFragment.FilterSelectListener {
+class RecordFragment : Fragment()/*, View.OnClickListener, PlayerJni.PlayerStateListener, MusicSeekBar.PlayStatus
+        , SeekBar.OnSeekBarChangeListener, CompoundButton.OnCheckedChangeListener, FilterListFragment.FilterSelectListener*/ {
 
-    private val player by lazy { SuperPlayer.getInstance() }
+   /* private val player by lazy { SuperPlayer.getInstance() }
     private lateinit var switchListener: SwitchFragmentListener
     private val handler = Handler(Looper.getMainLooper())
     private var isRecording = false
@@ -46,7 +48,7 @@ class RecordFragment : Fragment(), View.OnClickListener, AudioJni.DataProcessLis
         childFragmentManager.beginTransaction().add(R.id.filter_container, filterFragment).commitAllowingStateLoss()
     }
 
-    override fun onDataReady() {
+    override fun onReady() {
         activity?.runOnUiThread {
             btn_control.text = "正在录音，点击结束"
             btn_control.isEnabled = true
@@ -159,5 +161,5 @@ class RecordFragment : Fragment(), View.OnClickListener, AudioJni.DataProcessLis
 
     override fun onFilterSelect(position: Int) {
         player.setFilter(position)
-    }
+    }*/
 }

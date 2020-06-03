@@ -13,13 +13,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
 import android.widget.Toast
+import com.smzh.superplayer.player.PlayerJni
+import com.smzh.superplayer.player.SuperPlayer
 import kotlinx.android.synthetic.main.fragment_peview.*
 import java.io.File
 
-class PreviewFragment : Fragment(), View.OnClickListener, AudioJni.DataProcessListener, MusicSeekBar.PlayStatus
-        , FilterListFragment.FilterSelectListener, SeekBar.OnSeekBarChangeListener {
+class PreviewFragment : Fragment(){}/*, View.OnClickListener, PlayerJni.PlayerStateListener, MusicSeekBar.PlayStatus
+        , FilterListFragment.FilterSelectListener, SeekBar.OnSeekBarChangeListener*/
+//{
 
-    private val player by lazy { SuperPlayer.getInstance() }
+   /* private val player by lazy { SuperPlayer.getInstance() }
     private lateinit var switchListener: SwitchFragmentListener
     private val handler = Handler(Looper.getMainLooper())
     private var playFinish = false
@@ -55,7 +58,7 @@ class PreviewFragment : Fragment(), View.OnClickListener, AudioJni.DataProcessLi
         player.prepare(false, AudioParemeter.defaultSample, AudioParemeter.defaultMusicPath, AudioParemeter.defaultTmpPath, AudioParemeter.defaultVocalPath)
     }
 
-    override fun onDataReady() {
+    override fun onReady() {
         activity?.runOnUiThread {
             btn_save.isEnabled = true
             music_seek_bar.resume()
@@ -200,4 +203,4 @@ class PreviewFragment : Fragment(), View.OnClickListener, AudioJni.DataProcessLi
     }
 
 
-}
+}*/

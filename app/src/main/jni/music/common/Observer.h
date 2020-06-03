@@ -9,7 +9,7 @@
 class Observer {
 
 public:
-    virtual void onDataReady() = 0;
+    virtual void onEngineReady() = 0;
 
     virtual void onError() = 0;
 

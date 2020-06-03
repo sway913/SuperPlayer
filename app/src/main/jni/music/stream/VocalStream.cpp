@@ -29,7 +29,7 @@ bool VocalStream::onAudioDataReady(int16_t *data, int32_t numFrames) {
         if (callbackCountToDrain > 0) {
             callbackCountToDrain--;
             if (observer && callbackCountToDrain == 0) {
-                observer->onDataReady();
+                observer->onEngineReady();
             }
             return true;
         }

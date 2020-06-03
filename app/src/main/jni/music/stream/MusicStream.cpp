@@ -154,7 +154,7 @@ void MusicStream::onDecodeCompleted() {
         source->prepare();
     }
     if (observer) {
-        observer->onDataReady();
+        observer->onEngineReady();
     }
     LOGI("decode complete");
 }
