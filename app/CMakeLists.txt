@@ -30,6 +30,7 @@ find_library(
 target_link_libraries(
         superplayer
         thirdpart
+        ${libs}
         ${log-lib}
 )
 

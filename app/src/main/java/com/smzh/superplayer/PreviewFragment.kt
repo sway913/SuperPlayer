@@ -7,12 +7,12 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import com.smzh.superplayer.player.PlayerJni
 import com.smzh.superplayer.player.SuperPlayer
 import kotlinx.android.synthetic.main.fragment_peview.*

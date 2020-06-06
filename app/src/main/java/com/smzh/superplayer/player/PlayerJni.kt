@@ -15,7 +15,7 @@ class PlayerJni {
 
 
     //声明周期方法请按顺序调用
-    external fun prepare()
+    external fun prepare(audioParam: AudioParam)
 
     external fun start()
 

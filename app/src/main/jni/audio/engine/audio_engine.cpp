@@ -21,9 +21,12 @@ bool AudioEngine::openStream() {
             ->setPerformanceMode(PerformanceMode::LowLatency)
             ->setSharingMode(SharingMode::Exclusive)
             ->setDirection(Direction::Output);
-    Result outResult = outBuilder.openManagedStream(output_stream);
+    Result result = outBuilder.openManagedStream(output_stream);
     output_stream->setBufferSizeInFrames(output_stream->getFramesPerBurst() * 2);
-    return outResult == Result::OK;
+    if (result == Result::OK) {
+        result = output_stream->requestStart();
+    }
+    return result == Result::OK;
 }
 
 
@@ -32,7 +35,9 @@ void AudioEngine::onErrorAfterClose(AudioStream *oboeStream, Result error) {
 }
 
 void AudioEngine::onErrorBeforeClose(AudioStream *oboeStream, Result error) {
-
+    if (observer) {
+        observer->onError();
+    }
 }
 
 void AudioEngine::prepare(SourceFactory *factory) {
@@ -55,8 +60,8 @@ void AudioEngine::stop() {
 
 }
 
-void AudioEngine::setObserver(Observer *observer) {
-
+void AudioEngine::setObserver(Observer *obs) {
+    this->observer = obs;
 }
 
 void AudioEngine::setEcho(bool isEcho) {

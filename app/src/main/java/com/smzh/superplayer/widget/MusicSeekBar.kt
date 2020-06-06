@@ -1,4 +1,4 @@
-package com.smzh.superplayer
+package com.smzh.superplayer.widget
 
 import android.content.Context
 import android.util.AttributeSet
@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.SeekBar
+import com.smzh.superplayer.R
 import kotlinx.android.synthetic.main.music_seek_bar_layout.view.*
 
 class MusicSeekBar : FrameLayout, View.OnClickListener, SeekBar.OnSeekBarChangeListener {

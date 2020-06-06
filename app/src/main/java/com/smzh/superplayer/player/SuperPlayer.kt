@@ -1,12 +1,16 @@
 package com.smzh.superplayer.player;
 
+import android.content.Context
+import android.media.AudioManager
 import android.os.Handler
 import android.os.HandlerThread
+import com.smzh.superplayer.App
 
 class SuperPlayer {
 
     private var handler: Handler
     private var playerJni: PlayerJni
+    private val outSample: Int
 
     companion object {
         val instance = SingletonHolder.holder
@@ -21,10 +25,14 @@ class SuperPlayer {
         playerThread.start();
         handler = Handler(playerThread.looper);
         playerJni = PlayerJni()
+        val myAudioMgr = App.context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        val sampleRateStr = myAudioMgr.getProperty(AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE)
+        outSample = sampleRateStr.toInt()
     }
 
-    fun prepare() {
-        handler.post { playerJni.prepare() }
+    fun prepare(audioParam: AudioParam) {
+        audioParam.setOutSample(outSample)
+        handler.post { playerJni.prepare(audioParam) }
     }
 
     fun start() {
@@ -85,7 +93,11 @@ class SuperPlayer {
         return playerJni.getMergeProgress()
     }
 
-    fun setPlayerListener(listener: PlayerJni.PlayerStateListener) {
+    fun addPlayerListener(listener: PlayerJni.PlayerStateListener) {
         playerJni.setPlayerListener(listener)
+    }
+
+    fun removePlayerListener(listener: PlayerJni.PlayerStateListener) {
+        playerJni.removePlayerStateListener(listener)
     }
 }

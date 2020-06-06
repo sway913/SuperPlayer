@@ -18,6 +18,12 @@ public:
 
     void start() override final;
 
+    DataCallbackResult onAudioReady(AudioStream *stream, void *data, int32_t numFrames) override final;
+
+
+private:
+
+
 };
 
 

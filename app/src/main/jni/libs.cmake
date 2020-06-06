@@ -32,7 +32,7 @@ set_target_properties(x264 PROPERTIES IMPORTED_LOCATION ${libs_dir}/x264/lib/and
 
 find_library(z-lib z)
 
-set(ffmpeg_libs avformat avcodec avfilter avutil postproc swscale swresample mp3lame x264 fdk-aac ${z-lib})
+set(libs avformat avcodec avfilter avutil postproc swscale swresample mp3lame x264 fdk-aac ${z-lib})
 
 include_directories(${libs_dir}/ffmpeg/include
         ${libs_dir}/lame/include

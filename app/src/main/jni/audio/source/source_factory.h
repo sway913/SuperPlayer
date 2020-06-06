@@ -6,6 +6,10 @@
 #define SUPERPLAYER_SOURCE_FACTORY_H
 
 #include <string>
+#include <vector>
+#include "isource.h"
+#include "pcm_source.h"
+#include "stream_source.h"
 
 using namespace std;
 
@@ -13,14 +17,19 @@ class SourceFactory {
 
 private:
 
-    std::shared_ptr<string> vocalPath{nullptr};
-    std::shared_ptr<string> aacPath{nullptr};
-    std::shared_ptr<string> guidePath{nullptr};
+    const char * vocalPath{nullptr};
+    const char * accPath{nullptr};
+    const char * funPath{nullptr};
+    int out_sample{0};
 
 
 public:
 
+    SourceFactory(const char *vocalPath, const char *accPath, const char *funPath, int outSample);
 
+    vector<ISource *> createPcmSource();
+
+    vector<ISource *> createStreamSource();
 };
 
 #endif //SUPERPLAYER_SOURCE_FACTORY_H

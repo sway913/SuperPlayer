@@ -8,7 +8,11 @@
 #include <future>
 #include "../common/android_log.h"
 #include "engine/player_engine.h"
+#include "source/source_factory.h"
 #include "../common/common_tools.h"
+#include "codec/file_decoder.h"
+#include "../common/audio_param.h"
+#include "engine/test_oboe.h"
 
 
 using namespace std::placeholders;
@@ -33,8 +37,13 @@ private:
     std::condition_variable cond;
     std::queue<MsgState> msg_queue;
     std::future<void> thread_future;
+    std::shared_ptr<AudioParam> audio_param{nullptr};
 
     void setMessage(MsgState msg);
+
+    FileDecoder *file_decoder{nullptr};
+
+    TestOboe *testOboe{nullptr};
 
 public:
 
@@ -42,7 +51,7 @@ public:
 
     virtual ~SuperAudio();
 
-    void prepare();
+    void prepare(std::shared_ptr<AudioParam> & param);
 
     void start();
 
@@ -64,7 +73,7 @@ public:
 
     void callLooper();
 
-    void onEngineReady() override;
+    void onReady() override;
 
     void onCompleted() override;
 

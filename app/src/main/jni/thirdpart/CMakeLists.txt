@@ -4,6 +4,7 @@ project(thirdpart)
 
 add_library(thirdpart
         STATIC
+        empty.h
 )
 
 target_link_libraries(

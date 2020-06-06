@@ -1,22 +1,42 @@
 #include "super_audio.h"
 
+//#define TEST_OBOE
+
 SuperAudio::SuperAudio(JNIEnv *jniEnv, jobject obj) {
     this->jniEnv = jniEnv;
     this->obj = jniEnv->NewGlobalRef(obj);
     jniEnv->GetJavaVM(&javaVm);
 }
 
-void SuperAudio::prepare() {
+void SuperAudio::prepare(std::shared_ptr<AudioParam> &param) {
+    this->audio_param = param;
     thread_future = std::async(std::launch::async, &SuperAudio::callLooper, this);
-    audio_engine = std::make_unique<PlayerEngine>(48000);
+#ifndef TEST_OBOE
+    audio_engine = std::make_unique<PlayerEngine>(param->getOutSample());
     audio_engine->setObserver(this);
-    audio_engine->prepare(nullptr);
+    auto *factory = new SourceFactory(param->getVocalPath(),
+                                      param->getAccPath(),
+                                      param->getFunctionPath(),
+                                      param->getOutSample());
+    audio_engine->prepare(factory);
+    file_decoder = new FileDecoder(param->getAccPath(), param->getFunctionPath(), 44100);
+    file_decoder->start(std::bind(&SuperAudio::onReady, this));
+#else
+    testOboe = new TestOboe();
+    onReady();
+#endif
 }
 
 void SuperAudio::start() {
+#ifndef TEST_OBOE
     if (audio_engine) {
         audio_engine->start();
     }
+#else
+    if (testOboe) {
+        testOboe->start();
+    }
+#endif
 }
 
 void SuperAudio::resume() {
@@ -32,13 +52,21 @@ void SuperAudio::pause() {
 }
 
 void SuperAudio::stop() {
+#ifndef TEST_OBOE
     if (audio_engine) {
         audio_engine->stop();
     }
+#else
+    if (testOboe) {
+        testOboe->stop();
+    }
+#endif
     setMessage(MsgState::MsgStop);
     JOIN(thread_future);
     while (!msg_queue.empty()) msg_queue.pop();
+    DELETEOBJ(file_decoder);
     audio_engine = nullptr;
+    audio_param = nullptr;
 }
 
 void SuperAudio::seek(int64_t millis) {
@@ -115,8 +143,6 @@ void SuperAudio::callLooper() {
             case MsgState::MsgStop:
                 isPlaying = false;
                 break;
-            default:
-                break;
         }
     }
 
@@ -145,7 +171,7 @@ int64_t SuperAudio::getCurrentMs() {
     return 0;
 }
 
-void SuperAudio::onEngineReady() {
+void SuperAudio::onReady() {
     setMessage(MsgState::MsgPrepared);
 }
 

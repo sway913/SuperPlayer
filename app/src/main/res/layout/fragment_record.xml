@@ -128,7 +128,7 @@
         app:layout_constraintBottom_toTopOf="@+id/filter_container"
         app:layout_constraintStart_toEndOf="@+id/tv_echo" />
 
-    <com.smzh.superplayer.MusicSeekBar
+    <com.smzh.superplayer.widget.MusicSeekBar
         android:id="@+id/music_seek_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

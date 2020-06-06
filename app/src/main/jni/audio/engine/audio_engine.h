@@ -6,19 +6,24 @@
 #define SUPERPLAYER_AUDIO_ENGINE_H
 
 #include <oboe/Oboe.h>
+#include <vector>
 #include "../observer.h"
 #include "../source/source_factory.h"
+#include "../source/mix_source.h"
 
 using namespace oboe;
+using namespace std;
 
 class AudioEngine : public AudioStreamCallback {
 
 protected:
 
     int sample_rate{48000};
-
     ManagedStream output_stream{nullptr};
     Observer *observer{nullptr};
+    SourceFactory *source_factory{nullptr};
+    vector<ISource *> source{};
+    MixSource *mix_source{nullptr};
 
     DataCallbackResult onAudioReady(AudioStream *stream, void *data, int32_t numFrames) override;
 
@@ -27,7 +32,6 @@ protected:
     void onErrorAfterClose(AudioStream *oboeStream, Result error) override;
 
     bool openStream();
-
 
 public:
 
