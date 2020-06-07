@@ -3,6 +3,16 @@
 //
 
 #include "audio_engine.h"
+#include "recorder_engine.h"
+#include "player_engine.h"
+
+std::unique_ptr<AudioEngine> AudioEngine::getEngine(bool is_recorder,int sample_rate) {
+    if(is_recorder) {
+        return  std::make_unique<RecorderEngine>(sample_rate);
+    } else {
+        return  std::make_unique<PlayerEngine>(sample_rate);
+    }
+}
 
 AudioEngine::AudioEngine(int sample_rate) : sample_rate(sample_rate) {}
 
@@ -11,7 +21,7 @@ DataCallbackResult AudioEngine::onAudioReady(AudioStream *stream, void *data, in
     return DataCallbackResult::Continue;
 }
 
-bool AudioEngine::openStream() {
+bool AudioEngine::openOutputStream() {
     AudioStreamBuilder outBuilder;
     (&outBuilder)->setCallback(this)
             ->setAudioApi(AudioApi::Unspecified)
@@ -21,10 +31,10 @@ bool AudioEngine::openStream() {
             ->setPerformanceMode(PerformanceMode::LowLatency)
             ->setSharingMode(SharingMode::Exclusive)
             ->setDirection(Direction::Output);
-    Result result = outBuilder.openManagedStream(output_stream);
-    output_stream->setBufferSizeInFrames(output_stream->getFramesPerBurst() * 2);
+    Result result = outBuilder.openManagedStream(out_stream);
+    out_stream->setBufferSizeInFrames(out_stream->getFramesPerBurst() * 2);
     if (result == Result::OK) {
-        result = output_stream->requestStart();
+        result = out_stream->requestStart();
     }
     return result == Result::OK;
 }
@@ -91,3 +101,9 @@ int64_t AudioEngine::getCurrentMs() {
 int64_t AudioEngine::getTotalMs() {
     return 0;
 }
+
+void AudioEngine::onSourceReady(long total_ms, int index) {
+
+}
+
+AudioEngine::~AudioEngine() = default;

@@ -12,15 +12,21 @@ void SuperAudio::prepare(std::shared_ptr<AudioParam> &param) {
     this->audio_param = param;
     thread_future = std::async(std::launch::async, &SuperAudio::callLooper, this);
 #ifndef TEST_OBOE
-    audio_engine = std::make_unique<PlayerEngine>(param->getOutSample());
+    audio_engine = AudioEngine::getEngine(param->isRecorder(), param->getOutSample());
     audio_engine->setObserver(this);
     auto *factory = new SourceFactory(param->getVocalPath(),
                                       param->getAccPath(),
-                                      param->getFunctionPath(),
+                                      param->getGuidePath(),
+                                      param->getDecodePath(),
                                       param->getOutSample());
     audio_engine->prepare(factory);
-    file_decoder = new FileDecoder(param->getAccPath(), param->getFunctionPath(), 44100);
-    file_decoder->start(std::bind(&SuperAudio::onReady, this));
+    if (param->isRecorder()) {
+        pcmWriter = new PcmWriter();
+        pcmWriter->start(param->getVocalPath(), param->getOutSample());
+    } else {
+        file_decoder = new FileDecoder(param->getAccPath(), param->getDecodePath(), 44100);
+        file_decoder->start(std::bind(&SuperAudio::onReady, this));
+    }
 #else
     testOboe = new TestOboe();
     onReady();
@@ -64,7 +70,14 @@ void SuperAudio::stop() {
     setMessage(MsgState::MsgStop);
     JOIN(thread_future);
     while (!msg_queue.empty()) msg_queue.pop();
-    DELETEOBJ(file_decoder);
+    if (file_decoder) {
+        file_decoder->stop();
+        DELETEOBJ(file_decoder);
+    }
+    if (pcmWriter) {
+        pcmWriter->stop();
+        DELETEOBJ(pcmWriter)
+    }
     audio_engine = nullptr;
     audio_param = nullptr;
 }
@@ -169,6 +182,12 @@ int64_t SuperAudio::getCurrentMs() {
         return audio_engine->getCurrentMs();
     }
     return 0;
+}
+
+void SuperAudio::onProduceData(short *data, int count) {
+    if (pcmWriter) {
+        pcmWriter->write(data, count);
+    }
 }
 
 void SuperAudio::onReady() {

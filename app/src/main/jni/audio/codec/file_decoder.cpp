@@ -19,11 +19,13 @@ void FileDecoder::decode(const std::function<void(void)> &callback) {
     ff_decoder->prepare(src_path, out_sample);
     AudioBuffer *audio_buffer = nullptr;
     while (!((audio_buffer = ff_decoder->decodeFrame())->isEmpty())) {
-        AudioFrame *frame = audio_buffer->pop();
-        if (frame && frame->audio_data && frame->len > 0) {
-            out_stream->write(frame->audio_data, frame->len);
+        AudioFrame *frame = nullptr;
+        while ((frame = audio_buffer->pop())) {
+            if (frame->audio_data && frame->len > 0) {
+                out_stream->write(frame->audio_data, frame->len);
+            }
+            DELETEOBJ(frame)
         }
-        DELETEOBJ(frame)
         DELETEOBJ(audio_buffer)
     }
 

@@ -33,6 +33,8 @@ public:
 
     bool isEmpty() override final;
 
+    void setObserver(std::function<void(long, int)>) override final;
+
     virtual ~PcmSource();
 
 protected:
@@ -42,16 +44,18 @@ protected:
 
 private:
 
-    LockFreeQueue<short, DATA_QUEUE_SIZE> *data_queue{nullptr};
+    LockFreeQueue<short, kDataQueueSize> *data_queue{nullptr};
     future<void> thread_result{};
     std::mutex mutex;
     std::condition_variable cond;
+    std::function<void(long, int)> callBack{nullptr};
     bool is_exit{false};
     bool is_pause{false};
     int read_packet_count{0};
     ifstream *file_stream{nullptr};
-    int total_size{0};
-    int read_size{0};
+    long total_size{0};
+    long read_size{0};
+    long total_ms{0};
     char *read_buffer{nullptr};
     int buffer_size = 1024;
     ResampleHelper *resampleHelper{nullptr};

@@ -7,7 +7,7 @@
 FFDecoder::FFDecoder() = default;
 
 bool FFDecoder::prepare(const char *fileName, int sample) {
-
+    LOGI("decode file path: %s", fileName);
     p_format_cxt = avformat_alloc_context();
     //avformat_context如果没有被声明分配内存，此方法会给分配。
     int ret = avformat_open_input(&p_format_cxt, fileName, nullptr, nullptr);
@@ -21,7 +21,7 @@ bool FFDecoder::prepare(const char *fileName, int sample) {
     totalTime = p_format_cxt->duration / (AV_TIME_BASE / 1000);
 
     ret = av_find_best_stream(p_format_cxt, AVMEDIA_TYPE_AUDIO, -1, -1, nullptr, 0);
-    if (ret != 0) {
+    if (ret < 0) {
         return false;
     }
     audioIndex = ret;
@@ -95,36 +95,6 @@ AudioBuffer *FFDecoder::decodeFrame() {
     av_packet_unref(p_av_packet);
     return audioBuffer;
 }
-
-
-/* if (need_resample) {
-     int in_nb_sample = pAvFrame->nb_samples;
-     int out_nb_sample = static_cast<int>((float) in_nb_sample * ((float) out_sample / (float) pCodecParameters->sample_rate) * 1.2f);
-     int out_size = out_nb_sample * 2 * sizeof(int16_t);
-     LOGI("in_sample %d ,out_sample %d, out size %d", in_nb_sample, out_nb_sample, out_size);
-     if (bufferLen < out_size) {
-         output = static_cast<uint8_t *>(realloc(output, out_size));
-         bufferLen = out_size;
-         LOGI("ff decode resample");
-     }
-
-     int len = 0;
-     output = resampleHelper->resample(pAvFrame, len);
-     av_frame_unref(pAvFrame);
-     av_packet_unref(pAvPacket);
-
-     return len;
-
- } else {
-     int line_size = 0;
-     int out_buffer_size = av_samples_get_buffer_size(&line_size, 2, pAvFrame->nb_samples, AV_SAMPLE_FMT_S16, 0);
-     output = static_cast<uint8_t *>(malloc(out_buffer_size));
-     memset(output, 0, out_buffer_size);
-     memcpy(output, pAvFrame->extended_data[0], out_buffer_size);
-     av_frame_unref(pAvFrame);
-     av_packet_unref(pAvPacket);
-     return out_buffer_size;
- }*/
 
 void FFDecoder::close() {
     if (p_format_cxt) {

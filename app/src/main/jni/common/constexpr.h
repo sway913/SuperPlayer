@@ -5,7 +5,8 @@
 #ifndef SUPERPLAYER_CONSTEXPR_H
 #define SUPERPLAYER_CONSTEXPR_H
 
-constexpr static int DATA_QUEUE_SIZE = 4096;
-constexpr static int READ_PACKET_COUNT = 5;
+constexpr static int kDataQueueSize = 8192;
+constexpr static int KRecorderCallbackCount = 20;
+constexpr static int KRecorderDrainCount = 30;
 
 #endif //SUPERPLAYER_CONSTEXPR_H

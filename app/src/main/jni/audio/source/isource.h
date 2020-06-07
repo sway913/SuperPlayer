@@ -35,10 +35,13 @@ public:
 
     virtual bool isEmpty() = 0;
 
+    virtual void setObserver(std::function<void(long, int)>) = 0;
+
+    virtual ~ISource() {}
+
 protected:
 
     virtual void produceData() = 0;
-
 
 };
 

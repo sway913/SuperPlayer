@@ -7,11 +7,44 @@
 
 
 #include "audio_engine.h"
+#include "oboe_recorder.h"
 
-class RecorderEngine: public AudioEngine {
+using namespace std;
+
+class RecorderEngine : public AudioEngine {
 
 public:
     RecorderEngine(int sampleRate);
+
+    void prepare(SourceFactory *factory) override final;
+
+    void start() override final;
+
+    void stop() override final;
+
+    DataCallbackResult onAudioReady(AudioStream *stream, void *data, int32_t numFrames) override final;
+
+    void onSourceReady(long total_ms, int index) override final;
+
+private:
+    bool mIsThreadAffinitySet{false};
+    std::vector<int> mCpuIds; // IDs of CPU cores which the audio callback should be bound to
+
+    volatile std::atomic<bool> stopped{false};
+    OboeRecorder *oboe_recorder{nullptr};
+    unique_ptr<short[]> record_buffer{nullptr};
+
+    int getMaxOutNumFrames();
+
+    void setThreadAffinity();
+
+    void disposeReadyState(int index);
+
+    std::mutex mutex;
+    bool recorder_ready{false};
+    bool source_ready{false};
+    long total_ms{0};
+    bool record_valid{false};
 
 };
 

@@ -32,7 +32,7 @@ public:
 
     void reset();
 
-    void getData(short *audioData, int numFrames);
+    void getMixData(short *out, int numFrames, short *input, int frameRead);
 
 private:
 
@@ -40,7 +40,7 @@ private:
     vector<ISource *> source;
     mutex _mutex{};
     condition_variable cond{};
-    LockFreeQueue<short, DATA_QUEUE_SIZE> *data_queue{nullptr};
+    LockFreeQueue<short, kDataQueueSize> *data_queue{nullptr};
 
     void mixData();
 

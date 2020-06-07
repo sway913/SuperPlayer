@@ -10,6 +10,9 @@
 #define DELETEOBJ(obj) if(obj != nullptr) { delete obj; obj = nullptr; }
 #define DELETEARR(arr) if(arr != nullptr) { delete[] arr; arr = nullptr; }
 
+#define MAX(a, b)  (((a) > (b)) ? (a) : (b))
+#define MIN(a, b)  (((a) < (b)) ? (a) : (b))
+
 
 inline void JOIN(std::future<void> &result) {
     std::future_status futureStatus;

@@ -1,9 +1,10 @@
 package com.smzh.superplayer.player
 
-class AudioParam(private val isRecorder: Boolean,
-                 private val vocalPath: String,
-                 private val accPath: String,
-                 private val functionPath: String) {
+class AudioParam(private val isRecorder: Boolean = false,
+                 private val vocalPath: String = "",
+                 private val accPath: String = "",
+                 private val guidePath: String = "",
+                 private val decodePath: String = "") {
 
     private var outSample: Int = 0
 
@@ -27,8 +28,11 @@ class AudioParam(private val isRecorder: Boolean,
         return vocalPath
     }
 
-    fun getFunctionPath(): String {
-        return functionPath
+    fun getDecodePath(): String {
+        return decodePath
     }
 
+    fun getGuidePath(): String {
+        return guidePath;
+    }
 }

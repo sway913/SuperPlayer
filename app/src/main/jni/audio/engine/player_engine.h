@@ -18,12 +18,15 @@ public:
 
     void start() override final;
 
+    void stop() override final;
+
     DataCallbackResult onAudioReady(AudioStream *stream, void *data, int32_t numFrames) override final;
 
+    void onSourceReady(long total_ms, int index) override final;
 
 private:
 
-
+    volatile std::atomic<bool> stopped{false};
 };
 
 

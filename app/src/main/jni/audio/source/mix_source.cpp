@@ -5,7 +5,7 @@
 #include "mix_source.h"
 
 MixSource::MixSource() {
-    data_queue = new LockFreeQueue<short, DATA_QUEUE_SIZE>();
+    data_queue = new LockFreeQueue<short, kDataQueueSize>();
     audioBuffer = new short[bufferSize];
     mixBuffer = new short[bufferSize];
 }
@@ -41,14 +41,19 @@ void MixSource::addSource(ISource *s) {
     }
 }
 
-void MixSource::getData(short *audioData, int numFrames) {
+void MixSource::getMixData(short *out, int numFrames, short *input, int frameRead) {
     if (isPause) {
-        memset(audioData, 0, numFrames * 2);
+        memset(out, 0, numFrames * 2);
         return;
     }
-    for (int i = 0; i < numFrames * 2; ++i) {
-        if (!data_queue->pop(audioData[i])) {
-            audioData[i] = 0;
+    for (int i = 0; i < numFrames; ++i) {
+        for (int j = 0; j < 2; ++j) {
+            if (!data_queue->pop(out[2 * i + j])) {
+                out[2 * i + j] = 0;
+            }
+            if (input && i < frameRead) {
+                out[2 * i + j] = mixAudioData(out[2 * i + j], input[i]);
+            }
         }
     }
     cond.notify_all();
@@ -64,7 +69,7 @@ void MixSource::mixData() {
             } else if (isPause) {
                 return false;
             } else {
-                return data_queue->size() < DATA_QUEUE_SIZE / 2;
+                return data_queue->size() < kDataQueueSize / 2;
             }
         });
 

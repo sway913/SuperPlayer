@@ -13,13 +13,14 @@
 
 using namespace oboe;
 using namespace std;
+using namespace placeholders;
 
 class AudioEngine : public AudioStreamCallback {
 
 protected:
 
     int sample_rate{48000};
-    ManagedStream output_stream{nullptr};
+    ManagedStream out_stream{nullptr};
     Observer *observer{nullptr};
     SourceFactory *source_factory{nullptr};
     vector<ISource *> source{};
@@ -31,11 +32,13 @@ protected:
 
     void onErrorAfterClose(AudioStream *oboeStream, Result error) override;
 
-    bool openStream();
+    bool openOutputStream();
 
 public:
 
     AudioEngine(int sampleRate);
+
+    virtual ~AudioEngine();
 
     void setObserver(Observer *observer);
 
@@ -62,6 +65,10 @@ public:
     virtual int64_t getTotalMs();
 
     virtual int64_t getCurrentMs();
+
+    virtual void onSourceReady(long total_ms, int index);
+
+    static std::unique_ptr<AudioEngine> getEngine(bool is_recorder, int sample_rate);
 };
 
 

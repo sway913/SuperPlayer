@@ -5,7 +5,7 @@
 #include "pcm_source.h"
 
 PcmSource::PcmSource(const char *file, int out_sample, int index) {
-    data_queue = new LockFreeQueue<short, DATA_QUEUE_SIZE>();
+    data_queue = new LockFreeQueue<short, kDataQueueSize>();
     file_stream = new ifstream(file, std::ios::binary);
     file_stream->seekg(0, std::ios::beg);
     file_stream->seekg(0, std::ios::end);
@@ -15,6 +15,11 @@ PcmSource::PcmSource(const char *file, int out_sample, int index) {
     resampleHelper = new ResampleHelper(2, 44100, 2, out_sample);
     this->index = index;
     this->sample_rate = out_sample;
+    total_ms = (double) total_size * 1000 / (44100 * 2 * sizeof(short));
+}
+
+void PcmSource::setObserver(std::function<void(long, int)> observer) {
+    this->callBack = observer;
 }
 
 void PcmSource::start() {
@@ -62,7 +67,7 @@ void PcmSource::produceData() {
             } else if (is_pause) {
                 return false;
             } else {
-                return data_queue->size() < DATA_QUEUE_SIZE / 2;
+                return data_queue->size() < kDataQueueSize / 2;
             }
         });
 
@@ -92,7 +97,9 @@ void PcmSource::produceData() {
             for (int j = 0; j < size; j++) {
                 data_queue->push(tmp_buffer[j]);
             }
-            read_packet_count++;
+            if (read_packet_count++ == 1) {
+                callBack(total_ms, index);
+            }
         }
         DELETEARR(out)
     }

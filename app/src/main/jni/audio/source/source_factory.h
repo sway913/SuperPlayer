@@ -19,13 +19,16 @@ private:
 
     const char * vocalPath{nullptr};
     const char * accPath{nullptr};
-    const char * funPath{nullptr};
+    const char * guidePath{nullptr};
+    const char * decodePath{nullptr};
     int out_sample{0};
 
 
 public:
 
-    SourceFactory(const char *vocalPath, const char *accPath, const char *funPath, int outSample);
+    SourceFactory(const char *vocalPath, const char *accPath, const char *guidePath, const char *decodePath, int outSample);
+
+    virtual ~SourceFactory();
 
     vector<ISource *> createPcmSource();
 

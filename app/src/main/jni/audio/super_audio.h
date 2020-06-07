@@ -7,12 +7,12 @@
 #include <queue>
 #include <future>
 #include "../common/android_log.h"
-#include "engine/player_engine.h"
 #include "source/source_factory.h"
 #include "../common/common_tools.h"
 #include "codec/file_decoder.h"
 #include "../common/audio_param.h"
 #include "engine/test_oboe.h"
+#include "consumer/pcm_writer.h"
 
 
 using namespace std::placeholders;
@@ -45,13 +45,15 @@ private:
 
     TestOboe *testOboe{nullptr};
 
+    PcmWriter *pcmWriter{nullptr};
+
 public:
 
     SuperAudio(JNIEnv *jniEnv, jobject obj);
 
     virtual ~SuperAudio();
 
-    void prepare(std::shared_ptr<AudioParam> & param);
+    void prepare(std::shared_ptr<AudioParam> &param);
 
     void start();
 
@@ -78,6 +80,8 @@ public:
     void onCompleted() override;
 
     void onError() override;
+
+    void onProduceData(short *data, int count) override;
 
     int64_t getTotalMs();
 

@@ -6,16 +6,18 @@ import com.smzh.superplayer.player.AudioParam
 import com.smzh.superplayer.player.PlayerJni
 import com.smzh.superplayer.player.SuperPlayer
 
-class SingViewModle(private val accPath: String) : ViewModel(), PlayerJni.PlayerStateListener {
+class SingViewModel(private val accPath: String) : ViewModel(), PlayerJni.PlayerStateListener {
 
     private val player by lazy { SuperPlayer.instance }
 
 
     fun prepare() {
-        val audioParam = AudioParam(false, SingParam.vocalPath, accPath, SingParam.decodePath)
+        val audioParam = AudioParam(isRecorder = true,
+                accPath = accPath,
+                guidePath = "",
+                vocalPath = SingParam.vocalPath)
         player.addPlayerListener(this)
         player.prepare(audioParam)
-
     }
 
     fun start() {
@@ -53,7 +55,7 @@ class SingViewModle(private val accPath: String) : ViewModel(), PlayerJni.Player
     class SingFactory(private val accPath: String) : ViewModelProvider.NewInstanceFactory() {
 
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return SingViewModle(accPath) as T
+            return SingViewModel(accPath) as T
         }
     }
 

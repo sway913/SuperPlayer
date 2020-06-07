@@ -10,7 +10,7 @@ import com.smzh.superplayer.R
 
 class SingFragment : Fragment() {
 
-    private lateinit var viewModel: SingViewModle
+    private lateinit var viewModel: SingViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -18,7 +18,7 @@ class SingFragment : Fragment() {
         arguments?.let {
             accPath = it.getString(ACC_PATH)!!
         }
-        viewModel = ViewModelProvider(this, SingViewModle.SingFactory(accPath))[SingViewModle::class.java]
+        viewModel = ViewModelProvider(this, SingViewModel.SingFactory(accPath))[SingViewModel::class.java]
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
