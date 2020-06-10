@@ -8,5 +8,6 @@
 constexpr static int kDataQueueSize = 8192;
 constexpr static int KRecorderCallbackCount = 20;
 constexpr static int KRecorderDrainCount = 30;
+constexpr static int KDecodeBufferSize = 16;
 
 #endif //SUPERPLAYER_CONSTEXPR_H

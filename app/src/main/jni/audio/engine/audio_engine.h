@@ -25,6 +25,7 @@ protected:
     SourceFactory *source_factory{nullptr};
     vector<ISource *> source{};
     MixSource *mix_source{nullptr};
+    long total_ms{0};
 
     DataCallbackResult onAudioReady(AudioStream *stream, void *data, int32_t numFrames) override;
 

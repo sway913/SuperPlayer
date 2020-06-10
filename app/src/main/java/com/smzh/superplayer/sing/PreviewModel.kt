@@ -10,15 +10,22 @@ import com.smzh.superplayer.player.AudioParam
 import com.smzh.superplayer.player.PlayerJni
 import com.smzh.superplayer.player.SuperPlayer
 
-class SingViewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener {
+class PreviewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener {
 
     private val player by lazy { SuperPlayer.instance }
-
-    val singState = MutableLiveData<Int>()
-    val singPercent = MutableLiveData<String>()
+    val currentMs = MutableLiveData<String>()
+    val totalMs = MutableLiveData<String>()
+    var progressText = MutableLiveData<String>()
     val progress = MutableLiveData<Int>()
     val songName = MutableLiveData<String>()
     val handler = Handler(Looper.getMainLooper())
+
+    init {
+        songName.value = song.name
+        currentMs.value = "00:00"
+        totalMs.value = "00:00"
+        progressText.value = "准备就绪"
+    }
 
     private val runnable = object : Runnable {
         override fun run() {
@@ -26,43 +33,26 @@ class SingViewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener
             if (total <= 0) {
                 total = 1L
             }
-            progress.value = (player.getCurrentMs() * 100f / total).toInt()
-            singPercent.value = "正在录制: ${DateUtils.formatElapsedTime(player.getCurrentMs() / 1000)} /${DateUtils.formatElapsedTime(total / 1000)}"
+            currentMs.value = DateUtils.formatElapsedTime((player.getCurrentMs() / 1000f).toLong())
+            totalMs.value = DateUtils.formatElapsedTime((total / 1000f).toLong())
+            progressText.postValue("正在播放:${currentMs.value}/${totalMs.value}")
+            progress.value = (player.getCurrentMs() * 100f / player.getTotalMs()).toInt()
             handler.postDelayed(this, 20)
         }
     }
 
-    init {
-        singState.value = 0
-        songName.value = song.name
-        singPercent.value = "准备就绪"
-    }
-
     fun prepare() {
-        val audioParam = AudioParam(isRecorder = true,
+        val audioParam = AudioParam(isRecorder = false,
                 accPath = song.path,
-                guidePath = "",
-                vocalPath = SingParam.vocalPath)
+                vocalPath = SingParam.vocalPath,
+                decodePath = SingParam.decodePath)
         player.addPlayerListener(this)
         player.prepare(audioParam)
     }
 
     override fun onPrepared() {
-        singState.postValue(1)
-        start()
-        handler.postDelayed(runnable, 20)
-    }
-
-    fun start() {
         player.start()
-    }
-
-    fun resume() {
-
-    }
-
-    fun pause() {
-
+        handler.postDelayed(runnable, 20)
     }
 
     fun stop() {
@@ -71,20 +61,25 @@ class SingViewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener
         handler.removeCallbacksAndMessages(null)
     }
 
-    override fun onError() {
-
-    }
-
     override fun onCompleted() {
 
     }
 
-    @Suppress("UNCHECKED_CAST")
-    class SingFactory(val song: Song) : ViewModelProvider.NewInstanceFactory() {
+    override fun onError() {
 
+    }
+
+
+    @Suppress("UNCHECKED_CAST")
+    class PreviewFactory(val song: Song) : ViewModelProvider.NewInstanceFactory() {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return SingViewModel(song) as T
+            return PreviewModel(song) as T
         }
     }
 
+
+    companion object {
+
+
+    }
 }

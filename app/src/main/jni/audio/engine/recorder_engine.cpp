@@ -9,6 +9,9 @@ RecorderEngine::RecorderEngine(int sampleRate) : AudioEngine(sampleRate) {}
 DataCallbackResult RecorderEngine::onAudioReady(AudioStream *stream, void *data, int32_t numFrames) {
     if (!mIsThreadAffinitySet) setThreadAffinity();
     memset(data, 0, numFrames * out_stream->getBytesPerFrame());
+    if (stopped) {
+        return DataCallbackResult::Stop;
+    }
     RecordState state = oboe_recorder->getState(record_buffer.get(), numFrames);
     if (state == RecordState::preparing) {
         return DataCallbackResult::Continue;
@@ -23,6 +26,9 @@ DataCallbackResult RecorderEngine::onAudioReady(AudioStream *stream, void *data,
         if (mix_source) {
             mix_source->getMixData((short *) data, numFrames, record_buffer.get(), framesRead);
         }
+        if (getCurrentMs() >= getTotalMs() - 500) {
+            observer->onCompleted();
+        }
         observer->onProduceData(record_buffer.get(), framesRead);
     }
     return DataCallbackResult::Continue;
@@ -30,7 +36,7 @@ DataCallbackResult RecorderEngine::onAudioReady(AudioStream *stream, void *data,
 
 void RecorderEngine::prepare(SourceFactory *factory) {
     source_factory = factory;
-    mix_source = new MixSource();
+    mix_source = new MixSource(sample_rate);
     source = source_factory->createStreamSource();
     for (auto &s : source) {
         s->setObserver(std::bind(&RecorderEngine::onSourceReady, this, _1, _2));
@@ -74,13 +80,6 @@ int RecorderEngine::getMaxOutNumFrames() {
 
 void RecorderEngine::stop() {
     stopped = true;
-    DELETEOBJ(source_factory)
-    for (auto &s : source) {
-        s->stop();
-        DELETEOBJ(s)
-    }
-    mix_source->stop();
-    DELETEOBJ(mix_source)
     if (out_stream) {
         out_stream->requestStop();
     }
@@ -88,6 +87,15 @@ void RecorderEngine::stop() {
         oboe_recorder->stop();
         DELETEOBJ(oboe_recorder)
     }
+    mix_source->stop();
+    DELETEOBJ(mix_source)
+
+    for (auto &s : source) {
+        s->stop();
+        DELETEOBJ(s)
+    }
+    DELETEOBJ(source_factory)
+
     record_buffer = nullptr;
     recorder_ready = false;
     source_ready = false;

@@ -81,7 +81,7 @@ JNIEXPORT jlong JNICALL Java_com_smzh_superplayer_player_PlayerJni_getTotalMs(JN
 
 JNIEXPORT jlong JNICALL Java_com_smzh_superplayer_player_PlayerJni_getCurrentMs(JNIEnv *env, jobject clazz) {
     if (super_audio) {
-        super_audio->getCurrentMs();
+        return super_audio->getCurrentMs();
     }
     return 0;
 }

@@ -6,11 +6,11 @@
 #include "recorder_engine.h"
 #include "player_engine.h"
 
-std::unique_ptr<AudioEngine> AudioEngine::getEngine(bool is_recorder,int sample_rate) {
-    if(is_recorder) {
-        return  std::make_unique<RecorderEngine>(sample_rate);
+std::unique_ptr<AudioEngine> AudioEngine::getEngine(bool is_recorder, int sample_rate) {
+    if (is_recorder) {
+        return std::make_unique<RecorderEngine>(sample_rate);
     } else {
-        return  std::make_unique<PlayerEngine>(sample_rate);
+        return std::make_unique<PlayerEngine>(sample_rate);
     }
 }
 
@@ -95,11 +95,16 @@ void AudioEngine::seek(int64_t millis) {
 }
 
 int64_t AudioEngine::getCurrentMs() {
-    return 0;
+    if (mix_source) {
+        return mix_source->getCurrentMs();
+    } else {
+        return 0;
+    }
 }
 
+
 int64_t AudioEngine::getTotalMs() {
-    return 0;
+    return total_ms;
 }
 
 void AudioEngine::onSourceReady(long total_ms, int index) {

@@ -5,8 +5,8 @@
 #ifndef SUPERPLAYER_AUDIO_BUFFER_H
 #define SUPERPLAYER_AUDIO_BUFFER_H
 
-#include <queue>
 #include "lock_free_queue.h"
+#include "constexpr.h"
 
 using namespace std;
 
@@ -34,38 +34,32 @@ class AudioBuffer {
 
 public:
 
-    queue<AudioFrame *> audio_queue;
-    mutex _mutex;
+    LockFreeQueue<AudioFrame *, KDecodeBufferSize> *audio_queue{nullptr};
 
 public:
 
+    AudioBuffer() {
+        audio_queue = new LockFreeQueue<AudioFrame *, KDecodeBufferSize>();
+    }
+
     void push(char *data, int len) {
-        lock_guard<mutex> lock(_mutex);
-        audio_queue.push(new AudioFrame(data, len));
+        audio_queue->push(new AudioFrame(data, len));
     }
 
     bool isEmpty() {
-        lock_guard<mutex> lock(_mutex);
-        return audio_queue.empty();
+        return audio_queue->size() == 0;
     }
 
     AudioFrame *pop() {
-        lock_guard<mutex> lock(_mutex);
-        AudioFrame *frame;
-        if(audio_queue.empty()){
-            frame = nullptr;
-        } else {
-            frame = audio_queue.front();
-            audio_queue.pop();
-        }
+        AudioFrame *frame = nullptr;
+        audio_queue->pop(frame);
         return frame;
     }
 
     virtual ~AudioBuffer() {
-        lock_guard<mutex> lock(_mutex);
-        while (!audio_queue.empty()) {
-            AudioFrame *frame = audio_queue.front();
-            audio_queue.pop();
+        while (!isEmpty()) {
+            AudioFrame *frame = nullptr;
+            audio_queue->pop(frame);
             DELETEOBJ(frame)
         }
     }

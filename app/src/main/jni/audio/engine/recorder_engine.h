@@ -43,7 +43,6 @@ private:
     std::mutex mutex;
     bool recorder_ready{false};
     bool source_ready{false};
-    long total_ms{0};
     bool record_valid{false};
 
 };

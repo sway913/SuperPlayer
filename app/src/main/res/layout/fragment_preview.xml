@@ -7,18 +7,17 @@
 
         <variable
             name="vm"
-            type="com.smzh.superplayer.sing.SingViewModel" />
+            type="com.smzh.superplayer.sing.PreviewModel" />
 
         <variable
             name="listener"
             type="android.view.View.OnClickListener" />
     </data>
 
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".sing.SingFragment">
+        tools:context=".sing.PreviewFragment">
 
         <LinearLayout
             android:id="@+id/top_bar"
@@ -49,52 +48,17 @@
                 android:layout_marginTop="5dp"
                 android:layout_marginBottom="10dp"
                 android:gravity="center"
-                android:text="@{vm.singPercent}"
+                android:text="@{vm.progressText}"
                 android:textColor="#99000000"
                 android:textSize="12sp"
-                tools:text="正在录制: 00:00/00:00" />
+                tools:text="正在播放: 00:00/00:00" />
 
-            <ProgressBar
-                android:id="@+id/sb_progress"
-                style="?android:progressBarStyleHorizontal"
+            <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#19000000"
-                android:interpolator="@android:anim/accelerate_interpolator"
-                android:max="100"
-                android:progress="@{vm.progress}"
-                android:progressDrawable="@drawable/progress_bar_bg" />
+                android:background="#19000000" />
 
         </LinearLayout>
-
-        <Button
-            android:id="@+id/btn_start"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginBottom="20dp"
-            android:gravity="center"
-            android:onClick="@{listener}"
-            android:text="开始"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:visible="@{vm.singState == 0}"
-            tools:visibility="gone" />
-
-        <com.smzh.superplayer.widget.SwitchButton
-            android:id="@+id/btn_switch"
-            android:layout_width="120dp"
-            android:layout_height="40dp"
-            android:layout_marginBottom="100dp"
-            android:gravity="center"
-            android:onClick="@{listener}"
-            android:text="音频"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:visible="@{vm.singState == 0}"
-            tools:visibility="visible" />
 
         <View
             android:id="@+id/deliver_line2"
@@ -109,25 +73,7 @@
             android:layout_height="50dp"
             android:gravity="bottom"
             android:orientation="horizontal"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:visible="@{vm.singState != 0}"
-            tools:layout_editor_absoluteX="6dp">
-
-            <Button
-                android:id="@+id/btn_quit"
-                android:layout_width="60dp"
-                android:layout_height="wrap_content"
-                android:background="@null"
-                android:gravity="center"
-                android:onClick="@{listener}"
-                android:text="退出"
-                android:textSize="14sp" />
-
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
+            app:layout_constraintBottom_toBottomOf="parent">
 
             <Button
                 android:id="@+id/btn_restart"
@@ -139,49 +85,99 @@
                 android:text="重唱"
                 android:textSize="14sp" />
 
+
             <View
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_weight="1" />
+                android:layout_weight="0.5" />
 
             <Button
-                android:id="@+id/btn_control"
+                android:id="@+id/btn_save"
                 android:layout_width="60dp"
                 android:layout_height="wrap_content"
                 android:background="@null"
                 android:gravity="center"
                 android:onClick="@{listener}"
-                android:text="调音"
+                android:text="保存"
                 android:textSize="14sp" />
 
             <View
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                tools:visibility="gone" />
 
             <Button
-                android:id="@+id/btn_finish"
+                android:id="@+id/btn_filter"
                 android:layout_width="60dp"
                 android:layout_height="wrap_content"
                 android:background="@null"
                 android:gravity="center"
                 android:onClick="@{listener}"
-                android:text="结束"
+                android:text="音效"
+                android:textSize="14sp"
+                tools:visibility="gone" />
+
+
+            <Button
+                android:id="@+id/btn_share"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:gravity="center"
+                android:layout_weight="1"
+                android:onClick="@{listener}"
+                android:text="分享"
                 android:textSize="14sp" />
 
         </LinearLayout>
 
-
-        <include
-            android:id="@+id/sing_controller"
-            layout="@layout/layout_audio_controller"
+        <SeekBar
+            android:id="@+id/play_progress"
+            style="@style/CustomSeekBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginBottom="20dp"
-            android:visibility="gone"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="50dp"
+            android:max="100"
+            android:maxHeight="2dp"
+            android:progress="@{vm.progress}"
             app:layout_constraintBottom_toTopOf="@+id/bottom_bar" />
+
+        <TextView
+            android:id="@+id/current_ms"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:lines="1"
+            android:maxWidth="248dp"
+            android:text="@{vm.currentMs}"
+            android:textColor="#99000000"
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="@+id/play_progress"
+            app:layout_constraintTop_toBottomOf="@+id/play_progress"
+            tools:text="00:00" />
+
+        <TextView
+            android:id="@+id/total_ms"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="15dp"
+            android:gravity="center"
+            android:lines="1"
+            android:maxWidth="248dp"
+            android:text="@{vm.totalMs}"
+            android:textColor="#99000000"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="@+id/play_progress"
+            app:layout_constraintTop_toBottomOf="@+id/play_progress"
+            tools:text="00:00" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

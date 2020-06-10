@@ -10,6 +10,9 @@ PlayerEngine::PlayerEngine(int sample_rate) : AudioEngine(sample_rate) {
 DataCallbackResult PlayerEngine::onAudioReady(AudioStream *stream, void *data, int32_t numFrames) {
     if (mix_source && !stopped) {
         mix_source->getMixData((short *) data, numFrames, nullptr, 0);
+        if(getCurrentMs() >= getTotalMs() - 500) {
+            observer->onCompleted();
+        }
         return DataCallbackResult::Continue;
     } else {
         return DataCallbackResult::Stop;
@@ -18,7 +21,7 @@ DataCallbackResult PlayerEngine::onAudioReady(AudioStream *stream, void *data, i
 
 void PlayerEngine::prepare(SourceFactory *factory) {
     source_factory = factory;
-    mix_source = new MixSource();
+    mix_source = new MixSource(sample_rate);
 }
 
 void PlayerEngine::start() {
@@ -34,20 +37,24 @@ void PlayerEngine::start() {
 }
 
 void PlayerEngine::onSourceReady(long ms, int index) {
-
+    if (index == 1) {
+        this->total_ms = ms;
+    }
 }
 
 void PlayerEngine::stop() {
     stopped = true;
+    if (out_stream) {
+        out_stream->requestStop();
+        out_stream = nullptr;
+    }
+    mix_source->stop();
+    DELETEOBJ(mix_source)
     DELETEOBJ(source_factory)
     for (auto &s : source) {
         s->stop();
         DELETEOBJ(s)
     }
-    mix_source->stop();
-    DELETEOBJ(mix_source)
-    if (out_stream) {
-        out_stream->requestStop();
-        out_stream = nullptr;
-    }
+
+
 }

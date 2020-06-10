@@ -21,7 +21,7 @@
         android:maxHeight="2dp"
         android:thumb="@drawable/oval"
         android:background="@null"
-        android:progressDrawable="@drawable/seekbar_bg" />
+        android:progressDrawable="@drawable/progress_bar_bg" />
 
     <TextView
         android:id="@+id/tv_time"

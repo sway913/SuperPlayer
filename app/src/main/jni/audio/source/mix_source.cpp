@@ -4,10 +4,11 @@
 
 #include "mix_source.h"
 
-MixSource::MixSource() {
+MixSource::MixSource(int sample) {
     data_queue = new LockFreeQueue<short, kDataQueueSize>();
     audioBuffer = new short[bufferSize];
     mixBuffer = new short[bufferSize];
+    this->sample_rate = sample;
 }
 
 void MixSource::start() {
@@ -56,7 +57,12 @@ void MixSource::getMixData(short *out, int numFrames, short *input, int frameRea
             }
         }
     }
+    current_ms += (long)((float)numFrames * 1000 / sample_rate);
     cond.notify_all();
+}
+
+long MixSource::getCurrentMs() {
+    return current_ms;
 }
 
 

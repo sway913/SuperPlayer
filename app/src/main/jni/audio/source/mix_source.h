@@ -16,7 +16,7 @@ class MixSource {
 
 public:
 
-    MixSource();
+    MixSource(int sample_rate);
 
     virtual ~MixSource();
 
@@ -31,6 +31,8 @@ public:
     void stop();
 
     void reset();
+
+    long getCurrentMs();
 
     void getMixData(short *out, int numFrames, short *input, int frameRead);
 
@@ -52,6 +54,8 @@ private:
     short *audioBuffer{nullptr};
     short *mixBuffer{nullptr};
     int bufferSize = 512;
+    long current_ms{0};
+    int sample_rate{0};
 
 };
 
