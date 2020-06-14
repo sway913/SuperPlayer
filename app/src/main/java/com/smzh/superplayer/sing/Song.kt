@@ -5,7 +5,7 @@ import android.os.Parcelable
 
 data class Song(var name: String? = null,
                 var singer: String? = null,
-                var path: String = "") : Parcelable {
+                var path: String? = "") : Parcelable, Comparable<Song> {
 
     constructor(parcel: Parcel) : this(
             parcel.readString(),
@@ -21,6 +21,10 @@ data class Song(var name: String? = null,
 
     override fun describeContents(): Int {
         return 0
+    }
+
+    override fun compareTo(other: Song): Int {
+        return -(name?.compareTo(other.name ?: "") ?: 0)
     }
 
     companion object CREATOR : Parcelable.Creator<Song> {

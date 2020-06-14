@@ -10,9 +10,10 @@ import androidx.lifecycle.ViewModelProvider
 import com.smzh.superplayer.MainActivity.Companion.SONG
 import com.smzh.superplayer.R
 import com.smzh.superplayer.databinding.FragmentPreviewBinding
+import kotlinx.android.synthetic.main.fragment_preview.*
 import kotlinx.android.synthetic.main.layout_song_item.*
 
-class PreviewFragment : BaseFragment(),View.OnClickListener {
+class PreviewFragment : BaseFragment(), View.OnClickListener {
 
     private lateinit var viewModel: PreviewModel
     private lateinit var binding: FragmentPreviewBinding
@@ -39,7 +40,13 @@ class PreviewFragment : BaseFragment(),View.OnClickListener {
     }
 
     override fun onClick(v: View?) {
-
+        when (v?.id) {
+            R.id.btn_save -> {
+                viewModel.stop()
+                viewModel.startMerger()
+                merger_container.visibility = View.VISIBLE
+            }
+        }
     }
 
     override fun onDestroyView() {

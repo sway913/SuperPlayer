@@ -3,8 +3,8 @@
 //
 
 #include <cstdlib>
-#include "AacEncoder.h"
-#include "../common/AndroidLog.h"
+#include "aac_encoder.h"
+#include "../../common/android_log.h"
 #include <memory>
 
 AacEncoder::AacEncoder() {}

@@ -7,7 +7,7 @@
 
 
 #include "PcmMixer.h"
-#include "../encode/AacEncoder.h"
+#include "../../audio/codec/aac_encoder.h"
 #include "../filter/FilterPackage.h"
 #include <fstream>
 #include <future>

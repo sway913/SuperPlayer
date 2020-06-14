@@ -26,6 +26,9 @@ protected:
     vector<ISource *> source{};
     MixSource *mix_source{nullptr};
     long total_ms{0};
+    bool is_pause{false};
+    volatile std::atomic<bool> stopped{false};
+
 
     DataCallbackResult onAudioReady(AudioStream *stream, void *data, int32_t numFrames) override;
 
@@ -47,7 +50,7 @@ public:
 
     virtual void start() = 0;
 
-    virtual void stop();
+    virtual void stop() = 0;
 
     virtual void resume();
 

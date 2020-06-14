@@ -92,22 +92,6 @@
                 android:layout_weight="0.5" />
 
             <Button
-                android:id="@+id/btn_save"
-                android:layout_width="60dp"
-                android:layout_height="wrap_content"
-                android:background="@null"
-                android:gravity="center"
-                android:onClick="@{listener}"
-                android:text="保存"
-                android:textSize="14sp" />
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                tools:visibility="gone" />
-
-            <Button
                 android:id="@+id/btn_filter"
                 android:layout_width="60dp"
                 android:layout_height="wrap_content"
@@ -115,19 +99,23 @@
                 android:gravity="center"
                 android:onClick="@{listener}"
                 android:text="音效"
-                android:textSize="14sp"
-                tools:visibility="gone" />
+                android:textSize="14sp" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
 
 
             <Button
-                android:id="@+id/btn_share"
+                android:id="@+id/btn_save"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
-                android:background="@null"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/button_bg"
                 android:gravity="center"
-                android:layout_weight="1"
                 android:onClick="@{listener}"
-                android:text="分享"
+                android:text="保存"
                 android:textSize="14sp" />
 
         </LinearLayout>
@@ -177,6 +165,26 @@
             app:layout_constraintEnd_toEndOf="@+id/play_progress"
             app:layout_constraintTop_toBottomOf="@+id/play_progress"
             tools:text="00:00" />
+
+        <LinearLayout
+            android:id="@+id/merger_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#88000000"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/merger_progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{vm.mergerProgress}"
+                android:textSize="50sp"
+                tools:text="100%" />
+        </LinearLayout>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

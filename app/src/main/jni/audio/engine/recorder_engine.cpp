@@ -9,6 +9,9 @@ RecorderEngine::RecorderEngine(int sampleRate) : AudioEngine(sampleRate) {}
 DataCallbackResult RecorderEngine::onAudioReady(AudioStream *stream, void *data, int32_t numFrames) {
     if (!mIsThreadAffinitySet) setThreadAffinity();
     memset(data, 0, numFrames * out_stream->getBytesPerFrame());
+    if (is_pause) {
+        return DataCallbackResult::Continue;
+    }
     if (stopped) {
         return DataCallbackResult::Stop;
     }
@@ -17,6 +20,7 @@ DataCallbackResult RecorderEngine::onAudioReady(AudioStream *stream, void *data,
         return DataCallbackResult::Continue;
     } else if (state == RecordState::success) {
         disposeReadyState(1);
+        is_pause = true;
     } else if (state == RecordState::fail) {
         observer->onError();
         oboe_recorder->stop();
@@ -26,10 +30,10 @@ DataCallbackResult RecorderEngine::onAudioReady(AudioStream *stream, void *data,
         if (mix_source) {
             mix_source->getMixData((short *) data, numFrames, record_buffer.get(), framesRead);
         }
-        if (getCurrentMs() >= getTotalMs() - 500) {
+        observer->onProduceData(record_buffer.get(), framesRead);
+        if (getCurrentMs() >= getTotalMs()) {
             observer->onCompleted();
         }
-        observer->onProduceData(record_buffer.get(), framesRead);
     }
     return DataCallbackResult::Continue;
 }
@@ -51,13 +55,14 @@ void RecorderEngine::prepare(SourceFactory *factory) {
     record_buffer = make_unique<short[]>(size);
 
     stopped = false;
-    record_valid = false;
-    mix_source->pause();
+    is_pause = false;
 }
 
 void RecorderEngine::start() {
-    record_valid = true;
-    mix_source->resume();
+    if (mix_source) {
+        mix_source->resume();
+    }
+    is_pause = false;
 }
 
 void RecorderEngine::onSourceReady(long ms, int index) {

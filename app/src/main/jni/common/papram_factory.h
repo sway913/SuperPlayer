@@ -6,6 +6,8 @@
 #define SUPERPLAYER_PAPRAM_FACTORY_H
 
 #include <jni.h>
+#include "merger_param.h"
+#include "audio_param.h"
 
 class ParamFactory {
 
@@ -35,6 +37,30 @@ public:
         env->ReleaseStringChars(j_guide_path, reinterpret_cast<const jchar *>(guide_path));
         env->ReleaseStringChars(j_vocal_path, reinterpret_cast<const jchar *>(vocal_path));
         env->ReleaseStringChars(j_decode_path, reinterpret_cast<const jchar *>(decode_path));
+        env->DeleteLocalRef(cls);
+        return sp_param;
+    }
+
+
+    static std::shared_ptr<MergerParam> generalMergerParam(JNIEnv *env, jobject obj) {
+        jclass cls = env->GetObjectClass(obj);
+        jmethodID acc_path_id = env->GetMethodID(cls, "getAccPath", "()Ljava/lang/String;");
+        jmethodID vocal_path_id = env->GetMethodID(cls, "getVocalPath", "()Ljava/lang/String;");
+        jmethodID out_path_id = env->GetMethodID(cls, "getOutPath", "()Ljava/lang/String;");
+
+        auto j_acc_path = static_cast<jstring>(env->CallObjectMethod(obj, acc_path_id));
+        auto j_vocal_path = static_cast<jstring>(env->CallObjectMethod(obj, vocal_path_id));
+        auto j_out_path = static_cast<jstring>(env->CallObjectMethod(obj, out_path_id));
+
+        const char *acc_path = env->GetStringUTFChars(j_acc_path, nullptr);
+        const char *vocal_path = env->GetStringUTFChars(j_vocal_path, nullptr);
+        const char *out_path = env->GetStringUTFChars(j_out_path, nullptr);
+
+        std::shared_ptr<MergerParam> sp_param = std::make_shared<MergerParam>(acc_path, vocal_path, out_path);
+
+        env->ReleaseStringChars(j_acc_path, reinterpret_cast<const jchar *>(acc_path));
+        env->ReleaseStringChars(j_vocal_path, reinterpret_cast<const jchar *>(vocal_path));
+        env->ReleaseStringChars(j_out_path, reinterpret_cast<const jchar *>(out_path));
         env->DeleteLocalRef(cls);
         return sp_param;
     }

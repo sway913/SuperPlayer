@@ -18,6 +18,7 @@ class SingViewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener
     val singPercent = MutableLiveData<String>()
     val progress = MutableLiveData<Int>()
     val songName = MutableLiveData<String>()
+    val singComplete = MutableLiveData<Boolean>()
     val handler = Handler(Looper.getMainLooper())
 
     private val runnable = object : Runnable {
@@ -40,8 +41,7 @@ class SingViewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener
 
     fun prepare() {
         val audioParam = AudioParam(isRecorder = true,
-                accPath = song.path,
-                guidePath = "",
+                accPath = song.path ?: "",
                 vocalPath = SingParam.vocalPath)
         player.addPlayerListener(this)
         player.prepare(audioParam)
@@ -76,7 +76,7 @@ class SingViewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener
     }
 
     override fun onCompleted() {
-
+        singComplete.postValue(true)
     }
 
     @Suppress("UNCHECKED_CAST")

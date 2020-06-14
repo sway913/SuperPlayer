@@ -19,7 +19,7 @@ private:
     char *decode_path{nullptr};
     int out_sample{0};
 
-    void copyPath(char *&dst, const char *src) {
+    static inline void copyPath(char *&dst, const char *src) {
         size_t len = strlen(src);
         if (len > 0) {
             dst = new char[len];

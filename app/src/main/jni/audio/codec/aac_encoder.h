@@ -2,8 +2,8 @@
 // Created by ldr on 2019-12-03.
 //
 
-#ifndef SUPERPLAYER_AACENCODER_H
-#define SUPERPLAYER_AACENCODER_H
+#ifndef SUPERPLAYER_AAC_ENCODER_H
+#define SUPERPLAYER_AAC_ENCODER_H
 
 #include <cstdint>
 #include <fdk-aac/aacenc_lib.h>
@@ -30,4 +30,4 @@ private:
 };
 
 
-#endif //SUPERPLAYER_AACENCODER_H
+#endif //SUPERPLAYER_AAC_ENCODER_H

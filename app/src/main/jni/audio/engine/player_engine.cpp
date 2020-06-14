@@ -8,9 +8,13 @@ PlayerEngine::PlayerEngine(int sample_rate) : AudioEngine(sample_rate) {
 }
 
 DataCallbackResult PlayerEngine::onAudioReady(AudioStream *stream, void *data, int32_t numFrames) {
+    memset(data, 0, numFrames * out_stream->getBytesPerFrame());
+    if (is_pause) {
+        return DataCallbackResult::Continue;
+    }
     if (mix_source && !stopped) {
         mix_source->getMixData((short *) data, numFrames, nullptr, 0);
-        if(getCurrentMs() >= getTotalMs() - 500) {
+        if (getCurrentMs() > getTotalMs()) {
             observer->onCompleted();
         }
         return DataCallbackResult::Continue;
@@ -21,10 +25,10 @@ DataCallbackResult PlayerEngine::onAudioReady(AudioStream *stream, void *data, i
 
 void PlayerEngine::prepare(SourceFactory *factory) {
     source_factory = factory;
-    mix_source = new MixSource(sample_rate);
 }
 
 void PlayerEngine::start() {
+    mix_source = new MixSource(sample_rate);
     source = source_factory->createPcmSource();
     for (auto &s : source) {
         s->setObserver(std::bind(&PlayerEngine::onSourceReady, this, _1, _2));
@@ -33,6 +37,7 @@ void PlayerEngine::start() {
     }
     mix_source->start();
     stopped = false;
+    is_pause = false;
     openOutputStream();
 }
 

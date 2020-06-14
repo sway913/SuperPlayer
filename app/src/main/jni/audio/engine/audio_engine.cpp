@@ -59,11 +59,17 @@ void AudioEngine::start() {
 }
 
 void AudioEngine::resume() {
-
+    is_pause = false;
+    if (mix_source) {
+        mix_source->resume();
+    }
 }
 
 void AudioEngine::pause() {
-
+    is_pause = true;
+    if (mix_source) {
+        mix_source->pause();
+    }
 }
 
 void AudioEngine::stop() {

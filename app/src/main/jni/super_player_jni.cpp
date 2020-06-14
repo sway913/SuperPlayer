@@ -3,10 +3,13 @@
 #include "audio/super_audio.h"
 #include "common/audio_param.h"
 #include "common/papram_factory.h"
+#include "audio/merger/audio_merger2.h"
+#include "common/merger_param.h"
 
 extern "C" {
 
 std::unique_ptr<SuperAudio> super_audio = nullptr;
+std::unique_ptr<AudioMerger2> audio_merger = nullptr;
 
 JNIEXPORT void JNICALL
 Java_com_smzh_superplayer_player_PlayerJni_prepare(JNIEnv *env, jobject clazz, jobject audio_param) {
@@ -86,21 +89,15 @@ JNIEXPORT jlong JNICALL Java_com_smzh_superplayer_player_PlayerJni_getCurrentMs(
     return 0;
 }
 
-JNIEXPORT void JNICALL Java_com_smzh_superplayer_player_PlayerJni_startMerge(JNIEnv *env, jobject clazz) {
-    if (super_audio) {
-
-    }
-}
-
-JNIEXPORT void JNICALL Java_com_smzh_superplayer_player_PlayerJni_stopMerge(JNIEnv *env, jobject clazz) {
-    if (super_audio) {
-
-    }
+JNIEXPORT void JNICALL Java_com_smzh_superplayer_player_PlayerJni_startMerge(JNIEnv *env, jobject clazz, jobject param) {
+    audio_merger = std::make_unique<AudioMerger2>();
+    std::shared_ptr<MergerParam> sp_param = ParamFactory::generalMergerParam(env, param);
+    audio_merger->start(sp_param);
 }
 
 JNIEXPORT jint JNICALL Java_com_smzh_superplayer_player_PlayerJni_getMergeProgress(JNIEnv *env, jobject clazz) {
-    if (super_audio) {
-
+    if (audio_merger) {
+        return audio_merger->getProgress();
     }
     return 0;
 }

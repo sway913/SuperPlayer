@@ -52,9 +52,9 @@ bool StreamSource::isReady() {
 }
 
 void StreamSource::produceData() {
-    ff_decoder = new FFDecoder();
-    ff_decoder->prepare(file_path, sample_rate);
-    total_ms = ff_decoder->getTotalMs();
+    audio_decoder = new AudioDecoder();
+    audio_decoder->prepare(file_path, sample_rate);
+    total_ms = audio_decoder->getTotalMs();
     while (!is_exit) {
         unique_lock<std::mutex> lock(mutex);
         cond.wait(lock, [this] {
@@ -71,7 +71,7 @@ void StreamSource::produceData() {
             break;
         }
 
-        AudioBuffer *audio_buffer = ff_decoder->decodeFrame();
+        AudioBuffer *audio_buffer = audio_decoder->decodeFrame();
         AudioFrame *frame = nullptr;
         int count = 0;
         while ((frame = audio_buffer->pop())) {
@@ -91,11 +91,11 @@ void StreamSource::produceData() {
         }
         DELETEOBJ(audio_buffer)
     }
-    ff_decoder->close();
+    audio_decoder->close();
 }
 
 StreamSource::~StreamSource() {
     DELETEOBJ(data_queue)
-    DELETEOBJ(ff_decoder)
+    DELETEOBJ(audio_decoder)
     file_path = nullptr;
 }

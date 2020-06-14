@@ -9,6 +9,7 @@
 #include <vector>
 #include "isource.h"
 #include "../../common/lock_free_queue.h"
+#include "../../common/common_tools.h"
 
 using namespace std;
 
@@ -45,8 +46,6 @@ private:
     LockFreeQueue<short, kDataQueueSize> *data_queue{nullptr};
 
     void mixData();
-
-    static inline short mixAudioData(short a, short b);
 
     bool isExit{false};
     bool isPause{false};

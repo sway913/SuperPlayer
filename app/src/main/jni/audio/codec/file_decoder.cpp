@@ -14,31 +14,37 @@ void FileDecoder::start(std::function<void(void)> callback) {
 }
 
 void FileDecoder::decode(const std::function<void(void)> &callback) {
+    unlink(dst_path);
     auto *out_stream = new std::ofstream(dst_path, std::ios::out | std::ios::binary);
-    auto *ff_decoder = new FFDecoder();
-    ff_decoder->prepare(src_path, out_sample);
+    auto *audioDecoder = new AudioDecoder();
+    audioDecoder->prepare(src_path, out_sample);
+    int64_t total_bytes = audioDecoder->getTotalMs() /  1000 * 44100 * 2 * sizeof(short);
+    long decode_bytes = 0;
     AudioBuffer *audio_buffer = nullptr;
-    while (!((audio_buffer = ff_decoder->decodeFrame())->isEmpty())) {
-        AudioFrame *frame = nullptr;
-        while ((frame = audio_buffer->pop())) {
-            if (frame->audio_data && frame->len > 0) {
-                out_stream->write(frame->audio_data, frame->len);
+    while (decode_bytes < total_bytes) {
+        if (!((audio_buffer = audioDecoder->decodeFrame())->isEmpty())) {
+            AudioFrame *frame = nullptr;
+            while ((frame = audio_buffer->pop())) {
+                if (frame->audio_data && frame->len > 0) {
+                    out_stream->write(frame->audio_data, frame->len);
+                    decode_bytes += frame->len;
+                }
+                DELETEOBJ(frame)
             }
-            DELETEOBJ(frame)
+            DELETEOBJ(audio_buffer)
         }
-        DELETEOBJ(audio_buffer)
     }
 
     out_stream->flush();
     out_stream->close();
-    ff_decoder->close();
+    audioDecoder->close();
 
     if (callback) {
         callback();
     }
 
     DELETEOBJ(out_stream)
-    DELETEOBJ(ff_decoder)
+    DELETEOBJ(audioDecoder)
 }
 
 void FileDecoder::stop() {

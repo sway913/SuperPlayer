@@ -39,9 +39,7 @@ class PlayerJni {
 
     external fun getCurrentMs(): Long
 
-    external fun startMerge()
-
-    external fun stopMerge()
+    external fun startMerge(mergerParam: MergerParam)
 
     external fun getMergeProgress(): Int
 

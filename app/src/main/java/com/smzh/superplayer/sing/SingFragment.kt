@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.smzh.superplayer.MainActivity.Companion.SONG
 import com.smzh.superplayer.R
@@ -42,6 +43,9 @@ class SingFragment : BaseFragment(), View.OnClickListener, SeekBar.OnSeekBarChan
         sb_acc_vol.setOnSeekBarChangeListener(this)
         sb_vocal_vol.setOnSeekBarChangeListener(this)
         sb_pitch.setOnSeekBarChangeListener(this)
+        viewModel.singComplete.observe(viewLifecycleOwner, Observer {
+            gotoPreview()
+        })
     }
 
     override fun onClick(v: View?) {
@@ -52,9 +56,7 @@ class SingFragment : BaseFragment(), View.OnClickListener, SeekBar.OnSeekBarChan
             }
 
             R.id.btn_finish -> {
-                viewModel.stop()
-                PreviewActivity.start(context!!, viewModel.song)
-                activity?.finish()
+                gotoPreview()
             }
 
             R.id.btn_start -> {
@@ -87,6 +89,12 @@ class SingFragment : BaseFragment(), View.OnClickListener, SeekBar.OnSeekBarChan
 
             }
         }
+    }
+
+    private fun gotoPreview() {
+        viewModel.stop()
+        PreviewActivity.start(context!!, viewModel.song)
+        activity?.finish()
     }
 
     override fun onBackPressed() {

@@ -12,7 +12,7 @@
 #include "codec/file_decoder.h"
 #include "../common/audio_param.h"
 #include "engine/test_oboe.h"
-#include "consumer/pcm_writer.h"
+#include "consumer/pcm_writer2.h"
 
 
 using namespace std::placeholders;
@@ -45,7 +45,7 @@ private:
 
     TestOboe *testOboe{nullptr};
 
-    PcmWriter *pcmWriter{nullptr};
+    PcmWriter2 *pcmWriter{nullptr};
 
 public:
 

@@ -96,6 +96,18 @@
             app:visible="@{vm.singState == 0}"
             tools:visibility="visible" />
 
+        <com.smzh.superplayer.widget.ProgressWheel
+            android:id="@+id/progress_wheel"
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:layout_marginBottom="100dp"
+            android:gravity="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:visible="@{vm.singState != 0}"
+            tools:visibility="visible" />
+
         <View
             android:id="@+id/deliver_line2"
             android:layout_width="match_parent"
@@ -166,7 +178,7 @@
                 android:background="@null"
                 android:gravity="center"
                 android:onClick="@{listener}"
-                android:text="结束"
+                android:text="完成"
                 android:textSize="14sp" />
 
         </LinearLayout>

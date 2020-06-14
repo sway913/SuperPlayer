@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.smzh.superplayer.player.AudioParam
+import com.smzh.superplayer.player.MergerParam
 import com.smzh.superplayer.player.PlayerJni
 import com.smzh.superplayer.player.SuperPlayer
 
@@ -18,6 +19,7 @@ class PreviewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener 
     var progressText = MutableLiveData<String>()
     val progress = MutableLiveData<Int>()
     val songName = MutableLiveData<String>()
+    val mergerProgress = MutableLiveData<String>()
     val handler = Handler(Looper.getMainLooper())
 
     init {
@@ -41,9 +43,23 @@ class PreviewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener 
         }
     }
 
+    private val mergerRunnable = object : Runnable {
+        override fun run() {
+            val progress = player.getMergeProgress()
+            if (progress < 0) {
+
+            } else if (progress == 100) {
+                mergerProgress.value = "${progress}%"
+            } else {
+                mergerProgress.value = "${progress}%"
+                handler.postDelayed(this, 20)
+            }
+        }
+    }
+
     fun prepare() {
         val audioParam = AudioParam(isRecorder = false,
-                accPath = song.path,
+                accPath = song.path ?: "",
                 vocalPath = SingParam.vocalPath,
                 decodePath = SingParam.decodePath)
         player.addPlayerListener(this)
@@ -67,6 +83,14 @@ class PreviewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener 
 
     override fun onError() {
 
+    }
+
+    fun startMerger() {
+        val mergerParam = MergerParam(SingParam.decodePath,
+                SingParam.vocalPath,
+                SingParam.mixPath)
+        player.startMerge(mergerParam)
+        handler.postDelayed(mergerRunnable, 100)
     }
 
 

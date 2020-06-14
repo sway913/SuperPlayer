@@ -53,7 +53,7 @@ void MixSource::getMixData(short *out, int numFrames, short *input, int frameRea
                 out[2 * i + j] = 0;
             }
             if (input && i < frameRead) {
-                out[2 * i + j] = mixAudioData(out[2 * i + j], input[i]);
+                out[2 * i + j] = mixAudioSample(out[2 * i + j], input[i]);
             }
         }
     }
@@ -116,15 +116,10 @@ void MixSource::mixData() {
         }
 
         for (int i = 0; i < bufferSize; ++i) {
-            short value = mixAudioData(audioBuffer[i], mixBuffer[i]);
+            short value = mixAudioSample(audioBuffer[i], mixBuffer[i]);
             data_queue->push(value);
         }
     }
-}
-
-short MixSource::mixAudioData(short a, short b) {
-    int tmp = a < 0 && b < 0 ? ((int) a + (int) b) - (((int) a * (int) b) / INT16_MIN) : (a > 0 && b > 0 ? ((int) a + (int) b) - (((int) a * (int) b) / INT16_MAX) : a + b);
-    return static_cast<int16_t>(tmp > INT16_MAX ? INT16_MAX : (tmp < INT16_MIN ? INT16_MIN : tmp));
 }
 
 MixSource::~MixSource() {

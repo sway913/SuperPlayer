@@ -7,7 +7,7 @@
 
 #include "isource.h"
 #include "../../common/lock_free_queue.h"
-#include "../codec/ff_decoder.h"
+#include "../codec/audio_decoder.h"
 
 class StreamSource : public ISource {
 
@@ -50,7 +50,7 @@ private:
     bool is_pause{false};
     int read_packet_count{0};
     long total_ms{0};
-    FFDecoder *ff_decoder{nullptr};
+    AudioDecoder *audio_decoder{nullptr};
     int index{0};
     int sample_rate{0};
     const char *file_path{nullptr};

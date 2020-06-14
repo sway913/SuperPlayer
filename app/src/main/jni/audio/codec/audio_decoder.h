@@ -2,8 +2,8 @@
 // Created by ldr on 2019-11-20.
 //
 
-#ifndef SUPERPLAYER_FF_DECODER_H
-#define SUPERPLAYER_FF_DECODER_H
+#ifndef SUPERPLAYER_AUDIO_DECODER_H
+#define SUPERPLAYER_AUDIO_DECODER_H
 
 #include "resample_helper.h"
 #include "../../common/android_log.h"
@@ -16,7 +16,7 @@ extern "C" {
 
 }
 
-class FFDecoder {
+class AudioDecoder {
 
 private:
 
@@ -35,9 +35,9 @@ private:
 
 public:
 
-    FFDecoder();
+    AudioDecoder();
 
-    virtual ~FFDecoder();
+    virtual ~AudioDecoder();
 
     bool prepare(const char *file_name, int sample);
 
@@ -52,4 +52,4 @@ public:
 };
 
 
-#endif //SUPERPLAYER_FF_DECODER_H
+#endif //SUPERPLAYER_AUDIO_DECODER_H

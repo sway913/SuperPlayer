@@ -21,7 +21,7 @@ void SuperAudio::prepare(std::shared_ptr<AudioParam> &param) {
                                       param->getOutSample());
     audio_engine->prepare(factory);
     if (param->isRecorder()) {
-        pcmWriter = new PcmWriter();
+        pcmWriter = new PcmWriter2();
         pcmWriter->start(param->getVocalPath(), param->getOutSample());
     } else {
         file_decoder = new FileDecoder(param->getAccPath(), param->getDecodePath(), 44100);
@@ -196,6 +196,9 @@ void SuperAudio::onReady() {
 
 
 void SuperAudio::onCompleted() {
+    if (audio_engine) {
+        audio_engine->pause();
+    }
     setMessage(MsgState::MsgCompleted);
 }
 

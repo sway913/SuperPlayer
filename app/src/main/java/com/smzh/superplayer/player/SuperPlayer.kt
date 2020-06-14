@@ -73,12 +73,8 @@ class SuperPlayer {
         handler.post { playerJni.setPitch(pitch) }
     }
 
-    fun startMerge() {
-        handler.post { startMerge() }
-    }
-
-    fun stopMerge() {
-        handler.post { playerJni.stopMerge() }
+    fun startMerge(mergerParam: MergerParam) {
+        handler.post { playerJni.startMerge(mergerParam) }
     }
 
     fun getTotalMs(): Long {

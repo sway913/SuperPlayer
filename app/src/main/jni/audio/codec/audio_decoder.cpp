@@ -2,11 +2,11 @@
 // Created by ldr on 2019-11-20.
 //
 
-#include "ff_decoder.h"
+#include "audio_decoder.h"
 
-FFDecoder::FFDecoder() = default;
+AudioDecoder::AudioDecoder() = default;
 
-bool FFDecoder::prepare(const char *fileName, int sample) {
+bool AudioDecoder::prepare(const char *fileName, int sample) {
     LOGI("decode file path: %s", fileName);
     p_format_cxt = avformat_alloc_context();
     //avformat_context如果没有被声明分配内存，此方法会给分配。
@@ -46,9 +46,10 @@ bool FFDecoder::prepare(const char *fileName, int sample) {
     p_av_packet = av_packet_alloc();
     p_av_frame = av_frame_alloc();
 
-    need_resample = (p_codec_para->sample_rate != sample
-                     || p_codec_para->channels != 2
-                     || p_codec_para->format != AV_SAMPLE_FMT_S16);
+    need_resample = true;
+//    need_resample = (p_codec_para->sample_rate != sample
+//                     || p_codec_para->channels != 2
+//                     || p_codec_para->format != AV_SAMPLE_FMT_S16);
     resampleHelper = new ResampleHelper(p_codec_para->channels,
                                         p_codec_para->sample_rate,
                                         2,
@@ -61,7 +62,7 @@ bool FFDecoder::prepare(const char *fileName, int sample) {
 }
 
 
-AudioBuffer *FFDecoder::decodeFrame() {
+AudioBuffer *AudioDecoder::decodeFrame() {
     auto *audioBuffer = new AudioBuffer();
     int ret = av_read_frame(p_format_cxt, p_av_packet);
     if (ret < 0) {
@@ -96,7 +97,7 @@ AudioBuffer *FFDecoder::decodeFrame() {
     return audioBuffer;
 }
 
-void FFDecoder::close() {
+void AudioDecoder::close() {
     if (p_format_cxt) {
         avformat_close_input(&p_format_cxt);
         avformat_free_context(p_format_cxt);
@@ -120,16 +121,16 @@ void FFDecoder::close() {
 
 }
 
-void FFDecoder::seek(int64_t millis) {
+void AudioDecoder::seek(int64_t millis) {
     avformat_flush(p_format_cxt);
     int64_t seekPts = 0;
     seekPts = static_cast<int64_t>(p_format_cxt->streams[audioIndex]->duration * millis / totalTime);
     int ret = av_seek_frame(p_format_cxt, audioIndex, seekPts, AVSEEK_FLAG_FRAME);
 }
 
-int64_t FFDecoder::getTotalMs() {
+int64_t AudioDecoder::getTotalMs() {
     return totalTime;
 }
 
-FFDecoder::~FFDecoder() = default;
+AudioDecoder::~AudioDecoder() = default;
 

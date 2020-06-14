@@ -1,13 +1,14 @@
 //
-// Created by Lvlingling on 2020/6/7.
+// Created by Lvlingling on 2020/6/14.
 //
 
-#ifndef SUPERPLAYER_PCM_WRITER_H
-#define SUPERPLAYER_PCM_WRITER_H
+#ifndef SUPERPLAYER_PCM_WRITER2_H
+#define SUPERPLAYER_PCM_WRITER2_H
+
 
 #include "../../common/common_tools.h"
 #include "../../common/circle_buffer.h"
-#include "../codec/audio_encoder.h"
+#include "../codec/resample_helper.h"
 
 #include <future>
 #include <fstream>
@@ -16,7 +17,7 @@
 #define BUFFER_SIZE 1024
 #define CIRCLE_BUFFER_CAPBILATY 4800
 
-class PcmWriter {
+class PcmWriter2 {
 
 private:
     short *tmp_buffer{nullptr};
@@ -25,20 +26,21 @@ private:
     bool valid{false};
     int in_sample_rate{0};
     long write_byte_size{0};
-    const char *file_name{nullptr};
+    std::ofstream *pcmFileStream{nullptr};
 
-    AudioEncoder *audioEncoder{nullptr};
+    ResampleHelper *resampleHelper{nullptr};
 
     std::future<void> writeResult{};
     std::mutex mutex{};
     std::condition_variable cond{};
+
     void writeToFile();
 
 public:
 
-    PcmWriter();
+    PcmWriter2();
 
-    virtual ~PcmWriter();
+    virtual ~PcmWriter2();
 
     void write(short *data, int count);
 
@@ -51,4 +53,4 @@ public:
 };
 
 
-#endif //SUPERPLAYER_PCM_WRITER_H
+#endif //SUPERPLAYER_PCM_WRITER2_H

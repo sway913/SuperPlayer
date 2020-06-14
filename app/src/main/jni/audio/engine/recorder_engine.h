@@ -29,8 +29,6 @@ public:
 private:
     bool mIsThreadAffinitySet{false};
     std::vector<int> mCpuIds; // IDs of CPU cores which the audio callback should be bound to
-
-    volatile std::atomic<bool> stopped{false};
     OboeRecorder *oboe_recorder{nullptr};
     unique_ptr<short[]> record_buffer{nullptr};
 
@@ -43,7 +41,6 @@ private:
     std::mutex mutex;
     bool recorder_ready{false};
     bool source_ready{false};
-    bool record_valid{false};
 
 };
 
