@@ -4,5 +4,5 @@
     <item
         android:id="@+id/menu_works"
         android:title="作品集"
-        app:showAsAction="never" />
+        app:showAsAction="always" />
 </menu>

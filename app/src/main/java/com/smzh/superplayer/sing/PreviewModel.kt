@@ -6,10 +6,18 @@ import android.text.format.DateUtils
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.smzh.superplayer.database.AppDataBase
 import com.smzh.superplayer.player.AudioParam
 import com.smzh.superplayer.player.MergerParam
 import com.smzh.superplayer.player.PlayerJni
 import com.smzh.superplayer.player.SuperPlayer
+import io.reactivex.*
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.functions.Action
+import io.reactivex.functions.Consumer
+import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
+import java.io.*
 
 class PreviewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener {
 
@@ -20,6 +28,7 @@ class PreviewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener 
     val progress = MutableLiveData<Int>()
     val songName = MutableLiveData<String>()
     val mergerProgress = MutableLiveData<String>()
+    val mergerSuccess = MutableLiveData<Boolean>()
     val handler = Handler(Looper.getMainLooper())
 
     init {
@@ -46,13 +55,18 @@ class PreviewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener 
     private val mergerRunnable = object : Runnable {
         override fun run() {
             val progress = player.getMergeProgress()
-            if (progress < 0) {
-
-            } else if (progress == 100) {
-                mergerProgress.value = "${progress}%"
-            } else {
-                mergerProgress.value = "${progress}%"
-                handler.postDelayed(this, 20)
+            when {
+                progress < 0 -> {
+                    mergerSuccess.value = false
+                }
+                progress == 100 -> {
+                    mergerProgress.value = "${progress}%"
+                    doOnMergerSuccess()
+                }
+                else -> {
+                    mergerProgress.value = "${progress}%"
+                    handler.postDelayed(this, 20)
+                }
             }
         }
     }
@@ -91,6 +105,35 @@ class PreviewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener 
                 SingParam.mixPath)
         player.startMerge(mergerParam)
         handler.postDelayed(mergerRunnable, 100)
+    }
+
+    fun doOnMergerSuccess() {
+        val disposable = Observable.create(ObservableOnSubscribe<Any> { emitter ->
+            var input: InputStream? = null
+            var output: OutputStream? = null
+            val dstPath = SingParam.filePath + System.currentTimeMillis() + ".aac"
+            try {
+                input = FileInputStream(SingParam.mixPath)
+                output = FileOutputStream(dstPath)
+                val buf = ByteArray(1024)
+                var bytesRead: Int
+                while (input.read(buf).also { bytesRead = it } > 0) {
+                    output.write(buf, 0, bytesRead)
+                }
+            } finally {
+                input?.close()
+                output?.close()
+                song.path = dstPath
+                AppDataBase.instance.songDao().insert(song)
+            }
+            emitter.onComplete()
+        })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    mergerSuccess.value = true
+                }
+
     }
 
 

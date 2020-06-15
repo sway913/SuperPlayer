@@ -5,10 +5,14 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.smzh.superplayer.App
 import com.smzh.superplayer.MainActivity.Companion.SONG
 import com.smzh.superplayer.R
+import com.smzh.superplayer.WorksActivity
 import com.smzh.superplayer.databinding.FragmentPreviewBinding
 import kotlinx.android.synthetic.main.fragment_preview.*
 import kotlinx.android.synthetic.main.layout_song_item.*
@@ -37,6 +41,13 @@ class PreviewFragment : BaseFragment(), View.OnClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.prepare()
+        viewModel.mergerSuccess.observe(viewLifecycleOwner, Observer {
+            if (it == true) {
+                WorksActivity.start(context!!)
+            } else if (it == false) {
+                Toast.makeText(App.context, "保存失败", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
     override fun onClick(v: View?) {

@@ -87,7 +87,7 @@ class MainActivity : AppCompatActivity(), SongAdapter.ChooseSongListener {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
             R.id.menu_works -> {
-
+                WorksActivity.start(this)
             }
         }
         return true

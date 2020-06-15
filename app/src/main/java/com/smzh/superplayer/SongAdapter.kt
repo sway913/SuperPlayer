@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.smzh.superplayer.sing.Song
 import kotlinx.android.synthetic.main.layout_song_item.view.*
 
-class SongAdapter(private val listener: ChooseSongListener) : RecyclerView.Adapter<SongAdapter.SongHolder>() {
+class SongAdapter(private val listener: ChooseSongListener, private val isWorksList: Boolean = false) : RecyclerView.Adapter<SongAdapter.SongHolder>() {
 
     private val songList = arrayListOf<Song>()
 
@@ -34,13 +34,16 @@ class SongAdapter(private val listener: ChooseSongListener) : RecyclerView.Adapt
 
     inner class SongHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        fun onBind(song: Song){
+        fun onBind(song: Song) {
             itemView.run {
-                btn_sing.setOnClickListener{
+                btn_sing.setOnClickListener {
                     listener.onSongChosen(song)
                 }
                 song_name.text = song.name
                 singer.text = song.singer
+                if (isWorksList) {
+                    btn_sing.text = "查看"
+                }
             }
         }
     }
