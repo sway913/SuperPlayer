@@ -58,6 +58,7 @@ class MainActivity : AppCompatActivity(), SongAdapter.ChooseSongListener {
             layoutManager = LinearLayoutManager(this@MainActivity, LinearLayoutManager.VERTICAL, false)
             adapter = SongAdapter(this@MainActivity)
         }
+        supportActionBar?.title = "歌曲列表"
     }
 
     override fun onSongChosen(song: Song) {

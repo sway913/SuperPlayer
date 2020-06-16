@@ -18,7 +18,12 @@ fun getMusicData(context: Context): MutableList<Song> {
     if (cursor != null) {
         while (cursor.moveToNext()) {
             val song = Song()
-            song.name = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME))
+            cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME)).apply {
+                val index = this.indexOf(".")
+                if (index > 0) {
+                    song.name = this.substring(0, index)
+                }
+            }
             song.singer = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST))
             song.path = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA))
             list.add(song)

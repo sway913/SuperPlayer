@@ -15,8 +15,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".PlayActivity"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".WorksActivity"
-            android:label="作品列表"
             android:screenOrientation="portrait" />
         <activity
             android:name=".sing.PreviewActivity"
@@ -28,7 +30,6 @@
             android:theme="@style/Activity.FullScreen" />
         <activity
             android:name=".MainActivity"
-            android:label="歌曲列表"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

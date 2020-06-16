@@ -3,6 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/menu_works"
-        android:title="作品集"
+        android:title="我的歌曲"
         app:showAsAction="always" />
 </menu>

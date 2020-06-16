@@ -7,14 +7,15 @@ import android.graphics.Paint
 import android.text.format.DateUtils
 import android.util.AttributeSet
 import android.view.View
-import com.smzh.superplayer.dp2px
 
 class ProgressWheel : View {
 
     private lateinit var bgPaint: Paint
+    private lateinit var bgPaint2: Paint
     private lateinit var textPaint: Paint
-    private lateinit var drawText: String
     private var currentProgress = 0L
+    private var totalProgress = 360L
+    private var angle = 0F
 
     constructor(context: Context?) : this(context, null)
     constructor(context: Context?, attrs: AttributeSet?) : this(context, attrs, 0)
@@ -26,13 +27,16 @@ class ProgressWheel : View {
         bgPaint = Paint().apply {
             color = Color.parseColor("#29000000")
         }
+        bgPaint2 = Paint().apply {
+            color = Color.parseColor("#40000000")
+        }
         textPaint = Paint().apply {
             color = Color.parseColor("#99000000")
             strokeWidth = 5f
             isAntiAlias = true
             style = Paint.Style.FILL
             textAlign = Paint.Align.CENTER
-            textSize = 36f
+            textSize = 40f
         }
     }
 
@@ -41,18 +45,45 @@ class ProgressWheel : View {
         super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(w, MeasureSpec.EXACTLY))
     }
 
-    fun setProgress(progress: Long) {
-        currentProgress = progress
-        invalidate()
+    fun setProgress(progress: Long?) {
+        if (progress != null) {
+            currentProgress = progress / 1000
+            if (totalProgress == 0L) {
+                angle = (currentProgress * 360f / 60f)
+            } else {
+                angle = (currentProgress * 360f / totalProgress)
+            }
+            if (angle > 360) {
+                angle = 360f
+            }
+            invalidate()
+        }
+    }
+
+    fun setTotalMs(progress: Long?) {
+        if (progress == totalProgress / 1000) {
+            return
+        }
+        progress?.let {
+            totalProgress = progress / 1000
+        }
     }
 
     override fun onDraw(canvas: Canvas?) {
-        canvas?.drawCircle(width / 2f, height / 2f, height / 2f, bgPaint)
-        val fontMetrics: Paint.FontMetrics = textPaint.fontMetrics
-        val top = fontMetrics.top
-        val bottom = fontMetrics.bottom
-        val baseLineY = (height / 2f - top / 2 - bottom / 2)
+        canvas?.run {
+            val startX = 0
+            val endX = width
+            val startY = 0
+            val endY = height
+            drawArc(startX.toFloat(), startY.toFloat(), endX.toFloat(), endY.toFloat(), -90f, 360f, true, bgPaint)
+            drawArc(startX.toFloat(), startY.toFloat(), endX.toFloat(), endY.toFloat(), -90f, angle, true, bgPaint2)
 
-        canvas?.drawText(DateUtils.formatElapsedTime(currentProgress), width / 2f, baseLineY, textPaint)
+            val fontMetrics: Paint.FontMetrics = textPaint.fontMetrics
+            val top = fontMetrics.top
+            val bottom = fontMetrics.bottom
+            val baseLineY = (height / 2f - top / 2 - bottom / 2)
+
+            drawText(DateUtils.formatElapsedTime(currentProgress), width / 2f, baseLineY, textPaint)
+        }
     }
 }

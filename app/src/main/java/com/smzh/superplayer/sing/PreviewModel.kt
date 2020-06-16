@@ -111,7 +111,7 @@ class PreviewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener 
         val disposable = Observable.create(ObservableOnSubscribe<Any> { emitter ->
             var input: InputStream? = null
             var output: OutputStream? = null
-            val dstPath = SingParam.filePath + System.currentTimeMillis() + ".aac"
+            val dstPath = SingParam.filePath + System.currentTimeMillis() + ".m4a"
             try {
                 input = FileInputStream(SingParam.mixPath)
                 output = FileOutputStream(dstPath)
@@ -126,7 +126,7 @@ class PreviewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener 
                 song.path = dstPath
                 AppDataBase.instance.songDao().insert(song)
             }
-            emitter.onComplete()
+            emitter.onNext(song)
         })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

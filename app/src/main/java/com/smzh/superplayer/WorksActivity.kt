@@ -21,6 +21,12 @@ class WorksActivity : AppCompatActivity(), SongAdapter.ChooseSongListener {
             layoutManager = LinearLayoutManager(this@WorksActivity, LinearLayoutManager.VERTICAL, false)
             adapter = SongAdapter(this@WorksActivity, true)
         }
+        supportActionBar?.title = "我的歌曲"
+        loaSong()
+    }
+
+    override fun onResume() {
+        super.onResume()
         loaSong()
     }
 
@@ -35,7 +41,7 @@ class WorksActivity : AppCompatActivity(), SongAdapter.ChooseSongListener {
     }
 
     override fun onSongChosen(song: Song) {
-
+        PlayActivity.start(this, song)
     }
 
     companion object {

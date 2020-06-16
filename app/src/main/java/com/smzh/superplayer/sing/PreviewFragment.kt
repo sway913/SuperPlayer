@@ -44,6 +44,7 @@ class PreviewFragment : BaseFragment(), View.OnClickListener {
         viewModel.mergerSuccess.observe(viewLifecycleOwner, Observer {
             if (it == true) {
                 WorksActivity.start(context!!)
+                activity?.finish()
             } else if (it == false) {
                 Toast.makeText(App.context, "保存失败", Toast.LENGTH_SHORT).show()
             }

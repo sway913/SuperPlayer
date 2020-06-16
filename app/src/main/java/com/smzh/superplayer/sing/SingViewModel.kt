@@ -45,10 +45,10 @@ class SingViewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener
                 vocalPath = SingParam.vocalPath)
         player.addPlayerListener(this)
         player.prepare(audioParam)
+        singState.postValue(1)
     }
 
     override fun onPrepared() {
-        singState.postValue(1)
         start()
         handler.postDelayed(runnable, 20)
     }
