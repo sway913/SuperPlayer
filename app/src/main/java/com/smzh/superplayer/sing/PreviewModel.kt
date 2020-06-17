@@ -22,20 +22,19 @@ import java.io.*
 class PreviewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener {
 
     private val player by lazy { SuperPlayer.instance }
-    val currentMs = MutableLiveData<String>()
-    val totalMs = MutableLiveData<String>()
+    val currentMs = MutableLiveData<Long>()
+    val totalMs = MutableLiveData<Long>()
     var progressText = MutableLiveData<String>()
-    val progress = MutableLiveData<Int>()
     val songName = MutableLiveData<String>()
     val mergerProgress = MutableLiveData<String>()
     val mergerSuccess = MutableLiveData<Boolean>()
+    val playState = MutableLiveData<Int>()
     val handler = Handler(Looper.getMainLooper())
 
     init {
         songName.value = song.name
-        currentMs.value = "00:00"
-        totalMs.value = "00:00"
         progressText.value = "准备就绪"
+        playState.value = STATE_IDLE
     }
 
     private val runnable = object : Runnable {
@@ -44,10 +43,9 @@ class PreviewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener 
             if (total <= 0) {
                 total = 1L
             }
-            currentMs.value = DateUtils.formatElapsedTime((player.getCurrentMs() / 1000f).toLong())
-            totalMs.value = DateUtils.formatElapsedTime((total / 1000f).toLong())
-            progressText.postValue("正在播放:${currentMs.value}/${totalMs.value}")
-            progress.value = (player.getCurrentMs() * 100f / player.getTotalMs()).toInt()
+            currentMs.value = player.getCurrentMs()
+            totalMs.value = total
+            progressText.postValue("正在播放: ${DateUtils.formatElapsedTime(currentMs.value!! / 1000)}/${DateUtils.formatElapsedTime(totalMs.value!! / 1000)}")
             handler.postDelayed(this, 20)
         }
     }
@@ -78,21 +76,41 @@ class PreviewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener 
                 decodePath = SingParam.decodePath)
         player.addPlayerListener(this)
         player.prepare(audioParam)
+        playState.postValue(STATE_PREPARE)
     }
 
     override fun onPrepared() {
         player.start()
         handler.postDelayed(runnable, 20)
+        playState.postValue(STATE_PLAY)
+    }
+
+    fun resume() {
+        player.resume()
+        playState.postValue(STATE_PLAY)
+        handler.post(runnable)
+    }
+
+    fun pause() {
+        player.pause()
+        handler.removeCallbacks(runnable)
+        playState.postValue(STATE_PAUSE)
     }
 
     fun stop() {
         player.stop()
         player.removePlayerListener(this)
         handler.removeCallbacksAndMessages(null)
+        playState.postValue(STATE_STOP)
+    }
+
+    fun seek(ms: Long) {
+        player.seek(ms)
     }
 
     override fun onCompleted() {
-
+        pause()
+        seek(0)
     }
 
     override fun onError() {
@@ -146,7 +164,10 @@ class PreviewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener 
 
 
     companion object {
-
-
+        const val STATE_IDLE = 0
+        const val STATE_PREPARE = 1
+        const val STATE_PLAY = 2
+        const val STATE_PAUSE = 3
+        const val STATE_STOP = 4
     }
 }

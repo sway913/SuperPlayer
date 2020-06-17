@@ -106,6 +106,12 @@ void PcmSource::produceData() {
     file_stream->close();
 }
 
+void PcmSource::seek(int64_t ms) {
+    data_queue->reset();
+    long pt = ms * 44100 * 2 * sizeof(short) / 1000.0f;
+    file_stream->seekg(pt, std::ios::beg);
+}
+
 PcmSource::~PcmSource() {
     DELETEOBJ(data_queue)
     DELETEOBJ(file_stream)

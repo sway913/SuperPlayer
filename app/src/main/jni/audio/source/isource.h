@@ -35,6 +35,8 @@ public:
 
     virtual bool isEmpty() = 0;
 
+    virtual void seek(int64_t ms) = 0;
+
     virtual void setObserver(std::function<void(long, int)>) = 0;
 
     virtual ~ISource() {}

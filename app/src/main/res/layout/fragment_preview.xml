@@ -110,7 +110,7 @@
             <Button
                 android:id="@+id/btn_save"
                 android:layout_width="150dp"
-                android:layout_height="wrap_content"
+                android:layout_height="40dp"
                 android:layout_marginEnd="20dp"
                 android:background="@drawable/button_bg"
                 android:gravity="center"
@@ -120,51 +120,20 @@
 
         </LinearLayout>
 
-        <SeekBar
-            android:id="@+id/play_progress"
-            style="@style/CustomSeekBar"
+        <com.smzh.superplayer.widget.CustomSeekBar
+            android:id="@+id/progress_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="50dp"
-            android:max="100"
-            android:maxHeight="2dp"
-            android:progress="@{vm.progress}"
-            app:layout_constraintBottom_toTopOf="@+id/bottom_bar" />
-
-        <TextView
-            android:id="@+id/current_ms"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="70dp"
             android:gravity="center"
-            android:lines="1"
-            android:maxWidth="248dp"
-            android:text="@{vm.currentMs}"
-            android:textColor="#99000000"
-            android:textSize="12sp"
-            app:layout_constraintStart_toStartOf="@+id/play_progress"
-            app:layout_constraintTop_toBottomOf="@+id/play_progress"
-            tools:text="00:00" />
-
-        <TextView
-            android:id="@+id/total_ms"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="15dp"
-            android:gravity="center"
-            android:lines="1"
-            android:maxWidth="248dp"
-            android:text="@{vm.totalMs}"
-            android:textColor="#99000000"
-            android:textSize="12sp"
-            app:layout_constraintEnd_toEndOf="@+id/play_progress"
-            app:layout_constraintTop_toBottomOf="@+id/play_progress"
-            tools:text="00:00" />
+            app:currentMs="@{vm.currentMs.longValue()}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:totalMs="@{vm.totalMs.longValue()}"
+            tools:visibility="visible" />
 
         <LinearLayout
             android:id="@+id/merger_container"

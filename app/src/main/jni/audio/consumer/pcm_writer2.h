@@ -26,6 +26,7 @@ private:
     bool valid{false};
     int in_sample_rate{0};
     long write_byte_size{0};
+    const char * file_name{nullptr};
     std::ofstream *pcmFileStream{nullptr};
 
     ResampleHelper *resampleHelper{nullptr};

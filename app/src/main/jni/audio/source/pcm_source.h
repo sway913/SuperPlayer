@@ -33,6 +33,8 @@ public:
 
     bool isEmpty() override final;
 
+    void seek(int64_t ms) override final;
+
     void setObserver(std::function<void(long, int)>) override final;
 
     virtual ~PcmSource();

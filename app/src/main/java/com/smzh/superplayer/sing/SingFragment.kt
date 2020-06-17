@@ -1,22 +1,23 @@
 package com.smzh.superplayer.sing
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.SeekBar
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.smzh.superplayer.MainActivity.Companion.SONG
 import com.smzh.superplayer.R
 import com.smzh.superplayer.databinding.FragmentSingBinding
-import kotlinx.android.synthetic.main.activity_main.view.*
+import com.smzh.superplayer.sing.SingViewModel.Companion.STATE_PAUSE
+import com.smzh.superplayer.sing.SingViewModel.Companion.STATE_SING
+import com.smzh.superplayer.widget.CustomSeekBar
+import kotlinx.android.synthetic.main.fragment_sing.*
 import kotlinx.android.synthetic.main.layout_audio_controller.*
 import kotlinx.android.synthetic.main.layout_song_item.*
 
-class SingFragment : BaseFragment(), View.OnClickListener, SeekBar.OnSeekBarChangeListener {
+class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekListener {
 
     private lateinit var viewModel: SingViewModel
     private lateinit var binding: FragmentSingBinding
@@ -40,11 +41,20 @@ class SingFragment : BaseFragment(), View.OnClickListener, SeekBar.OnSeekBarChan
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        sb_acc_vol.setOnSeekBarChangeListener(this)
-        sb_vocal_vol.setOnSeekBarChangeListener(this)
-        sb_pitch.setOnSeekBarChangeListener(this)
+        progress_bar.setPlayStatusListener(this)
         viewModel.singComplete.observe(viewLifecycleOwner, Observer {
             gotoPreview()
+        })
+        viewModel.singState.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                STATE_SING -> {
+                    progress_bar.toggle(true)
+                }
+                STATE_PAUSE -> {
+                    progress_bar.toggle(false)
+                    viewModel.singPercent.postValue( "暂停中")
+                }
+            }
         })
     }
 
@@ -69,25 +79,19 @@ class SingFragment : BaseFragment(), View.OnClickListener, SeekBar.OnSeekBarChan
         }
     }
 
-    override fun onStartTrackingTouch(seekBar: SeekBar?) {
-
+    override fun seek(millis: Long) {
+        viewModel.seek(millis)
     }
 
-    override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-
+    override fun startSeek() {
+        viewModel.pause()
     }
 
-    override fun onStopTrackingTouch(seekBar: SeekBar?) {
-        when (seekBar?.id) {
-            R.id.sb_acc_vol -> {
-
-            }
-            R.id.sb_vocal_vol -> {
-
-            }
-            R.id.sb_pitch -> {
-
-            }
+    override fun play(playing: Boolean) {
+        if (playing) {
+            viewModel.resume()
+        } else {
+            viewModel.pause()
         }
     }
 

@@ -31,7 +31,7 @@ public:
 
     void stop();
 
-    void reset();
+    void seek(int64_t ms);
 
     long getCurrentMs();
 

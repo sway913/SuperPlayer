@@ -14,10 +14,13 @@ import com.smzh.superplayer.MainActivity.Companion.SONG
 import com.smzh.superplayer.R
 import com.smzh.superplayer.WorksActivity
 import com.smzh.superplayer.databinding.FragmentPreviewBinding
+import com.smzh.superplayer.sing.PreviewModel.Companion.STATE_PAUSE
+import com.smzh.superplayer.sing.PreviewModel.Companion.STATE_PLAY
+import com.smzh.superplayer.widget.CustomSeekBar
 import kotlinx.android.synthetic.main.fragment_preview.*
 import kotlinx.android.synthetic.main.layout_song_item.*
 
-class PreviewFragment : BaseFragment(), View.OnClickListener {
+class PreviewFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekListener {
 
     private lateinit var viewModel: PreviewModel
     private lateinit var binding: FragmentPreviewBinding
@@ -40,6 +43,7 @@ class PreviewFragment : BaseFragment(), View.OnClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        progress_bar.setPlayStatusListener(this)
         viewModel.prepare()
         viewModel.mergerSuccess.observe(viewLifecycleOwner, Observer {
             if (it == true) {
@@ -47,6 +51,17 @@ class PreviewFragment : BaseFragment(), View.OnClickListener {
                 activity?.finish()
             } else if (it == false) {
                 Toast.makeText(App.context, "保存失败", Toast.LENGTH_SHORT).show()
+            }
+        })
+        viewModel.playState.observe(viewLifecycleOwner, Observer {
+            when (it) {
+                STATE_PLAY -> {
+                    progress_bar.toggle(true)
+                }
+                STATE_PAUSE -> {
+                    progress_bar.toggle(false)
+                    viewModel.progressText.postValue("暂停中")
+                }
             }
         })
     }
@@ -59,6 +74,22 @@ class PreviewFragment : BaseFragment(), View.OnClickListener {
                 merger_container.visibility = View.VISIBLE
             }
         }
+    }
+
+    override fun play(playing: Boolean) {
+        if (playing) {
+            viewModel.resume()
+        } else {
+            viewModel.pause()
+        }
+    }
+
+    override fun seek(millis: Long) {
+        viewModel.seek(millis)
+    }
+
+    override fun startSeek() {
+        viewModel.pause()
     }
 
     override fun onDestroyView() {

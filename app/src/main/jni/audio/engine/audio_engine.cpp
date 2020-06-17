@@ -97,7 +97,12 @@ void AudioEngine::setFilter(int type) {
 }
 
 void AudioEngine::seek(int64_t millis) {
-
+    for (auto &s : source) {
+        s->seek(millis);
+    }
+    if (mix_source) {
+        mix_source->seek(millis);
+    }
 }
 
 int64_t AudioEngine::getCurrentMs() {
@@ -113,7 +118,7 @@ int64_t AudioEngine::getTotalMs() {
     return total_ms;
 }
 
-void AudioEngine::onSourceReady(long total_ms, int index) {
+void AudioEngine::onSourceReady(long total, int index) {
 
 }
 

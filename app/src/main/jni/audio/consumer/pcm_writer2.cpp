@@ -14,6 +14,7 @@ void PcmWriter2::start(const char *fileName, int in_sample) {
     valid = true;
     this->in_sample_rate = in_sample;
     unlink(fileName);
+    this->file_name = fileName;
     pcmFileStream = new std::ofstream(fileName, std::ios::out | std::ios::binary);
     resampleHelper = new ResampleHelper(1, in_sample_rate, 2, 44100);
     writeResult = std::async(std::launch::async, &PcmWriter2::writeToFile, this);
@@ -22,7 +23,7 @@ void PcmWriter2::start(const char *fileName, int in_sample) {
 
 void PcmWriter2::writeToFile() {
     while (valid) {
-        std::unique_lock <std::mutex> lock(mutex);
+        std::unique_lock<std::mutex> lock(mutex);
         cond.wait(lock);
 
         int copied = 0;
@@ -51,7 +52,8 @@ void PcmWriter2::writeToFile() {
 }
 
 void PcmWriter2::seek(int64_t millis) {
-    int64_t fileSize = 44100 * 2 * sizeof(int16_t) / 1000 * millis;
+    int64_t fileSize = millis * 44100 * 2 * sizeof(int16_t) / 1000;
+    write_byte_size = fileSize;
     if (pcmFileStream && pcmFileStream->is_open())
         pcmFileStream->seekp(fileSize);
 }
@@ -63,7 +65,12 @@ void PcmWriter2::stop() {
     JOIN(writeResult);
     if (pcmFileStream) {
         pcmFileStream->flush();
+        pcmFileStream->seekp(0, std::ios::end);
+        long file_len = pcmFileStream->tellp();
         pcmFileStream->close();
+        if (file_len > write_byte_size) {
+            truncate(file_name, write_byte_size);
+        }
     }
 
 }

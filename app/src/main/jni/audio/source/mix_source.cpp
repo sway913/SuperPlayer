@@ -31,8 +31,9 @@ void MixSource::stop() {
     source.clear();
 }
 
-void MixSource::reset() {
+void MixSource::seek(int64_t ms) {
     data_queue->reset();
+    current_ms = ms;
 }
 
 

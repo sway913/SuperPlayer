@@ -94,6 +94,11 @@ void StreamSource::produceData() {
     audio_decoder->close();
 }
 
+void StreamSource::seek(int64_t ms) {
+    data_queue->reset();
+    audio_decoder->seek(ms);
+}
+
 StreamSource::~StreamSource() {
     DELETEOBJ(data_queue)
     DELETEOBJ(audio_decoder)
