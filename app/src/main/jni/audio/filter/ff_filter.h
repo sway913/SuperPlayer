@@ -2,15 +2,13 @@
 // Created by ldr on 2019-12-16.
 //
 
-#ifndef SUPERPLAYER_AUDIOFILTER_H
-#define SUPERPLAYER_AUDIOFILTER_H
+#ifndef SUPERPLAYER_FF_FILTER_H
+#define SUPERPLAYER_FF_FILTER_H
 
 #include <mutex>
 #include <inttypes.h>
 #include <SLES/OpenSLES.h>
-#include "AudioFilter.h"
-#include "../common/AndroidLog.h"
-#include "../common/AudioProperty.h"
+#include "../../common/android_log.h"
 
 
 extern "C" {
@@ -40,11 +38,11 @@ extern "C" {
 #define EFFECT_PRESET_ORIGINAL      14
 #define EFFECT_PRESET_TEST 99
 
-class AudioFilter {
+class FFFilter {
 
 public:
 
-    AudioFilter(AudioProperty outProperty);
+    FFFilter(int sampleRate, int channelCount = 2);
 
     int32_t process(void *input, int32_t size, int framePerBuff);
 
@@ -52,13 +50,12 @@ public:
 
     void setVolume(double vol);
 
-    ~AudioFilter();
+    ~FFFilter();
 
 private:
 
     bool init();
 
-    AudioProperty outProperty;
     uint64_t processCount;
     int preset = 0;
     double volume = 1;
@@ -69,6 +66,9 @@ private:
     AVFilterContext *avSink_{nullptr};
     AVFrame *avFrame_{nullptr};
 
+    int sample_rate{0};
+    int channels{0};
+
 protected:
     int initFilterGraph(AVFilterGraph **graph, AVFilterContext **src, AVFilterContext **sink);
 
@@ -78,4 +78,4 @@ protected:
 };
 
 
-#endif //SUPERPLAYER_AUDIOFILTER_H
+#endif //SUPERPLAYER_FF_FILTER_H

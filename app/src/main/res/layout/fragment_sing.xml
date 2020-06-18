@@ -173,5 +173,54 @@
 
         </LinearLayout>
 
+        <EditText
+            android:id="@+id/lyric_input"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="5dp"
+            android:hint="手动输入一行歌词，回车显示到下方"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toStartOf="@+id/lyric_enter"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/top_bar"
+            app:visible="@{vm.singState == 0}" />
+
+        <Button
+            android:id="@+id/lyric_enter"
+            android:layout_width="60dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="20dp"
+            android:gravity="center"
+            android:text="换行"
+            android:textColor="#cc000000"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/top_bar"
+            app:visible="@{vm.singState == 0}" />
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/lyric_container"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="50dp"
+            app:layout_constraintBottom_toTopOf="@+id/progress_bar"
+            app:layout_constraintTop_toBottomOf="@+id/lyric_input">
+
+            <TextView
+                android:id="@+id/tv_lyric"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:gravity="center"
+                android:lineSpacingExtra="5dp"
+                android:minHeight="500dp"
+                android:text="@{vm.lyric}"
+                android:textColor="#cc000000"
+                android:textSize="14sp" />
+
+        </androidx.core.widget.NestedScrollView>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

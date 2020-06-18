@@ -24,6 +24,7 @@ class SingViewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener
     val currentMs = MutableLiveData<Long>()
     val songName = MutableLiveData<String>()
     val singComplete = MutableLiveData<Boolean>()
+    val lyric = MutableLiveData<String>()
     val handler = Handler(Looper.getMainLooper())
 
     private val runnable = object : Runnable {
@@ -43,6 +44,7 @@ class SingViewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener
         singState.value = STATE_IDLE
         songName.value = song.name
         singPercent.value = "准备就绪"
+        lyric.value = "如果戴上耳机\n效果会更好哦"
     }
 
     fun prepare() {
@@ -52,6 +54,9 @@ class SingViewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener
         player.addPlayerListener(this)
         player.prepare(audioParam)
         singState.postValue(STATE_PREPARE)
+        if (lyric.value == "如果戴上耳机\n效果会更好哦") {
+            lyric.postValue(null)
+        }
     }
 
     override fun onPrepared() {

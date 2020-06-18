@@ -1,15 +1,6 @@
-//
-// Created by ldr on 2019-12-16.
-//
-
-
-#include "AudioFilter.h"
+#include "ff_filter.h"
 
 #define INPUT_FORMAT         AV_SAMPLE_FMT_S16
-
-//
-// Created by kaileiwang on 2019/6/24.
-//
 
 void getEchoOptionString(char *str, size_t size, int type) {
     switch (type) {
@@ -130,14 +121,15 @@ void getEqualizerOptionString(char *str, size_t size, int type) {
     }
 }
 
-AudioFilter::AudioFilter(AudioProperty outProperty) {
-    this->outProperty = outProperty;
+FFFilter::FFFilter(int sampleRate, int channelCount) {
+    this->sample_rate = sampleRate;
+    this->channels = channelCount;
     if (!init()) {
         LOGE("AudioFilter::AudioFilter init failed");
     }
 }
 
-bool AudioFilter::init() {
+bool FFFilter::init() {
 
     int err;
     avFrame_ = av_frame_alloc();
@@ -154,15 +146,13 @@ bool AudioFilter::init() {
         return false;
     }
 
-//    LOGD("AudioFilter::init samplerate: %d, channel %d, format %d, frames %d",
-//         sampleInfo_->sampleRate_, sampleInfo_->channels_, sampleInfo_->pcmFormat_, sampleInfo_->framesPerBuf_);
     LOGD(" --------- AudioFilter::init success ---------");
 
     return true;
 }
 
 
-int32_t AudioFilter::process(void *input, int size, int frameBuff) {
+int32_t FFFilter::process(void *input, int size, int frameBuff) {
 
     if (!avSrc_ || !avFrame_ || !avSink_) {
         return -1;
@@ -182,7 +172,7 @@ int32_t AudioFilter::process(void *input, int size, int frameBuff) {
     std::lock_guard<std::mutex> lock(configureMutex_);
 
     uint64_t channelLayout;
-    switch (outProperty.channelCount) {
+    switch (channels) {
         case 1:
             channelLayout = AV_CH_LAYOUT_MONO;
             break;
@@ -208,7 +198,7 @@ int32_t AudioFilter::process(void *input, int size, int frameBuff) {
             format = AV_SAMPLE_FMT_S16;
     }
 
-    avFrame_->sample_rate = outProperty.sampleRate;
+    avFrame_->sample_rate = sample_rate;
     avFrame_->format = format;
     avFrame_->channel_layout = channelLayout;
     avFrame_->nb_samples = frameBuff;
@@ -219,8 +209,6 @@ int32_t AudioFilter::process(void *input, int size, int frameBuff) {
     err = av_frame_get_buffer(avFrame_, 0);
     if (err < 0) {
         LOGE("AudioFilter::init error");
-//        LOGE("AudioFilter::init samplerate: %d, channel %lld, format %d, frames %d",
-//             avFrame_->sample_rate, avFrame_->channel_layout, avFrame_->format, avFrame_->nb_samples);
         printError(err);
         return err;
     }
@@ -231,8 +219,6 @@ int32_t AudioFilter::process(void *input, int size, int frameBuff) {
     err = av_buffersrc_add_frame(avSrc_, avFrame_);
     if (err < 0) {
         LOGE("AudioFilter::init error");
-//        LOGE("AudioFilter::init samplerate: %d, channel %lld, format %d, frames %d",
-//             avFrame_->sample_rate, avFrame_->channel_layout, avFrame_->format, avFrame_->nb_samples);
         av_frame_unref(avFrame_);
         fprintf(stderr, "Error submitting the frame to the filtergraph:");
         printError(err);
@@ -254,12 +240,10 @@ int32_t AudioFilter::process(void *input, int size, int frameBuff) {
     memcpy(input, avFrame_->extended_data[0], size);
     av_frame_unref(avFrame_);
 
-//    LOGD("AudioFilter::process success");
-//    LOGD("AudioFilter::process time %lld", GetSystemTicks() - t);
     return size;
 }
 
-void AudioFilter::setVolume(double vol) {
+void FFFilter::setVolume(double vol) {
     if (volume == vol) {
         return;
     }
@@ -268,7 +252,7 @@ void AudioFilter::setVolume(double vol) {
     reconfigure();
 }
 
-void AudioFilter::setFilter(int filter) {
+void FFFilter::setFilter(int filter) {
     if (preset == filter) {
         return;
     }
@@ -277,7 +261,7 @@ void AudioFilter::setFilter(int filter) {
     reconfigure();
 }
 
-bool AudioFilter::reconfigure() {
+bool FFFilter::reconfigure() {
     std::lock_guard<std::mutex> lock(configureMutex_);
 
     if (filterGraph_) {
@@ -290,11 +274,10 @@ bool AudioFilter::reconfigure() {
         printError(err);
         return false;
     }
-//    LOGD(" --------- AudioFilter::reconfigure success ---------");
     return true;
 }
 
-AudioFilter::~AudioFilter() {
+FFFilter::~FFFilter() {
     if (avSrc_) {
         avfilter_free(avSrc_);
         avSrc_ = nullptr;
@@ -313,13 +296,13 @@ AudioFilter::~AudioFilter() {
     }
 }
 
-void AudioFilter::printError(int err) {
+void FFFilter::printError(int err) {
     char errstr[1024];
     av_strerror(err, errstr, sizeof(errstr));
     LOGE("AudioFilter::printError description: %s", errstr);
 }
 
-int AudioFilter::initFilterGraph(AVFilterGraph **graph, AVFilterContext **src, AVFilterContext **sink) {
+int FFFilter::initFilterGraph(AVFilterGraph **graph, AVFilterContext **src, AVFilterContext **sink) {
     AVFilterGraph *filter_graph;
 
     AVFilterContext *abuffer_ctx;
@@ -375,7 +358,7 @@ int AudioFilter::initFilterGraph(AVFilterGraph **graph, AVFilterContext **src, A
     }
 
     /* Set the filter options through the AVOptions API. */
-    switch (outProperty.channelCount) {
+    switch (channels) {
         case 1:
             av_get_channel_layout_string(ch_layout, sizeof(ch_layout), 0, AV_CH_LAYOUT_MONO);
             break;
@@ -388,8 +371,8 @@ int AudioFilter::initFilterGraph(AVFilterGraph **graph, AVFilterContext **src, A
     }
     av_opt_set(abuffer_ctx, "channel_layout", ch_layout, AV_OPT_SEARCH_CHILDREN);
     av_opt_set(abuffer_ctx, "sample_fmt", av_get_sample_fmt_name(INPUT_FORMAT), AV_OPT_SEARCH_CHILDREN);
-    av_opt_set_q(abuffer_ctx, "time_base", (AVRational) {1, (int) outProperty.sampleRate}, AV_OPT_SEARCH_CHILDREN);
-    av_opt_set_int(abuffer_ctx, "sample_rate", outProperty.sampleRate, AV_OPT_SEARCH_CHILDREN);
+    av_opt_set_q(abuffer_ctx, "time_base", (AVRational) {1, (int) sample_rate}, AV_OPT_SEARCH_CHILDREN);
+    av_opt_set_int(abuffer_ctx, "sample_rate", sample_rate, AV_OPT_SEARCH_CHILDREN);
 
     /* Now initialize the filter; we pass NULL options, since we have already
      * set all the options above. */
@@ -515,7 +498,7 @@ int AudioFilter::initFilterGraph(AVFilterGraph **graph, AVFilterContext **src, A
     /* A third way of passing the options is in a string of the form
      * key1=value1:key2=value2.... */
     uint32_t channelcount;
-    switch (outProperty.channelCount) {
+    switch (channels) {
         case 1:
             channelcount = AV_CH_LAYOUT_MONO;
             break;
@@ -528,7 +511,7 @@ int AudioFilter::initFilterGraph(AVFilterGraph **graph, AVFilterContext **src, A
     }
     snprintf(options_str, sizeof(options_str),
              "sample_fmts=%s:sample_rates=%d:channel_layouts=0x%x",
-             av_get_sample_fmt_name(AV_SAMPLE_FMT_S16), outProperty.sampleRate,
+             av_get_sample_fmt_name(AV_SAMPLE_FMT_S16), sample_rate,
              channelcount);
     err = avfilter_init_str(aformat_ctx, options_str);
     if (err < 0) {

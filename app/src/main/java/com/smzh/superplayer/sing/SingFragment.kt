@@ -7,6 +7,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo.IME_ACTION_SEND
 import android.widget.PopupWindow
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -31,6 +32,8 @@ class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekLis
         }
     }
 
+    private val lyricTxt by lazy { StringBuilder() }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -51,6 +54,13 @@ class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekLis
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         progress_bar.setPlayStatusListener(this)
+        lyric_enter.setOnClickListener {
+            if (lyric_input.text == null) {
+                return@setOnClickListener
+            }
+            viewModel.lyric.value = lyricTxt.append(lyric_input.text).append("\n").toString()
+            lyric_input?.text = null
+        }
         viewModel.singComplete.observe(viewLifecycleOwner, Observer {
             gotoPreview()
         })
@@ -79,6 +89,7 @@ class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekLis
             }
 
             R.id.btn_start -> {
+                view?.requestFocus()
                 viewModel.prepare()
             }
 
