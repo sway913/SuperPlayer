@@ -106,7 +106,9 @@ void RecorderEngine::stop() {
         oboe_recorder->stop();
         DELETEOBJ(oboe_recorder)
     }
-    mix_source->stop();
+    if (mix_source) {
+        mix_source->stop();
+    }
     DELETEOBJ(mix_source)
 
     for (auto &s : source) {

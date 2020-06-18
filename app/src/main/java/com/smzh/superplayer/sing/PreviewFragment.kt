@@ -1,6 +1,8 @@
 package com.smzh.superplayer.sing
 
+import android.graphics.Rect
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -9,11 +11,14 @@ import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.smzh.superplayer.App
 import com.smzh.superplayer.MainActivity.Companion.SONG
 import com.smzh.superplayer.R
 import com.smzh.superplayer.WorksActivity
 import com.smzh.superplayer.databinding.FragmentPreviewBinding
+import com.smzh.superplayer.dp2px
 import com.smzh.superplayer.sing.PreviewModel.Companion.STATE_PAUSE
 import com.smzh.superplayer.sing.PreviewModel.Companion.STATE_PLAY
 import com.smzh.superplayer.widget.CustomSeekBar
@@ -21,15 +26,11 @@ import com.smzh.superplayer.widget.SingControlView
 import kotlinx.android.synthetic.main.fragment_preview.*
 import kotlinx.android.synthetic.main.layout_song_item.*
 
-class PreviewFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekListener, SingControlView.SingControlListener {
+class PreviewFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekListener, SingControlView.SingControlListener,
+        AudioFilterAdapter.AudioEffectSelectListener {
 
     private lateinit var viewModel: PreviewModel
     private lateinit var binding: FragmentPreviewBinding
-    private val controlView by lazy {
-        SingControlView(context!!).apply {
-            setListener(this@PreviewFragment)
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +52,11 @@ class PreviewFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.Seek
         super.onViewCreated(view, savedInstanceState)
         progress_bar.setPlayStatusListener(this)
         play_control.setListener(this)
+        effect_view.run {
+            layoutManager = GridLayoutManager(context, 5, GridLayoutManager.VERTICAL, false)
+            adapter = AudioFilterAdapter(this@PreviewFragment)
+            addItemDecoration(EffectItemDecoration())
+        }
         viewModel.prepare()
         viewModel.mergerSuccess.observe(viewLifecycleOwner, Observer {
             if (it == true) {
@@ -116,6 +122,10 @@ class PreviewFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.Seek
         viewModel.setVocalVolume(volume)
     }
 
+    override fun onAudioEffectSelect(audioEffect: AudioEffect) {
+
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
     }
@@ -123,6 +133,18 @@ class PreviewFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.Seek
     override fun onBackPressed() {
         viewModel.stop()
         super.onBackPressed()
+    }
+
+    inner class EffectItemDecoration : RecyclerView.ItemDecoration() {
+        override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
+            val width = parent.context.resources.displayMetrics.widthPixels
+            val mLR = (width - dp2px(parent.context, 390)) / 8
+            val pos = parent.getChildLayoutPosition(view)
+            outRect.left = mLR
+            outRect.right = mLR
+            outRect.top = dp2px(parent.context, 10)
+            outRect.bottom = dp2px(parent.context, 10)
+        }
     }
 
     companion object {

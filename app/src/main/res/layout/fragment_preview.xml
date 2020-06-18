@@ -137,10 +137,19 @@
 
         <com.smzh.superplayer.widget.SingControlView
             android:id="@+id/play_control"
-            android:layout_marginBottom="20dp"
-            app:layout_constraintBottom_toTopOf="@+id/progress_bar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            app:layout_constraintTop_toBottomOf="@+id/top_bar" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/effect_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            app:layout_constraintTop_toBottomOf="@+id/play_control" />
 
         <LinearLayout
             android:id="@+id/merger_container"

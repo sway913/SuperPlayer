@@ -55,7 +55,7 @@ private:
     std::mutex mutex;
     std::condition_variable cond;
     std::function<void(long, int)> callBack{nullptr};
-    bool is_exit{false};
+    bool is_exit{true};
     bool is_pause{false};
     int read_packet_count{0};
     ifstream *file_stream{nullptr};

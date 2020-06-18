@@ -18,6 +18,7 @@ private:
     const char *src_path;
     const char *dst_path;
     int out_sample{0};
+    bool is_exit{false};
 
     void decode(const std::function<void(void)>& callback);
 

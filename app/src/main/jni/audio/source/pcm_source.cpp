@@ -23,6 +23,7 @@ void PcmSource::setObserver(std::function<void(long, int)> observer) {
 }
 
 void PcmSource::start() {
+    is_exit = false;
     thread_result = std::async(std::launch::async, &PcmSource::produceData, this);
 }
 
@@ -37,9 +38,11 @@ void PcmSource::pause() {
 }
 
 void PcmSource::stop() {
-    is_exit = true;
-    cond.notify_all();
-    JOIN(thread_result);
+    if (!is_exit) {
+        is_exit = true;
+        cond.notify_all();
+        JOIN(thread_result);
+    }
 }
 
 bool PcmSource::getData(short &value) {

@@ -21,17 +21,22 @@ void FileDecoder::decode(const std::function<void(void)> &callback) {
     int64_t total_bytes = audioDecoder->getTotalMs() /  1000 * 44100 * 2 * sizeof(short);
     long decode_bytes = 0;
     AudioBuffer *audio_buffer = nullptr;
-    while (decode_bytes < total_bytes) {
+    int try_conut = 0;
+    while (decode_bytes < total_bytes && !is_exit && try_conut < 100) {
         if (!((audio_buffer = audioDecoder->decodeFrame())->isEmpty())) {
             AudioFrame *frame = nullptr;
             while ((frame = audio_buffer->pop())) {
                 if (frame->audio_data && frame->len > 0) {
                     out_stream->write(frame->audio_data, frame->len);
                     decode_bytes += frame->len;
+                } else {
+                    try_conut++;
                 }
                 DELETEOBJ(frame)
             }
             DELETEOBJ(audio_buffer)
+        } else {
+            try_conut++;
         }
     }
 
@@ -39,7 +44,7 @@ void FileDecoder::decode(const std::function<void(void)> &callback) {
     out_stream->close();
     audioDecoder->close();
 
-    if (callback) {
+    if (callback && !is_exit) {
         callback();
     }
 
@@ -48,6 +53,7 @@ void FileDecoder::decode(const std::function<void(void)> &callback) {
 }
 
 void FileDecoder::stop() {
+    is_exit = true;
     JOIN(thread_result);
 }
 

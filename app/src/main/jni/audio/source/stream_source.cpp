@@ -16,6 +16,7 @@ void StreamSource::setObserver(std::function<void(long, int)> observer) {
 }
 
 void StreamSource::start() {
+    is_exit = false;
     thread_result = std::async(std::launch::async, &StreamSource::produceData, this);
 }
 
@@ -30,9 +31,11 @@ void StreamSource::pause() {
 }
 
 void StreamSource::stop() {
-    is_exit = true;
-    cond.notify_all();
-    JOIN(thread_result);
+    if (!is_exit) {
+        is_exit = true;
+        cond.notify_all();
+        JOIN(thread_result);
+    }
 }
 
 bool StreamSource::getData(short &value) {

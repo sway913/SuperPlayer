@@ -63,7 +63,9 @@ void PlayerEngine::stop() {
         out_stream->requestStop();
         out_stream = nullptr;
     }
-    mix_source->stop();
+    if (mix_source) {
+        mix_source->stop();
+    }
     DELETEOBJ(mix_source)
     DELETEOBJ(source_factory)
     for (auto &s : source) {

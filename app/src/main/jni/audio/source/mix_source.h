@@ -48,7 +48,7 @@ private:
 
     void mixData();
 
-    bool isExit{false};
+    bool isExit{true};
     bool isPause{false};
 
     short *audioBuffer{nullptr};

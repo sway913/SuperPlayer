@@ -12,6 +12,7 @@ MixSource::MixSource(int sample) {
 }
 
 void MixSource::start() {
+    isExit = false;
     threadResult = async(launch::async, &MixSource::mixData, this);
 }
 
@@ -25,10 +26,14 @@ void MixSource::pause() {
 }
 
 void MixSource::stop() {
-    isExit = true;
-    cond.notify_all();
-    JOIN(threadResult);
-    source.clear();
+    if (isExit) {
+        source.clear();
+    } else {
+        isExit = true;
+        cond.notify_all();
+        JOIN(threadResult);
+        source.clear();
+    }
 }
 
 void MixSource::seek(int64_t ms) {
