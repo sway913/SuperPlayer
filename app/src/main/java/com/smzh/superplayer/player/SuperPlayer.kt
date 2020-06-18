@@ -65,11 +65,11 @@ class SuperPlayer {
         handler.post { playerJni.setFilter(type) }
     }
 
-    fun setVolume(volume: Float, track: Int) {
-        handler.post { playerJni.setVolume(volume, track) }
+    fun setVolume(volume: Float, track: Tracker) {
+        handler.post { playerJni.setVolume(volume, track.index) }
     }
 
-    fun setPitch(pitch: Int) {
+    fun setPitch(pitch: Float) {
         handler.post { playerJni.setPitch(pitch) }
     }
 
@@ -95,5 +95,10 @@ class SuperPlayer {
 
     fun removePlayerListener(listener: PlayerJni.PlayerStateListener) {
         playerJni.removePlayerStateListener(listener)
+    }
+
+    enum class Tracker(var index: Int) {
+        VOCAL(1),
+        ACC(2);
     }
 }

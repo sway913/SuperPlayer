@@ -1,7 +1,12 @@
 package com.smzh.superplayer
 
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothProfile
 import android.content.Context
 import android.content.res.Resources
+import android.media.AudioDeviceInfo
+import android.media.AudioManager
+import android.os.Build
 import android.provider.MediaStore
 import com.smzh.superplayer.sing.Song
 
@@ -31,4 +36,45 @@ fun getMusicData(context: Context): MutableList<Song> {
         cursor.close()
     }
     return list
+}
+
+fun isWiredHeadsetOn(context: Context): Boolean {
+    val am = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        var result = false
+        val infos = am.getDevices(AudioManager.GET_DEVICES_ALL)
+        for (info in infos) {
+            if (info.type == AudioDeviceInfo.TYPE_WIRED_HEADSET ||
+                    info.type == AudioDeviceInfo.TYPE_USB_HEADSET ||
+                    info.type == AudioDeviceInfo.TYPE_USB_DEVICE) {
+                result = true
+            }
+        }
+        if (am.isWiredHeadsetOn && !result) {
+            var devices = ""
+            for (info in infos) {
+                devices += "${info.type},"
+            }
+        }
+        return am.isWiredHeadsetOn || result
+    } else {
+        return am.isWiredHeadsetOn
+    }
+}
+
+fun isWirelessHeadsetOn(): Boolean {
+    val ba = BluetoothAdapter.getDefaultAdapter() ?: return false
+    val a2dp = ba.getProfileConnectionState(BluetoothProfile.A2DP)              //可操控蓝牙设备，
+    val headset = ba.getProfileConnectionState(BluetoothProfile.HEADSET)        //蓝牙头戴式耳机，支持语音输入输出
+    val health = ba.getProfileConnectionState(BluetoothProfile.HEALTH)          //蓝牙穿戴式设备
+    return when {
+        a2dp == BluetoothProfile.STATE_CONNECTED -> true
+        headset == BluetoothProfile.STATE_CONNECTED -> true
+        health == BluetoothProfile.STATE_CONNECTED -> true
+        else -> false
+    }
+}
+
+fun isHeadSetOn(context: Context): Boolean {
+    return isWiredHeadsetOn(context) || isWirelessHeadsetOn()
 }

@@ -23,7 +23,7 @@ class CustomSeekBar : FrameLayout, SeekBar.OnSeekBarChangeListener {
     private fun initView() {
         View.inflate(context, R.layout.custom_seek_bar_layout, this)
         iv_switch.isSelected = false
-        iv_switch.setOnClickListener {
+        iv_switch_container.setOnClickListener {
             listener?.play(!iv_switch.isSelected)
         }
         play_progress.setOnSeekBarChangeListener(this)

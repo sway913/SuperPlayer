@@ -35,6 +35,10 @@ public:
 
     void seek(int64_t ms) override final;
 
+    int getIndex() override final;
+
+    void setFilter(FilterPackage *filterPacage);
+
     void setObserver(std::function<void(long, int)>) override final;
 
     virtual ~PcmSource();
@@ -63,6 +67,7 @@ private:
     ResampleHelper *resampleHelper{nullptr};
     int index{0};
     int sample_rate{0};
+    FilterPackage *filterPackage{nullptr};
 
 };
 

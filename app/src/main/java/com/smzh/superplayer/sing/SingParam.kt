@@ -6,9 +6,14 @@ import java.io.File
 
 object SingParam {
 
+    var vocalFactor = 0.5f
+    var accFactor = 1f
+    var pitch = 0f
+
     val vocalPath: String
     val mixPath: String
     val decodePath: String
+    const val vocalGain = 4F
 
     init {
 

@@ -6,9 +6,12 @@ import android.text.format.DateUtils
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.smzh.superplayer.App
+import com.smzh.superplayer.isHeadSetOn
 import com.smzh.superplayer.player.AudioParam
 import com.smzh.superplayer.player.PlayerJni
 import com.smzh.superplayer.player.SuperPlayer
+import com.smzh.superplayer.player.SuperPlayer.Tracker
 
 class SingViewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener {
 
@@ -53,6 +56,8 @@ class SingViewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener
 
     override fun onPrepared() {
         start()
+        setVocalVolume(0.5f)
+        player.setEcho(isHeadSetOn(App.context))
         totalMs.postValue(player.getTotalMs())
         handler.postDelayed(runnable, 20)
     }
@@ -86,12 +91,26 @@ class SingViewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener
     }
 
     override fun onError() {
-
+        player.stop()
+        prepare()
     }
 
     override fun onCompleted() {
         singComplete.postValue(true)
     }
+
+    fun setVocalVolume(vol: Float) {
+        player.setVolume(vol * SingParam.vocalGain, Tracker.VOCAL)
+    }
+
+    fun setAccVolume(vol: Float) {
+        player.setVolume(vol, Tracker.ACC)
+    }
+
+    fun setPitch(pitch: Float) {
+        player.setPitch(pitch)
+    }
+
 
     @Suppress("UNCHECKED_CAST")
     class SingFactory(val song: Song) : ViewModelProvider.NewInstanceFactory() {

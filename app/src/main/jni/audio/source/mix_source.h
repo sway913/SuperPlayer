@@ -10,6 +10,7 @@
 #include "isource.h"
 #include "../../common/lock_free_queue.h"
 #include "../../common/common_tools.h"
+#include "../filter/filter_package.h"
 
 using namespace std;
 
@@ -43,7 +44,7 @@ private:
     vector<ISource *> source;
     mutex _mutex{};
     condition_variable cond{};
-    LockFreeQueue<short, kDataQueueSize> *data_queue{nullptr};
+    LockFreeQueue<short, kMixDataSize> *data_queue{nullptr};
 
     void mixData();
 
@@ -52,7 +53,7 @@ private:
 
     short *audioBuffer{nullptr};
     short *mixBuffer{nullptr};
-    int bufferSize = 512;
+    int bufferSize = 1024;
     long current_ms{0};
     int sample_rate{0};
 

@@ -13,7 +13,6 @@ void AudioMerger2::mergerFun() {
     unlink(sp_param->getOutPath());
     vocal_buffer = new short[buffer_size];
     acc_buffer = new short[buffer_size];
-    mix_buffer = new short[buffer_size];
     std::ifstream vocal_file = std::ifstream(sp_param->getVocalPath(), std::ios::binary | std::ios::in);
     std::ifstream acc_file = std::ifstream(sp_param->getAccPath(), std::ios::binary | std::ios::in);
     audioEncoder = new AudioEncoder();
@@ -22,13 +21,24 @@ void AudioMerger2::mergerFun() {
     total_bytes = vocal_file.tellg();
     vocal_file.seekg(0, std::ios::beg);
 
+    vocal_filter = new FilterPackage();
+    vocal_filter->init(Vocal, 44100, 2);
+    vocal_filter->setVolume(sp_param->getVocalVolume());
+
+    acc_filter = new FilterPackage();
+    acc_filter->init(Acc, 44100, 2);
+    acc_filter->setVolume(sp_param->getAccVolume());
+    acc_filter->setPitch(sp_param->getPitch());
+
     while (merger_bytes < total_bytes) {
 
-        int read_bytes = (merger_bytes + buffer_size * sizeof(short) > total_bytes) ? total_bytes - merger_bytes * sizeof(short) : buffer_size * sizeof(short);
+        int64_t read_bytes = (merger_bytes + buffer_size * sizeof(short) > total_bytes) ? total_bytes - merger_bytes * sizeof(short) : buffer_size * sizeof(short);
         vocal_file.read((char *) vocal_buffer, read_bytes);
+        vocal_filter->process(vocal_buffer, buffer_size);
         acc_file.read((char *) acc_buffer, read_bytes);
-        mixAudioBuffer(acc_buffer, vocal_buffer, read_bytes / sizeof(short));
-        audioEncoder->encode(acc_buffer, read_bytes / sizeof(short));
+        acc_filter->process(acc_buffer, buffer_size);
+        mixAudioBuffer(acc_buffer, vocal_buffer, buffer_size);
+        audioEncoder->encode(acc_buffer, (int) (read_bytes / sizeof(short)));
         merger_bytes += buffer_size * sizeof(short);
     }
 
@@ -38,6 +48,10 @@ void AudioMerger2::mergerFun() {
     DELETEOBJ(audioEncoder)
     DELETEARR(vocal_buffer)
     DELETEARR(acc_buffer)
+    vocal_filter->destroy();
+    acc_filter->destroy();
+    DELETEOBJ(vocal_filter)
+    DELETEOBJ(acc_filter)
     vocal_file.close();
     acc_file.close();
     sp_param = nullptr;

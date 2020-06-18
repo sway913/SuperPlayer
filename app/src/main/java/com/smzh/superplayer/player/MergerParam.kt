@@ -1,8 +1,11 @@
 package com.smzh.superplayer.player
 
-class MergerParam(private val aacPath: String = "",
-                  private val vocalPath: String = "",
-                  private val outPath: String = "") {
+class MergerParam(private val aacPath: String,
+                  private val vocalPath: String,
+                  private val outPath: String,
+                  private val vocalVolume: Float,
+                  private val accVolume: Float,
+                  private val pitch: Float) {
 
 
     fun getAccPath(): String {
@@ -16,5 +19,18 @@ class MergerParam(private val aacPath: String = "",
     fun getOutPath(): String {
         return outPath
     }
+
+    fun getVocalVolume(): Float {
+        return vocalVolume
+    }
+
+    fun getAccVolume(): Float {
+        return accVolume
+    }
+
+    fun getPitch(): Float {
+        return pitch
+    }
+
 
 }

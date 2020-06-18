@@ -50,30 +50,24 @@ void AudioEngine::onErrorBeforeClose(AudioStream *oboeStream, Result error) {
     }
 }
 
-void AudioEngine::prepare(SourceFactory *factory) {
-
-}
-
-void AudioEngine::start() {
-
-}
-
 void AudioEngine::resume() {
-    is_pause = false;
+    for (auto &s : source) {
+      s->resume();
+    }
     if (mix_source) {
         mix_source->resume();
     }
+    is_pause = false;
 }
 
 void AudioEngine::pause() {
-    is_pause = true;
+    for (auto &s : source) {
+        s->pause();
+    }
     if (mix_source) {
         mix_source->pause();
     }
-}
-
-void AudioEngine::stop() {
-
+    is_pause = true;
 }
 
 void AudioEngine::setObserver(Observer *obs) {
@@ -85,15 +79,25 @@ void AudioEngine::setEcho(bool isEcho) {
 }
 
 void AudioEngine::setVolume(float volume, int track) {
-
+    if (vocal_filter) {
+        if (track == 1) {
+            vocal_filter->setVolume(volume);
+        } else {
+            acc_filter->setVolume(volume);
+        }
+    }
 }
 
-void AudioEngine::setPitch(int pitch) {
-
+void AudioEngine::setPitch(float pitch) {
+    if (acc_filter) {
+        acc_filter->setPitch(pitch);
+    }
 }
 
 void AudioEngine::setFilter(int type) {
-
+    if (vocal_filter) {
+        vocal_filter->setEffect(type);
+    }
 }
 
 void AudioEngine::seek(int64_t millis) {
@@ -116,10 +120,6 @@ int64_t AudioEngine::getCurrentMs() {
 
 int64_t AudioEngine::getTotalMs() {
     return total_ms;
-}
-
-void AudioEngine::onSourceReady(long total, int index) {
-
 }
 
 AudioEngine::~AudioEngine() = default;

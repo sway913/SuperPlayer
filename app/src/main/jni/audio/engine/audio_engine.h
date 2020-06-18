@@ -10,6 +10,7 @@
 #include "../observer.h"
 #include "../source/source_factory.h"
 #include "../source/mix_source.h"
+#include "../filter/filter_package.h"
 
 using namespace oboe;
 using namespace std;
@@ -28,6 +29,8 @@ protected:
     long total_ms{0};
     bool is_pause{false};
     volatile std::atomic<bool> stopped{false};
+    FilterPackage *vocal_filter{nullptr};
+    FilterPackage *acc_filter{nullptr};
 
 
     DataCallbackResult onAudioReady(AudioStream *stream, void *data, int32_t numFrames) override;
@@ -44,13 +47,15 @@ public:
 
     virtual ~AudioEngine();
 
-    void setObserver(Observer *observer);
-
     virtual void prepare(SourceFactory *factory) = 0;
 
     virtual void start() = 0;
 
     virtual void stop() = 0;
+
+    virtual void onSourceReady(long total_ms, int index) = 0;
+
+public:
 
     virtual void resume();
 
@@ -64,13 +69,13 @@ public:
 
     virtual void setFilter(int type);
 
-    virtual void setPitch(int pitch);
+    virtual void setPitch(float pitch);
 
     virtual int64_t getTotalMs();
 
     virtual int64_t getCurrentMs();
 
-    virtual void onSourceReady(long total_ms, int index);
+    void setObserver(Observer *observer);
 
     static std::unique_ptr<AudioEngine> getEngine(bool is_recorder, int sample_rate);
 };

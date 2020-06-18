@@ -1,26 +1,35 @@
 package com.smzh.superplayer.sing
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupWindow
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.smzh.superplayer.MainActivity.Companion.SONG
 import com.smzh.superplayer.R
 import com.smzh.superplayer.databinding.FragmentSingBinding
+import com.smzh.superplayer.dp2px
 import com.smzh.superplayer.sing.SingViewModel.Companion.STATE_PAUSE
 import com.smzh.superplayer.sing.SingViewModel.Companion.STATE_SING
 import com.smzh.superplayer.widget.CustomSeekBar
+import com.smzh.superplayer.widget.SingControlView
 import kotlinx.android.synthetic.main.fragment_sing.*
-import kotlinx.android.synthetic.main.layout_audio_controller.*
-import kotlinx.android.synthetic.main.layout_song_item.*
 
-class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekListener {
+class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekListener, SingControlView.SingControlListener {
 
     private lateinit var viewModel: SingViewModel
     private lateinit var binding: FragmentSingBinding
+    private val controlView by lazy {
+        SingControlView(context!!).apply {
+            setListener(this@SingFragment)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,7 +61,7 @@ class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekLis
                 }
                 STATE_PAUSE -> {
                     progress_bar.toggle(false)
-                    viewModel.singPercent.postValue( "暂停中")
+                    viewModel.singPercent.postValue("暂停中")
                 }
             }
         })
@@ -62,7 +71,7 @@ class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekLis
         when (v?.id) {
 
             R.id.btn_control -> {
-
+                showControlView()
             }
 
             R.id.btn_finish -> {
@@ -71,6 +80,10 @@ class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekLis
 
             R.id.btn_start -> {
                 viewModel.prepare()
+            }
+
+            R.id.btn_restart -> {
+                viewModel.seek(0)
             }
 
             R.id.btn_switch -> {
@@ -95,6 +108,18 @@ class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekLis
         }
     }
 
+    override fun onVocalVolumeChange(volume: Float) {
+        viewModel.setVocalVolume(volume)
+    }
+
+    override fun onAccVolumeChange(volume: Float) {
+        viewModel.setAccVolume(volume)
+    }
+
+    override fun onPitchChange(pitch: Float) {
+        viewModel.setPitch(pitch)
+    }
+
     private fun gotoPreview() {
         viewModel.stop()
         PreviewActivity.start(context!!, viewModel.song)
@@ -104,6 +129,25 @@ class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekLis
     override fun onBackPressed() {
         viewModel.stop()
         super.onBackPressed()
+    }
+
+
+    private var control: PopupWindow? = null
+    private fun showControlView() {
+        if (control != null) {
+            control?.dismiss()
+            control = null
+            return
+        }
+        control = PopupWindow(context).apply {
+            contentView = controlView
+            width = ViewGroup.LayoutParams.MATCH_PARENT
+            height = ViewGroup.LayoutParams.WRAP_CONTENT
+            isTouchable = true
+            isOutsideTouchable = true
+            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            showAtLocation(rootView, Gravity.BOTTOM, 0, dp2px(context!!, 220))
+        }
     }
 
     override fun onDestroyView() {

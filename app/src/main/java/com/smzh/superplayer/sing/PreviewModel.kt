@@ -81,6 +81,7 @@ class PreviewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener 
 
     override fun onPrepared() {
         player.start()
+        setVocalVolume(0.5f)
         handler.postDelayed(runnable, 20)
         playState.postValue(STATE_PLAY)
     }
@@ -108,19 +109,38 @@ class PreviewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener 
         player.seek(ms)
     }
 
+    fun setVocalVolume(vol: Float) {
+        player.setVolume(vol * SingParam.vocalGain, SuperPlayer.Tracker.VOCAL)
+        SingParam.vocalFactor = vol
+    }
+
+    fun setAccVolume(vol: Float) {
+        player.setVolume(vol, SuperPlayer.Tracker.ACC)
+        SingParam.accFactor = vol
+    }
+
+    fun setPitch(pitch: Float) {
+        player.setPitch(pitch)
+        SingParam.pitch = pitch
+    }
+
     override fun onCompleted() {
         pause()
-        seek(0)
+        seek(0L)
     }
 
     override fun onError() {
-
+        player.stop()
+        prepare()
     }
 
     fun startMerger() {
         val mergerParam = MergerParam(SingParam.decodePath,
                 SingParam.vocalPath,
-                SingParam.mixPath)
+                SingParam.mixPath,
+                SingParam.vocalFactor * SingParam.vocalGain,
+                SingParam.accFactor,
+                SingParam.pitch)
         player.startMerge(mergerParam)
         handler.postDelayed(mergerRunnable, 100)
     }

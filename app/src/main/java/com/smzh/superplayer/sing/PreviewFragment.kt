@@ -17,13 +17,19 @@ import com.smzh.superplayer.databinding.FragmentPreviewBinding
 import com.smzh.superplayer.sing.PreviewModel.Companion.STATE_PAUSE
 import com.smzh.superplayer.sing.PreviewModel.Companion.STATE_PLAY
 import com.smzh.superplayer.widget.CustomSeekBar
+import com.smzh.superplayer.widget.SingControlView
 import kotlinx.android.synthetic.main.fragment_preview.*
 import kotlinx.android.synthetic.main.layout_song_item.*
 
-class PreviewFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekListener {
+class PreviewFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekListener, SingControlView.SingControlListener {
 
     private lateinit var viewModel: PreviewModel
     private lateinit var binding: FragmentPreviewBinding
+    private val controlView by lazy {
+        SingControlView(context!!).apply {
+            setListener(this@PreviewFragment)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,6 +50,7 @@ class PreviewFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.Seek
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         progress_bar.setPlayStatusListener(this)
+        play_control.setListener(this)
         viewModel.prepare()
         viewModel.mergerSuccess.observe(viewLifecycleOwner, Observer {
             if (it == true) {
@@ -73,6 +80,11 @@ class PreviewFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.Seek
                 viewModel.startMerger()
                 merger_container.visibility = View.VISIBLE
             }
+            R.id.btn_restart -> {
+                viewModel.stop()
+                SingActivity.start(context!!, viewModel.song)
+                activity?.finish()
+            }
         }
     }
 
@@ -90,6 +102,18 @@ class PreviewFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.Seek
 
     override fun startSeek() {
         viewModel.pause()
+    }
+
+    override fun onAccVolumeChange(volume: Float) {
+        viewModel.setAccVolume(volume)
+    }
+
+    override fun onPitchChange(pitch: Float) {
+        viewModel.setPitch(pitch)
+    }
+
+    override fun onVocalVolumeChange(volume: Float) {
+        viewModel.setVocalVolume(volume)
     }
 
     override fun onDestroyView() {

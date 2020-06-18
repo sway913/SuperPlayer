@@ -78,6 +78,9 @@ void StreamSource::produceData() {
             if (frame->audio_data && frame->len > 0) {
                 int32_t size = frame->len / sizeof(short);
                 auto *tmp_buffer = (short *) (frame->audio_data);
+                if (filterPackage) {
+                    filterPackage->process(tmp_buffer, size);
+                }
                 for (int j = 0; j < size; j++) {
                     data_queue->push(tmp_buffer[j]);
                 }
@@ -97,6 +100,14 @@ void StreamSource::produceData() {
 void StreamSource::seek(int64_t ms) {
     data_queue->reset();
     audio_decoder->seek(ms);
+}
+
+int StreamSource::getIndex() {
+    return index;
+}
+
+void StreamSource::setFilter(FilterPackage *filter) {
+    this->filterPackage = filter;
 }
 
 StreamSource::~StreamSource() {

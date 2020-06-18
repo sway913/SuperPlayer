@@ -103,7 +103,7 @@ void SuperAudio::setEcho(bool isEcho) {
     }
 }
 
-void SuperAudio::setPitch(int pitch) {
+void SuperAudio::setPitch(float pitch) {
     if (audio_engine) {
         audio_engine->setPitch(pitch);
     }

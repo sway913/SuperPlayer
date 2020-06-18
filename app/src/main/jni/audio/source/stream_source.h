@@ -8,6 +8,7 @@
 #include "isource.h"
 #include "../../common/lock_free_queue.h"
 #include "../codec/audio_decoder.h"
+#include "../filter/filter_package.h"
 
 class StreamSource : public ISource {
 
@@ -33,6 +34,10 @@ public:
 
     void seek(int64_t ms) override final;
 
+    int getIndex() override final;
+
+    void setFilter(FilterPackage *filterPacage);
+
     void setObserver(std::function<void(long, int)>) override final;
 
     virtual ~StreamSource();
@@ -56,6 +61,7 @@ private:
     int index{0};
     int sample_rate{0};
     const char *file_path{nullptr};
+    FilterPackage *filterPackage{nullptr};
 
 };
 

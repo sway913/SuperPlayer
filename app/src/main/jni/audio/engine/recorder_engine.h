@@ -22,6 +22,8 @@ public:
 
     void stop() override final;
 
+    void setEcho(bool isEcho) override final;
+
     DataCallbackResult onAudioReady(AudioStream *stream, void *data, int32_t numFrames) override final;
 
     void onSourceReady(long total_ms, int index) override final;
@@ -41,6 +43,8 @@ private:
     std::mutex mutex;
     bool recorder_ready{false};
     bool source_ready{false};
+
+    bool isEcho{false};
 
 };
 

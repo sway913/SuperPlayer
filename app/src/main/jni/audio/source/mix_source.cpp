@@ -5,7 +5,7 @@
 #include "mix_source.h"
 
 MixSource::MixSource(int sample) {
-    data_queue = new LockFreeQueue<short, kDataQueueSize>();
+    data_queue = new LockFreeQueue<short, kMixDataSize>();
     audioBuffer = new short[bufferSize];
     mixBuffer = new short[bufferSize];
     this->sample_rate = sample;
@@ -58,7 +58,7 @@ void MixSource::getMixData(short *out, int numFrames, short *input, int frameRea
             }
         }
     }
-    current_ms += (long)((float)numFrames * 1000 / sample_rate);
+    current_ms += (long) ((float) numFrames * 1000 / sample_rate);
     cond.notify_all();
 }
 
@@ -76,7 +76,7 @@ void MixSource::mixData() {
             } else if (isPause) {
                 return false;
             } else {
-                return data_queue->size() < kDataQueueSize / 2;
+                return data_queue->size() < kMixDataSize / 2;
             }
         });
 

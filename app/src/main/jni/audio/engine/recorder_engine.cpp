@@ -27,8 +27,11 @@ DataCallbackResult RecorderEngine::onAudioReady(AudioStream *stream, void *data,
         return DataCallbackResult::Stop;
     } else {
         int32_t framesRead = oboe_recorder->read(record_buffer.get(), numFrames);
+        if (vocal_filter) {
+            vocal_filter->process(record_buffer.get(), framesRead);
+        }
         if (mix_source) {
-            mix_source->getMixData((short *) data, numFrames, record_buffer.get(), framesRead);
+            mix_source->getMixData((short *) data, numFrames, isEcho ? record_buffer.get() : nullptr, isEcho ? framesRead : 0);
         }
         observer->onProduceData(record_buffer.get(), framesRead);
         if (getCurrentMs() >= getTotalMs()) {
@@ -41,9 +44,16 @@ DataCallbackResult RecorderEngine::onAudioReady(AudioStream *stream, void *data,
 void RecorderEngine::prepare(SourceFactory *factory) {
     source_factory = factory;
     mix_source = new MixSource(sample_rate);
+    vocal_filter = new FilterPackage();
+    vocal_filter->init(Vocal, sample_rate, 1);
+    acc_filter = new FilterPackage();
+    acc_filter->init(Acc, sample_rate);
     source = source_factory->createStreamSource();
     for (auto &s : source) {
         s->setObserver(std::bind(&RecorderEngine::onSourceReady, this, _1, _2));
+        if (s->getIndex() == 2) {
+            s->setFilter(acc_filter);
+        }
         s->start();
         mix_source->addSource(s);
     }
@@ -66,7 +76,7 @@ void RecorderEngine::start() {
 }
 
 void RecorderEngine::onSourceReady(long ms, int index) {
-    if (index == 1) {
+    if (index == 2) {
         this->total_ms = ms;
         disposeReadyState(2);
     }
@@ -83,6 +93,10 @@ int RecorderEngine::getMaxOutNumFrames() {
     }
 }
 
+void RecorderEngine::setEcho(bool echo) {
+    this->isEcho = echo;
+}
+
 void RecorderEngine::stop() {
     stopped = true;
     if (out_stream) {
@@ -97,7 +111,16 @@ void RecorderEngine::stop() {
 
     for (auto &s : source) {
         s->stop();
+        s->setFilter(nullptr);
         DELETEOBJ(s)
+    }
+    if (vocal_filter) {
+        vocal_filter->destroy();
+        DELETEOBJ(vocal_filter)
+    }
+    if (acc_filter) {
+        acc_filter->destroy();
+        DELETEOBJ(acc_filter)
     }
     DELETEOBJ(source_factory)
 

@@ -135,6 +135,13 @@
             app:totalMs="@{vm.totalMs.longValue()}"
             tools:visibility="visible" />
 
+        <com.smzh.superplayer.widget.SingControlView
+            android:id="@+id/play_control"
+            android:layout_marginBottom="20dp"
+            app:layout_constraintBottom_toTopOf="@+id/progress_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
         <LinearLayout
             android:id="@+id/merger_container"
             android:layout_width="match_parent"

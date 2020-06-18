@@ -33,5 +33,35 @@ static inline void mixAudioBuffer(short *a, short *b, int len) {
     }
 }
 
+inline int16_t adjustAudioVolume(int16_t source, float volume) {
+
+    int16_t result;
+    int temp = (int) ((int) source * volume);
+    int sign = 1;
+    if (temp < 0) {
+        sign = -1;
+    }
+    int abstemp = abs(temp);
+    if (abstemp < 29490) {
+        result = temp;
+    } else if (abstemp > 46285) {
+        result = 32767 * sign;
+    } else if (abstemp > 32630) {
+        result = ((abstemp - 29490) / 8 + 30668) * sign;
+    } else {
+        result = ((abstemp - 29490) / 2 + 29490) * sign;
+    }
+    return result;
+}
+
+
+inline void adjustSamplesVolume(int16_t *samples, int size, float accompanyVolume) {
+    if (accompanyVolume != 1.0) {
+        for (int i = 0; i < size; i++) {
+            samples[i] = adjustAudioVolume(samples[i], accompanyVolume);
+        }
+    }
+}
+
 
 #endif //SUPERPLAYER_COMMON_TOOLS_H

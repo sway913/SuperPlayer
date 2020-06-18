@@ -71,7 +71,7 @@ public:
 
     void setFilter(int type);
 
-    void setPitch(int pitch);
+    void setPitch(float pitch);
 
     void callLooper();
 

@@ -75,6 +75,11 @@ void PcmSource::produceData() {
             break;
         }
 
+        if (read_size < 0) {
+            read_size = 0;
+        }
+        file_stream->seekg(read_size, std::ios::beg);
+
         int32_t remain_size = total_size - read_size;
         int32_t frame_size = 0;
         if (remain_size >= buffer_size) {
@@ -94,6 +99,9 @@ void PcmSource::produceData() {
         if (len > 0) {
             int32_t size = len * 2;
             auto *tmp_buffer = (short *) (out);
+            if (filterPackage) {
+                filterPackage->process(tmp_buffer, size);
+            }
             for (int j = 0; j < size; j++) {
                 data_queue->push(tmp_buffer[j]);
             }
@@ -107,9 +115,17 @@ void PcmSource::produceData() {
 }
 
 void PcmSource::seek(int64_t ms) {
+    LOGI("pcm source seek ms %ld", ms);
     data_queue->reset();
-    long pt = ms * 44100 * 2 * sizeof(short) / 1000.0f;
-    file_stream->seekg(pt, std::ios::beg);
+    read_size = ms / 1000.0f * 44100 * 2 * sizeof(short);
+}
+
+int PcmSource::getIndex() {
+    return index;
+}
+
+void PcmSource::setFilter(FilterPackage *filter) {
+    this->filterPackage = filter;
 }
 
 PcmSource::~PcmSource() {

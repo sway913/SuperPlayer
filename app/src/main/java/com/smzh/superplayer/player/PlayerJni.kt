@@ -33,7 +33,7 @@ class PlayerJni {
 
     external fun setVolume(volume: Float, track: Int)
 
-    external fun setPitch(pitch: Int)
+    external fun setPitch(pitch: Float)
 
     external fun getTotalMs(): Long
 

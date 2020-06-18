@@ -16,6 +16,7 @@
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/rootView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".sing.SingFragment">
@@ -94,7 +95,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:visible="@{vm.singState == 0}"
-            tools:visibility="visible" />
+            tools:visibility="invisible" />
 
         <com.smzh.superplayer.widget.CustomSeekBar
             android:id="@+id/progress_bar"
@@ -130,22 +131,6 @@
             tools:layout_editor_absoluteX="6dp">
 
             <Button
-                android:id="@+id/btn_quit"
-                android:layout_width="60dp"
-                android:layout_height="wrap_content"
-                android:background="@null"
-                android:gravity="center"
-                android:onClick="@{listener}"
-                android:text="退出"
-                android:textSize="14sp" />
-
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
-            <Button
                 android:id="@+id/btn_restart"
                 android:layout_width="60dp"
                 android:layout_height="wrap_content"
@@ -158,7 +143,7 @@
             <View
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_weight="1" />
+                android:layout_weight="0.5" />
 
             <Button
                 android:id="@+id/btn_control"
@@ -177,27 +162,16 @@
 
             <Button
                 android:id="@+id/btn_finish"
-                android:layout_width="60dp"
-                android:layout_height="wrap_content"
-                android:background="@null"
+                android:layout_width="150dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/button_bg"
                 android:gravity="center"
                 android:onClick="@{listener}"
                 android:text="完成"
                 android:textSize="14sp" />
 
         </LinearLayout>
-
-
-        <include
-            android:id="@+id/sing_controller"
-            layout="@layout/layout_audio_controller"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginBottom="20dp"
-            android:visibility="gone"
-            app:layout_constraintBottom_toTopOf="@+id/bottom_bar" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

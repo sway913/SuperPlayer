@@ -12,6 +12,7 @@
 #include "../codec/resample_helper.h"
 #include "../../common/common_tools.h"
 #include "../../common/constexpr.h"
+#include "../filter/filter_package.h"
 
 using namespace std;
 
@@ -36,6 +37,10 @@ public:
     virtual bool isEmpty() = 0;
 
     virtual void seek(int64_t ms) = 0;
+
+    virtual int getIndex() = 0;
+
+    virtual void setFilter(FilterPackage *filterPacage) = 0;
 
     virtual void setObserver(std::function<void(long, int)>) = 0;
 

@@ -23,7 +23,7 @@ vector<ISource *> SourceFactory::createPcmSource() {
 
 vector<ISource *> SourceFactory::createStreamSource() {
     auto source = vector<ISource *>();
-    source.push_back(new StreamSource(accPath, out_sample, 1));
+    source.push_back(new StreamSource(accPath, out_sample, 2));
     return source;
 }
 
