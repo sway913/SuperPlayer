@@ -11,7 +11,9 @@ target_link_libraries(
         thirdpart
         oboe
         soundtouch
+        sox
 )
 
 ADD_SUBDIRECTORY(oboe-1.3)
 ADD_SUBDIRECTORY(soundtouch)
+ADD_SUBDIRECTORY(sox)
