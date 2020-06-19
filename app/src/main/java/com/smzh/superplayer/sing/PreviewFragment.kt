@@ -21,13 +21,14 @@ import com.smzh.superplayer.databinding.FragmentPreviewBinding
 import com.smzh.superplayer.dp2px
 import com.smzh.superplayer.sing.PreviewModel.Companion.STATE_PAUSE
 import com.smzh.superplayer.sing.PreviewModel.Companion.STATE_PLAY
+import com.smzh.superplayer.widget.CustomEffectView
 import com.smzh.superplayer.widget.CustomSeekBar
 import com.smzh.superplayer.widget.SingControlView
 import kotlinx.android.synthetic.main.fragment_preview.*
 import kotlinx.android.synthetic.main.layout_song_item.*
 
 class PreviewFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekListener, SingControlView.SingControlListener,
-        AudioFilterAdapter.AudioEffectSelectListener {
+        AudioFilterAdapter.AudioEffectSelectListener, CustomEffectView.CustomEffectChangedListener {
 
     private lateinit var viewModel: PreviewModel
     private lateinit var binding: FragmentPreviewBinding
@@ -52,6 +53,7 @@ class PreviewFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.Seek
         super.onViewCreated(view, savedInstanceState)
         progress_bar.setPlayStatusListener(this)
         play_control.setListener(this)
+        custom_view.setCustomEffectChangeListener(this)
         effect_view.run {
             layoutManager = GridLayoutManager(context, 5, GridLayoutManager.VERTICAL, false)
             adapter = AudioFilterAdapter(this@PreviewFragment)
@@ -123,7 +125,15 @@ class PreviewFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.Seek
     }
 
     override fun onAudioEffectSelect(audioEffect: AudioEffect) {
+        if (audioEffect.index == 15) {
+            custom_view.show()
+            return
+        }
         viewModel.setEffect(audioEffect.index)
+    }
+
+    override fun onCustomEffectChanged(customEffect: FloatArray) {
+        viewModel.setCustomEffect(customEffect)
     }
 
     override fun onDestroyView() {
@@ -131,6 +141,10 @@ class PreviewFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.Seek
     }
 
     override fun onBackPressed() {
+        if (custom_view.visibility == View.VISIBLE) {
+            custom_view.hide()
+            return
+        }
         viewModel.stop()
         super.onBackPressed()
     }

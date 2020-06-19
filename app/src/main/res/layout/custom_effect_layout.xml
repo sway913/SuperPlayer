@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#e6000000"
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/close_btn"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="35dp"
+        android:tint="#ffffffff"
+        app:layout_constraintBottom_toTopOf="@+id/container"
+        app:layout_constraintEnd_toEndOf="@+id/container"
+        app:srcCompat="@android:drawable/ic_menu_close_clear_cancel" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/tv_rb_ratio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="混响比例:"
+            android:textColor="#ffffff"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <SeekBar
+            android:id="@+id/sb_rb_ratio"
+            style="@style/CustomSeekBarWhite"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:max="100"
+            android:maxHeight="2dp"
+            android:progress="50"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_rb_ratio"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tv_rb_ratio"
+            app:layout_constraintTop_toTopOf="@+id/tv_rb_ratio" />
+
+        <TextView
+            android:id="@+id/tv_rb_depth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:text="混响深度:"
+            android:textColor="#ffffff"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_rb_ratio" />
+
+        <SeekBar
+            android:id="@+id/sb_rb_depth"
+            style="@style/CustomSeekBarWhite"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:max="100"
+            android:maxHeight="2dp"
+            android:progress="50"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_rb_depth"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tv_rb_depth"
+            app:layout_constraintTop_toTopOf="@+id/tv_rb_depth" />
+
+        <TextView
+            android:id="@+id/tv_rb_grain"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:text="混响增益:"
+            android:textColor="#ffffff"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_rb_depth" />
+
+        <SeekBar
+            android:id="@+id/sb_rb_grain"
+            style="@style/CustomSeekBarWhite"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:max="100"
+            android:maxHeight="2dp"
+            android:progress="50"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_rb_grain"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tv_rb_grain"
+            app:layout_constraintTop_toTopOf="@+id/tv_rb_grain" />
+
+        <TextView
+            android:id="@+id/tv_min_delay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:text="最小延迟:"
+            android:textColor="#ffffff"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_rb_grain" />
+
+        <SeekBar
+            android:id="@+id/sb_min_delay"
+            style="@style/CustomSeekBarWhite"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:max="100"
+            android:maxHeight="2dp"
+            android:progress="50"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_min_delay"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tv_min_delay"
+            app:layout_constraintTop_toTopOf="@+id/tv_min_delay" />
+
+        <TextView
+            android:id="@+id/tv_max_delay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:text="最大延迟:"
+            android:textColor="#ffffff"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_min_delay" />
+
+        <SeekBar
+            android:id="@+id/sb_max_delay"
+            style="@style/CustomSeekBarWhite"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:max="100"
+            android:maxHeight="2dp"
+            android:progress="50"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_max_delay"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tv_max_delay"
+            app:layout_constraintTop_toTopOf="@+id/tv_max_delay" />
+
+        <TextView
+            android:id="@+id/tv_cmp_limit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:text="压缩门限:"
+            android:textColor="#ffffff"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_max_delay" />
+
+        <SeekBar
+            android:id="@+id/sb_cmp_limit"
+            style="@style/CustomSeekBarWhite"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:max="100"
+            android:maxHeight="2dp"
+            android:progress="50"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_cmp_limit"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tv_cmp_limit"
+            app:layout_constraintTop_toTopOf="@+id/tv_cmp_limit" />
+
+        <TextView
+            android:id="@+id/tv_cmp_range"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:text="压缩范围:"
+            android:textColor="#ffffff"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_cmp_limit" />
+
+        <SeekBar
+            android:id="@+id/sb_cmp_range"
+            style="@style/CustomSeekBarWhite"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:max="100"
+            android:maxHeight="2dp"
+            android:progress="50"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_cmp_range"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tv_cmp_range"
+            app:layout_constraintTop_toTopOf="@+id/tv_cmp_range" />
+
+        <TextView
+            android:id="@+id/tv_cmp_grain"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:text="压缩增益"
+            android:textColor="#ffffff"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_cmp_range" />
+
+        <SeekBar
+            android:id="@+id/sb_cmp_grain"
+            style="@style/CustomSeekBarWhite"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:max="100"
+            android:maxHeight="2dp"
+            android:progress="50"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_cmp_grain"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tv_cmp_grain"
+            app:layout_constraintTop_toTopOf="@+id/tv_cmp_grain" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

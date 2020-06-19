@@ -128,6 +128,10 @@ class PreviewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener 
         player.setFilter(index)
     }
 
+    fun setCustomEffect(floatArray: FloatArray) {
+        player.setCustomFilter(floatArray)
+    }
+
     override fun onCompleted() {
         pause()
         seek(0L)

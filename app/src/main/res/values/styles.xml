@@ -20,4 +20,9 @@
         <item name="android:thumb">@drawable/oval</item>
     </style>
 
+    <style name="CustomSeekBarWhite">
+        <item name="android:progressDrawable">@drawable/progress_bar_white_bg</item>
+        <item name="android:thumb">@drawable/oval_white</item>
+    </style>
+
 </resources>

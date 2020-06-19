@@ -86,7 +86,7 @@ void SuperAudio::seek(int64_t millis) {
     if (audio_engine) {
         audio_engine->seek(millis);
     }
-    if(pcmWriter) {
+    if (pcmWriter) {
         pcmWriter->seek(millis);
     }
 }
@@ -94,6 +94,12 @@ void SuperAudio::seek(int64_t millis) {
 void SuperAudio::setFilter(int type) {
     if (audio_engine) {
         audio_engine->setFilter(type);
+    }
+}
+
+void SuperAudio::setCustomFilter(float *arr) {
+    if (audio_engine) {
+        audio_engine->setCustomFilter(arr);
     }
 }
 

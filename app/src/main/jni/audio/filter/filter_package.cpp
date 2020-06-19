@@ -9,6 +9,8 @@ void FilterPackage::init(Tracker tracker, int sample_rate, int channels) {
     if (tracker == Vocal) {
         filters.push_back(new VolumeFilter());
         ff_filter = new FFFilter(sample_rate, channels);
+        custom_filter = new CustomFilter();
+        custom_filter->init(sample_rate, channels);
     }
     if (tracker == Acc) {
         filters.push_back(new VolumeFilter());
@@ -50,6 +52,14 @@ void FilterPackage::setEffect(int type) {
     filter_type = type;
 }
 
+void FilterPackage::setCustomEffect(float *arr) {
+    lock_guard<mutex> lock(_mutex);
+    if (custom_filter) {
+        custom_filter->setEffect(arr);
+    }
+    filter_type = 15;
+}
+
 int FilterPackage::process(short *data, int len) {
     lock_guard<mutex> lock(_mutex);
     for (auto &filter : filters) {
@@ -57,9 +67,13 @@ int FilterPackage::process(short *data, int len) {
     }
     if (filter_type != 14) {
         if (filter_type != 15) {
-            ff_filter->process(data, len);
+            if (ff_filter) {
+                ff_filter->process(data, len);
+            }
         } else {
-
+            if (custom_filter) {
+                custom_filter->process(data, len);
+            }
         }
     }
     return len;

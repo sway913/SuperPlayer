@@ -57,6 +57,14 @@ JNIEXPORT void JNICALL Java_com_smzh_superplayer_player_PlayerJni_setFilter(JNIE
     }
 }
 
+JNIEXPORT void JNICALL Java_com_smzh_superplayer_player_PlayerJni_setCustomFilter(JNIEnv *env, jobject clazz, jfloatArray array) {
+    if (super_audio) {
+        jfloat *param = env->GetFloatArrayElements(array, nullptr);
+        super_audio->setCustomFilter(param);
+        env->ReleaseFloatArrayElements(array, param, 0);
+    }
+}
+
 JNIEXPORT void JNICALL Java_com_smzh_superplayer_player_PlayerJni_setPitch(JNIEnv *env, jobject clazz, jfloat pitch) {
     if (super_audio) {
         super_audio->setPitch(pitch);

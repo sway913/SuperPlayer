@@ -10,6 +10,7 @@
 #include "volume_filer.h"
 #include "pitch_filter.h"
 #include "ff_filter.h"
+#include "custom_filter.h"
 #include <mutex>
 
 using namespace std;
@@ -26,6 +27,7 @@ private:
     list<IFilter *> filters{};
     mutex _mutex;
     FFFilter *ff_filter{nullptr};
+    CustomFilter *custom_filter{nullptr};
     int filter_type{14};
 
 public:
@@ -39,6 +41,8 @@ public:
     void setPitch(float pitch);
 
     void setEffect(int type);
+
+    void setCustomEffect(float *arr);
 
     void destroy();
 

@@ -100,6 +100,12 @@ void AudioEngine::setFilter(int type) {
     }
 }
 
+void AudioEngine::setCustomFilter(float *arr) {
+    if(vocal_filter){
+
+    }
+}
+
 void AudioEngine::seek(int64_t millis) {
     for (auto &s : source) {
         s->seek(millis);

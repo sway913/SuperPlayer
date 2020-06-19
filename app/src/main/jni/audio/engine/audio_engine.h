@@ -69,6 +69,8 @@ public:
 
     virtual void setFilter(int type);
 
+    virtual void setCustomFilter(float *arr);
+
     virtual void setPitch(float pitch);
 
     virtual int64_t getTotalMs();

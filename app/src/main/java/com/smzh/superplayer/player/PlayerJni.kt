@@ -31,6 +31,8 @@ class PlayerJni {
 
     external fun setFilter(type: Int)
 
+    external fun setCustomFilter(floatArray: FloatArray)
+
     external fun setVolume(volume: Float, track: Int)
 
     external fun setPitch(pitch: Float)

@@ -71,6 +71,8 @@ public:
 
     void setFilter(int type);
 
+    void setCustomFilter(float* arr);
+
     void setPitch(float pitch);
 
     void callLooper();
