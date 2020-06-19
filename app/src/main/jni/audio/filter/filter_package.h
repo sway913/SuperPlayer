@@ -22,13 +22,17 @@ enum Tracker {
 
 class FilterPackage {
 
+    enum FilterType {
+        None,
+        FF_Filter,
+        Custom
+    };
+
 private:
 
     list<IFilter *> filters{};
     mutex _mutex;
-    FFFilter *ff_filter{nullptr};
-    CustomFilter *custom_filter{nullptr};
-    int filter_type{14};
+    FilterType filter_type{None};
 
 public:
 

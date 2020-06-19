@@ -17,7 +17,7 @@ private:
 
 public:
 
-    void init(int sampleRate, int channel, int param) override final;
+    void init(int sampleRate, int channel) override final;
 
     int process(short *data, int len) override final;
 

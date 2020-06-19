@@ -4,7 +4,7 @@
 
 #include "pitch_filter.h"
 
-void PitchFilter::init(int sampleRate, int channel, int param) {
+void PitchFilter::init(int sampleRate, int channel) {
     soundTouch = new SoundTouch();
     soundTouch->setSampleRate(static_cast<uint>(sampleRate));
     soundTouch->setChannels(static_cast<uint>(channel));

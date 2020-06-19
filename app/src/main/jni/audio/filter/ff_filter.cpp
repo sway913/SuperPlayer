@@ -121,7 +121,7 @@ void getEqualizerOptionString(char *str, size_t size, int type) {
     }
 }
 
-FFFilter::FFFilter(int sampleRate, int channelCount) {
+void FFFilter::init(int sampleRate, int channelCount) {
     this->sample_rate = sampleRate;
     this->channels = channelCount;
     if (!init()) {
@@ -152,7 +152,7 @@ bool FFFilter::init() {
 }
 
 
-int32_t FFFilter::process(short *input, int len) {
+int FFFilter::process(short *input, int len) {
 
     if (!avSrc_ || !avFrame_ || !avSink_) {
         return -1;
@@ -277,7 +277,7 @@ bool FFFilter::reconfigure() {
     return true;
 }
 
-FFFilter::~FFFilter() {
+void FFFilter::destroy() {
     if (avSrc_) {
         avfilter_free(avSrc_);
         avSrc_ = nullptr;

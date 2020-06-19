@@ -4,7 +4,7 @@
 
 #include "volume_filer.h"
 
-void VolumeFilter::init(int sampleRate, int channel, int param) {
+void VolumeFilter::init(int sampleRate, int channel) {
 
 }
 

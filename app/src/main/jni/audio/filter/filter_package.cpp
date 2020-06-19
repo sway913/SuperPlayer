@@ -8,16 +8,15 @@ void FilterPackage::init(Tracker tracker, int sample_rate, int channels) {
     lock_guard<mutex> lock(_mutex);
     if (tracker == Vocal) {
         filters.push_back(new VolumeFilter());
-        ff_filter = new FFFilter(sample_rate, channels);
-        custom_filter = new CustomFilter();
-        custom_filter->init(sample_rate, channels);
+        filters.push_back(new FFFilter());
+        filters.push_back(new CustomFilter());
     }
     if (tracker == Acc) {
         filters.push_back(new VolumeFilter());
         filters.push_back(new PitchFilter());
     }
     for (auto &filter : filters) {
-        filter->init(sample_rate, channels, 0);
+        filter->init(sample_rate, channels);
     }
 }
 
@@ -42,38 +41,40 @@ void FilterPackage::setPitch(float pitch) {
 
 void FilterPackage::setEffect(int type) {
     lock_guard<mutex> lock(_mutex);
-    if (type != 15) {
-        if (ff_filter) {
+    for (auto &filter : filters) {
+        if (auto *ff_filter = dynamic_cast<FFFilter *>(filter)) {
             ff_filter->setFilter(type);
         }
-    } else {
-
     }
-    filter_type = type;
+    filter_type = type == 14 ? None : FF_Filter;
 }
 
 void FilterPackage::setCustomEffect(float *arr) {
     lock_guard<mutex> lock(_mutex);
-    if (custom_filter) {
-        custom_filter->setEffect(arr);
+    for (auto &filter : filters) {
+        if (auto *custom_filter = dynamic_cast<CustomFilter *>(filter)) {
+            custom_filter->setEffect(arr);
+        }
     }
-    filter_type = 15;
+    filter_type = Custom;
 }
 
 int FilterPackage::process(short *data, int len) {
     lock_guard<mutex> lock(_mutex);
     for (auto &filter : filters) {
-        filter->process(data, len);
-    }
-    if (filter_type != 14) {
-        if (filter_type != 15) {
-            if (ff_filter) {
+        if (auto *custom_filter = dynamic_cast<CustomFilter *>(filter)) {
+            if (filter_type == Custom) {
+                custom_filter->process(data, len);
+            }
+        } else if (auto *ff_filter = dynamic_cast<FFFilter *>(filter)) {
+            if (filter_type == FF_Filter) {
                 ff_filter->process(data, len);
             }
         } else {
-            if (custom_filter) {
-                custom_filter->process(data, len);
-            }
+            filter->process(data, len);
+        }
+        if (filter_type == None) {
+
         }
     }
     return len;

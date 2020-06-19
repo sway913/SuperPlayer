@@ -9,6 +9,7 @@
 #include <inttypes.h>
 #include <SLES/OpenSLES.h>
 #include "../../common/android_log.h"
+#include "ifilter.h"
 
 
 extern "C" {
@@ -38,19 +39,19 @@ extern "C" {
 #define EFFECT_PRESET_ORIGINAL      14
 #define EFFECT_PRESET_TEST 99
 
-class FFFilter {
+class FFFilter : public IFilter {
 
 public:
 
-    FFFilter(int sampleRate, int channelCount = 2);
+    void init(int sampleRate, int channel) override final;
 
-    int32_t process(short *input, int len);
+    int process(short *data, int len) override final;
+
+    void destroy() override final;
 
     void setFilter(int effect);
 
     void setVolume(double vol);
-
-    ~FFFilter();
 
 private:
 

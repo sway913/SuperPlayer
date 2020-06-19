@@ -9,7 +9,7 @@ class IFilter {
 
 public:
 
-    virtual void init(int sampleRate, int channel, int param) = 0;
+    virtual void init(int sampleRate, int channel) = 0;
 
     virtual int process(short *data, int len) = 0;
 

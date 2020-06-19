@@ -52,7 +52,7 @@ void AudioEngine::onErrorBeforeClose(AudioStream *oboeStream, Result error) {
 
 void AudioEngine::resume() {
     for (auto &s : source) {
-      s->resume();
+        s->resume();
     }
     if (mix_source) {
         mix_source->resume();
@@ -101,8 +101,8 @@ void AudioEngine::setFilter(int type) {
 }
 
 void AudioEngine::setCustomFilter(float *arr) {
-    if(vocal_filter){
-
+    if (vocal_filter) {
+        vocal_filter->setCustomEffect(arr);
     }
 }
 
