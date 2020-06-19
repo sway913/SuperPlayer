@@ -1,6 +1,5 @@
 package com.smzh.superplayer.sing
 
-import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.recyclerview.widget.RecyclerView
@@ -14,7 +13,8 @@ class AudioFilterAdapter(val listener: AudioEffectSelectListener) : RecyclerView
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AudioEffectHolder {
         val view = AudioEffectView(parent.context)
-        view.layoutParams = FrameLayout.LayoutParams(dp2px(parent.context, 70), dp2px(parent.context, 70)).apply {
+        val width = (parent.context.resources.displayMetrics.widthPixels - dp2px(parent.context, 40)) / 5 - dp2px(parent.context, 20)
+        view.layoutParams = FrameLayout.LayoutParams(width, width).apply {
 
         }
         return AudioEffectHolder(view)
@@ -61,15 +61,15 @@ class AudioFilterAdapter(val listener: AudioEffectSelectListener) : RecyclerView
                 AudioEffect(11, "摇滚"),
                 AudioEffect(12, "嘻哈"),
                 AudioEffect(13, "空灵"),
+                AudioEffect(8, "迷幻"),
                 AudioEffect(2, "KTV"),
-                AudioEffect(6, "录音机"),
+                AudioEffect(6, "留声机"),
                 AudioEffect(3, "录音棚"),
                 AudioEffect(4, "音乐会"),
                 AudioEffect(1, "电影院"),
                 AudioEffect(5, "男声"),
                 AudioEffect(7, "女声"),
-                AudioEffect(8, "通透"),
-                AudioEffect(15, "自定义")
+                AudioEffect(15, "···")
         )
     }
 

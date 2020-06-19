@@ -13,6 +13,7 @@ object SingParam {
     val vocalPath: String
     val mixPath: String
     val decodePath: String
+    val testVocalPath: String
     const val vocalGain = 4F
 
     init {
@@ -23,6 +24,7 @@ object SingParam {
             vocalPath = this + "vocal.pcm"
             mixPath = this + "mix.aac"
             decodePath = this + "decode.pcm"
+            testVocalPath = this + "test_vocal.pcm"
         }
         filePath.run {
             val file = File(this)

@@ -33,7 +33,3 @@ void PitchFilter::setPitch(float pitch) {
     soundTouch->setPitchSemiTones(pitch);
     this->pitch_shift = pitch;
 }
-
-FilterType PitchFilter::getType() {
-    return FilterType::PitchType;
-}

@@ -91,7 +91,7 @@ AudioBuffer *AudioDecoder::decodeFrame() {
             int size = p_av_frame->nb_samples * p_av_frame->channels * av_get_bytes_per_sample((AVSampleFormat) p_codec_para->format);
             audioBuffer->push((char *) (p_av_frame->extended_data[0]), size);
         }
-        av_frame_unref(p_av_frame);
+//        av_frame_unref(p_av_frame);
     }
     av_packet_unref(p_av_packet);
     return audioBuffer;

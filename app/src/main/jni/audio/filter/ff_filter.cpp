@@ -152,7 +152,7 @@ bool FFFilter::init() {
 }
 
 
-int32_t FFFilter::process(void *input, int size, int frameBuff) {
+int32_t FFFilter::process(short *input, int len) {
 
     if (!avSrc_ || !avFrame_ || !avSink_) {
         return -1;
@@ -166,7 +166,7 @@ int32_t FFFilter::process(void *input, int size, int frameBuff) {
 
     if (isConfiguring) {
         LOGW("AudioFilter::process isConfiguring true");
-        return size;
+        return len;
     }
 
     std::lock_guard<std::mutex> lock(configureMutex_);
@@ -201,8 +201,8 @@ int32_t FFFilter::process(void *input, int size, int frameBuff) {
     avFrame_->sample_rate = sample_rate;
     avFrame_->format = format;
     avFrame_->channel_layout = channelLayout;
-    avFrame_->nb_samples = frameBuff;
-    avFrame_->pts = processCount * frameBuff;
+    avFrame_->nb_samples = len / channels;
+    avFrame_->pts = processCount * len / channels;
 
 
     int err = 0;
@@ -212,8 +212,8 @@ int32_t FFFilter::process(void *input, int size, int frameBuff) {
         printError(err);
         return err;
     }
-    memcpy(avFrame_->extended_data[0], input, size);
-    avFrame_->linesize[0] = size;
+    memcpy(avFrame_->extended_data[0], input, len * sizeof(short));
+    avFrame_->linesize[0] = len * sizeof(short);
 
     /* Send the frame to the input of the filtergraph. */
     err = av_buffersrc_add_frame(avSrc_, avFrame_);
@@ -237,10 +237,10 @@ int32_t FFFilter::process(void *input, int size, int frameBuff) {
         return err;
     }
 
-    memcpy(input, avFrame_->extended_data[0], size);
+    memcpy(input, avFrame_->extended_data[0], len * sizeof(short));
     av_frame_unref(avFrame_);
 
-    return size;
+    return len;
 }
 
 void FFFilter::setVolume(double vol) {

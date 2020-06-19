@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.View
 
@@ -13,12 +14,13 @@ class AudioEffectView : View {
 
 
     private val whitePaint: Paint = Paint().apply {
-        color = Color.TRANSPARENT
+        color = Color.WHITE
         strokeWidth = 3f
         isAntiAlias = true
         style = Paint.Style.FILL
         textAlign = Paint.Align.CENTER
         textSize = 34f
+        typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD)
     }
     private var blackPaint: Paint = Paint().apply {
         color = Color.parseColor("#99000000")
@@ -27,6 +29,7 @@ class AudioEffectView : View {
         style = Paint.Style.FILL
         textAlign = Paint.Align.CENTER
         textSize = 34f
+        typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD)
     }
 
     constructor(context: Context?) : super(context)
@@ -66,6 +69,7 @@ class AudioEffectView : View {
             val top = fontMetrics.top
             val bottom = fontMetrics.bottom
             val baseLineY = (height / 2f - top / 2 - bottom / 2)
+            blackPaint.style = Paint.Style.FILL
             canvas?.drawText(text, width / 2f, baseLineY, blackPaint)
         }
     }

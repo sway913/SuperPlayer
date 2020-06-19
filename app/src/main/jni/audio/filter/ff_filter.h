@@ -44,7 +44,7 @@ public:
 
     FFFilter(int sampleRate, int channelCount = 2);
 
-    int32_t process(void *input, int32_t size, int framePerBuff);
+    int32_t process(short *input, int len);
 
     void setFilter(int effect);
 
@@ -58,7 +58,7 @@ private:
 
     uint64_t processCount;
     int preset = 0;
-    double volume = 1;
+    double volume = 2;
     bool isConfiguring;
     std::mutex configureMutex_;
     AVFilterGraph *filterGraph_{nullptr};

@@ -27,8 +27,6 @@ public:
 
     void setPitch(float pitch);
 
-    FilterType getType() override final;
-
 };
 
 

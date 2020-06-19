@@ -123,7 +123,7 @@ class PreviewFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.Seek
     }
 
     override fun onAudioEffectSelect(audioEffect: AudioEffect) {
-
+        viewModel.setEffect(audioEffect.index)
     }
 
     override fun onDestroyView() {
@@ -137,13 +137,10 @@ class PreviewFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.Seek
 
     inner class EffectItemDecoration : RecyclerView.ItemDecoration() {
         override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
-            val width = parent.context.resources.displayMetrics.widthPixels
-            val mLR = (width - dp2px(parent.context, 390)) / 8
-            val pos = parent.getChildLayoutPosition(view)
-            outRect.left = mLR
-            outRect.right = mLR
-            outRect.top = dp2px(parent.context, 10)
-            outRect.bottom = dp2px(parent.context, 10)
+            outRect.left = dp2px(parent.context, 10)
+            outRect.right = dp2px(parent.context, 10)
+            outRect.top = dp2px(parent.context, 15)
+            outRect.bottom = dp2px(parent.context, 15)
         }
     }
 

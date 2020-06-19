@@ -26,11 +26,6 @@ class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekLis
 
     private lateinit var viewModel: SingViewModel
     private lateinit var binding: FragmentSingBinding
-    private val controlView by lazy {
-        SingControlView(context!!).apply {
-            setListener(this@SingFragment)
-        }
-    }
 
     private val lyricTxt by lazy { StringBuilder() }
 
@@ -54,6 +49,7 @@ class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekLis
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         progress_bar.setPlayStatusListener(this)
+        sing_control.setListener(this)
         lyric_enter.setOnClickListener {
             if (lyric_input.text == null) {
                 return@setOnClickListener
@@ -81,7 +77,13 @@ class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekLis
         when (v?.id) {
 
             R.id.btn_control -> {
-                showControlView()
+                if (sing_control.visibility == View.VISIBLE) {
+                    sing_control.visibility = View.GONE
+                    btn_control.setTextColor(Color.BLACK)
+                } else {
+                    sing_control.visibility = View.VISIBLE
+                    btn_control.setTextColor(Color.GRAY)
+                }
             }
 
             R.id.btn_finish -> {
@@ -140,25 +142,6 @@ class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekLis
     override fun onBackPressed() {
         viewModel.stop()
         super.onBackPressed()
-    }
-
-
-    private var control: PopupWindow? = null
-    private fun showControlView() {
-        if (control != null) {
-            control?.dismiss()
-            control = null
-            return
-        }
-        control = PopupWindow(context).apply {
-            contentView = controlView
-            width = ViewGroup.LayoutParams.MATCH_PARENT
-            height = ViewGroup.LayoutParams.WRAP_CONTENT
-            isTouchable = true
-            isOutsideTouchable = true
-            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            showAtLocation(rootView, Gravity.BOTTOM, 0, dp2px(context!!, 220))
-        }
     }
 
     override fun onDestroyView() {

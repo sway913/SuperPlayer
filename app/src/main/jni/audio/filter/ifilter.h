@@ -5,12 +5,6 @@
 #ifndef SUPERPLAYER_IFILTER_H
 #define SUPERPLAYER_IFILTER_H
 
-enum FilterType {
-    VolumeType,
-    PitchType,
-    NormalType
-};
-
 class IFilter {
 
 public:
@@ -20,10 +14,6 @@ public:
     virtual int process(short *data, int len) = 0;
 
     virtual void destroy() = 0;
-
-    virtual FilterType getType() {
-        return NormalType;
-    }
 
     virtual ~IFilter() {
 

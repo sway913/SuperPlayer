@@ -9,6 +9,7 @@
 #include "ifilter.h"
 #include "volume_filer.h"
 #include "pitch_filter.h"
+#include "ff_filter.h"
 #include <mutex>
 
 using namespace std;
@@ -24,6 +25,8 @@ private:
 
     list<IFilter *> filters{};
     mutex _mutex;
+    FFFilter *ff_filter{nullptr};
+    int filter_type{14};
 
 public:
 

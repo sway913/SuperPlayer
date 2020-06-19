@@ -25,7 +25,6 @@ public:
 
     void setVolume(float vol);
 
-    FilterType getType() override final ;
 };
 
 

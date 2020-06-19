@@ -23,7 +23,3 @@ void VolumeFilter::setVolume(float vol) {
 void VolumeFilter::destroy() {
 
 }
-
-FilterType VolumeFilter::getType() {
-    return FilterType::VolumeType;
-}

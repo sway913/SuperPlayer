@@ -72,7 +72,7 @@ class PreviewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener 
     fun prepare() {
         val audioParam = AudioParam(isRecorder = false,
                 accPath = song.path ?: "",
-                vocalPath = SingParam.vocalPath,
+                vocalPath = SingParam.testVocalPath,
                 decodePath = SingParam.decodePath)
         player.addPlayerListener(this)
         player.prepare(audioParam)
@@ -122,6 +122,10 @@ class PreviewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener 
     fun setPitch(pitch: Float) {
         player.setPitch(pitch)
         SingParam.pitch = pitch
+    }
+
+    fun setEffect(index: Int) {
+        player.setFilter(index)
     }
 
     override fun onCompleted() {
