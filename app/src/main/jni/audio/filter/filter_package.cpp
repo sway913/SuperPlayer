@@ -39,24 +39,26 @@ void FilterPackage::setPitch(float pitch) {
     }
 }
 
-void FilterPackage::setEffect(int type) {
+void FilterPackage::setEffect(float *arr) {
     lock_guard<mutex> lock(_mutex);
-    for (auto &filter : filters) {
-        if (auto *ff_filter = dynamic_cast<FFFilter *>(filter)) {
-            ff_filter->setFilter(type);
+    int index = (int) arr[8];
+    if (index == 14) {
+        filter_type = None;
+    } else if (index == 15) {
+        filter_type = Custom;
+        for (auto &filter : filters) {
+            if (auto *custom_filter = dynamic_cast<CustomFilter *>(filter)) {
+                custom_filter->setEffect(arr);
+            }
+        }
+    } else {
+        filter_type = FF_Filter;
+        for (auto &filter : filters) {
+            if (auto *ff_filter = dynamic_cast<FFFilter *>(filter)) {
+                ff_filter->setFilter(index);
+            }
         }
     }
-    filter_type = type == 14 ? None : FF_Filter;
-}
-
-void FilterPackage::setCustomEffect(float *arr) {
-    lock_guard<mutex> lock(_mutex);
-    for (auto &filter : filters) {
-        if (auto *custom_filter = dynamic_cast<CustomFilter *>(filter)) {
-            custom_filter->setEffect(arr);
-        }
-    }
-    filter_type = Custom;
 }
 
 int FilterPackage::process(short *data, int len) {

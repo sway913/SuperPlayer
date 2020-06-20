@@ -94,15 +94,9 @@ void AudioEngine::setPitch(float pitch) {
     }
 }
 
-void AudioEngine::setFilter(int type) {
+void AudioEngine::setFilter(float *arr) {
     if (vocal_filter) {
-        vocal_filter->setEffect(type);
-    }
-}
-
-void AudioEngine::setCustomFilter(float *arr) {
-    if (vocal_filter) {
-        vocal_filter->setCustomEffect(arr);
+        vocal_filter->setEffect(arr);
     }
 }
 

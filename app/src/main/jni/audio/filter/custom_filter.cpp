@@ -17,7 +17,7 @@ static int input_drain(sox_effect_t *effp, sox_sample_t *obuf, size_t *osamp) {
     return SOX_SUCCESS;
 }
 
-static int compressor_output_flow(sox_effect_t *effp LSX_UNUSED, sox_sample_t const *ibuf, sox_sample_t *obuf LSX_UNUSED, size_t *isamp, size_t *osamp) {
+static int output_flow(sox_effect_t *effp LSX_UNUSED, sox_sample_t const *ibuf, sox_sample_t *obuf LSX_UNUSED, size_t *isamp, size_t *osamp) {
     if (*isamp) {
         int i = 0;
         for (; i < *isamp; i++) {
@@ -34,7 +34,7 @@ static sox_effect_handler_t const *input_handler() {
 }
 
 static sox_effect_handler_t const *output_handler() {
-    static sox_effect_handler_t handler = {"output", nullptr, SOX_EFF_MCHAN | SOX_EFF_MODIFY | SOX_EFF_PREC, nullptr, nullptr, compressor_output_flow, nullptr, nullptr, nullptr, 0};
+    static sox_effect_handler_t handler = {"output", nullptr, SOX_EFF_MCHAN | SOX_EFF_MODIFY | SOX_EFF_PREC, nullptr, nullptr, output_flow, nullptr, nullptr, nullptr, 0};
     return &handler;
 }
 
@@ -61,11 +61,26 @@ void CustomFilter::init(int sampleRate, int channelCount) {
     mono_signal = signal;
     mono_signal.channels = 1;
 
-    float arr[] = {0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f};
+    float arr[] = {0.5f, 0.96f, 0.5f, 0.76f, 0.08f, 0.62f, 0.33f, 0.92f};
     initChain(arr);
+
+    out_data = new short[2048];
 }
 
-void CustomFilter::initChain(float *arr) {
+void CustomFilter::initChain(const float *arr) {
+    float reverbRatio = arr[0];
+    float reverbDeep = arr[1];
+    float reverbGain = arr[2];
+
+    float minDelay = arr[3];
+    float maxDelay = arr[4];
+
+    float compressLimit = arr[5];
+    float compressRange = arr[6];
+    float compressGain = arr[7];
+
+    dryWetMix = static_cast<float>((tan((reverbGain - 0.44) * M_PI / 1.5) + 1.4) / 4);
+
 
     int input1 = -75;
     int output1 = -100;
@@ -81,35 +96,21 @@ void CustomFilter::initChain(float *arr) {
     int input4 = 0;
     int output4 = compressRange * t + output3;
 
-    
     t = -1 - output4;
     t = t > 0 ? t : 0;
     t = t < 40 ? t : 40;
     t *= 0.75;
-    int gain = t + compressGain * 20 - 20;
+    int cmp_gain = t + compressGain * 20 - 20;;
 
 
     float attackTime = 0.02f;
     float decayTime = 0.04f;
 
-    int reverberance = 40 + reverbRatio * 60;
+    int reverbeRance = 40 + reverbRatio * 60;
     int roomScale = 40 + reverbRatio * 60;
-
-    int echoPredecay = 70 - reverbDeep * 60;
     int preDelay = 56 + reverbDeep * 27;
     int damping = reverbDeep * 10;
-
-    int echoDecayRatio = 20 + minDelay * 60;
-
-    int echoDelay = 10 + maxDelay * 120;
-    int echoPeriod = 30 + maxDelay * 110;
-    if (maxDelay > 0.9) {
-        echoPeriod += 700 * (maxDelay - 0.9);
-    }
-
     int wetGain = 3;
-    int echoNum = 5;
-    int echoPhaseDiff = 22;
     int stereoDepth = 83;
 
 
@@ -121,22 +122,22 @@ void CustomFilter::initChain(float *arr) {
 
     if (channels == 2) {
         e = sox_create_effect(sox_find_effect("channels"));
-        assert(sox_effect_options(e, 0, NULL) == SOX_SUCCESS);
+        assert(sox_effect_options(e, 0, nullptr) == SOX_SUCCESS);
         assert(sox_add_effect(effect_chain, e, &signal, &mono_signal) == SOX_SUCCESS);
         free(e);
     }
 
     int compaundArgs = 5;
     char *attackRelease = new char[20];
-    compressorFilterParam->getAttackRelease(&attackRelease);
+    sprintf(attackRelease, "%g,%g", attackTime, decayTime);
     char *functionTransforTable = new char[100];
-    compressorFilterParam->getFunctionTransforTable(&functionTransforTable);
+    sprintf(functionTransforTable, "%d:%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d", 3, -100, input1, output1, input2, output2, input3, output3, input4, output4, 0, 0, 0, 0);
     char *gain = new char[10];
-    compressorFilterParam->getGain(&gain);
+    sprintf(gain, "%d", cmp_gain);
     char *initialVolume = new char[10];
-    compressorFilterParam->getInitialVolume(&initialVolume);
+    sprintf(initialVolume, "%d", -100);
     char *delay = new char[10];
-    compressorFilterParam->getDelay(&delay);
+    sprintf(delay, "%g", 0.0);
     char *compaundArgv[] = {attackRelease, functionTransforTable, gain, initialVolume, delay};
     e = sox_create_effect(sox_find_effect("compand"));
     assert(sox_effect_options(e, compaundArgs, compaundArgv) == SOX_SUCCESS);
@@ -153,15 +154,14 @@ void CustomFilter::initChain(float *arr) {
         free(e);
     }
 
-
     int equalizerArgs = 3;
     char *frequency = new char[10];
-    equalizerFilterParam->getFrequency(&frequency);
+    sprintf(frequency, "%d", 5800 + (int) (2800 * minDelay));
     char *width = new char[10];
-    equalizerFilterParam->getWidth(&width);
-    char *gain = new char[10];
-    equalizerFilterParam->getGain(&gain);
-    char *equalizerArgv[] = {frequency, width, gain};
+    sprintf(width, "%0.2fq", 0.2 + 1 - maxDelay);
+    char *eq_gain = new char[10];
+    sprintf(eq_gain, "%d", 1);
+    char *equalizerArgv[] = {frequency, width, eq_gain};
     e = sox_create_effect(sox_find_effect("equalizer"));
     assert(sox_effect_options(e, equalizerArgs, equalizerArgv) == SOX_SUCCESS);
     for (int i = 0; i < equalizerArgs; i++) {
@@ -169,23 +169,23 @@ void CustomFilter::initChain(float *arr) {
     }
 
     int reverbArgs = 7;
-    char *wetOnly = new char[10];
-    reverbFilterParam->getWetOnly(&wetOnly);
-    char *reverbrance = new char[10];
-    reverbFilterParam->getReverbrance(&reverbrance);
-    char *damping = new char[10];
-    reverbFilterParam->getDamping(&damping);
-    char *roomScale = new char[10];
-    reverbFilterParam->getRoomScale(&roomScale);
-    char *stereoDepth = new char[10];
-    reverbFilterParam->getStereoDepth(&stereoDepth);
-    char *preDelay = new char[10];
-    reverbFilterParam->getPreDelay(&preDelay);
-    char *wetGain = new char[10];
-    reverbFilterParam->getWetGain(&wetGain);
+    char *e_wetOnly = new char[10];
+    sprintf(e_wetOnly, "%s", "-w");
+    char *e_reverbrance = new char[10];
+    sprintf(e_reverbrance, "%d", reverbeRance);
+    char *e_damping = new char[10];
+    sprintf(e_damping, "%d", damping);
+    char *e_roomScale = new char[10];
+    sprintf(e_roomScale, "%d", roomScale);
+    char *e_stereoDepth = new char[10];
+    sprintf(e_stereoDepth, "%d", stereoDepth);
+    char *e_preDelay = new char[10];
+    sprintf(e_preDelay, "%d", preDelay);
+    char *e_wetGain = new char[10];
+    sprintf(e_wetGain, "%d", wetGain);
 
 
-    char *reverbArgv[] = {wetOnly, reverbrance, damping, roomScale, stereoDepth, preDelay, wetGain};
+    char *reverbArgv[] = {e_wetOnly, e_reverbrance, e_damping, e_roomScale, e_stereoDepth, e_preDelay, e_wetGain};
 
     e = sox_create_effect(sox_find_effect("reverb"));
     assert(sox_effect_options(e, reverbArgs, reverbArgv) == SOX_SUCCESS);
@@ -217,15 +217,20 @@ void CustomFilter::setEffect(float *arr) {
 int CustomFilter::process(short *data, int len) {
     input_size = len;
     input_data = data;
+    auto *directAudioBuffer = new short[len];
+    memcpy(directAudioBuffer, data, len * sizeof(short));
     if (effect_chain != nullptr) {
         sox_flow_effects(effect_chain, nullptr, nullptr);
         memcpy(data, out_data, len * sizeof(short));
+        for (int i = 0; i < len; i++) {
+            data[i] = static_cast<short>(directAudioBuffer[i] * (1 - dryWetMix) + out_data[i] * dryWetMix);
+        }
     }
+    delete[] directAudioBuffer;
     return len;
 }
 
 void CustomFilter::destroy() {
     destroyChain();
     DELETEARR(out_data)
-    DELETEARR(input_data)
 }

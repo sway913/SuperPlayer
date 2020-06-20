@@ -67,9 +67,7 @@ public:
 
     virtual void setVolume(float volume, int track);
 
-    virtual void setFilter(int type);
-
-    virtual void setCustomFilter(float *arr);
+    virtual void setFilter(float *arr);
 
     virtual void setPitch(float pitch);
 

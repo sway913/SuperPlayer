@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.SeekBar
 import com.smzh.superplayer.R
+import com.smzh.superplayer.sing.SingParam.AudioEffect
 import kotlinx.android.synthetic.main.custom_effect_layout.view.*
 
 class CustomEffectView : FrameLayout, SeekBar.OnSeekBarChangeListener {
@@ -22,21 +23,21 @@ class CustomEffectView : FrameLayout, SeekBar.OnSeekBarChangeListener {
     private fun initView() {
         View.inflate(context, R.layout.custom_effect_layout, this)
         sb_rb_ratio.setOnSeekBarChangeListener(this)
-        sb_rb_ratio.progress = (customEffect[0] * 100).toInt()
+        sb_rb_ratio.progress = (AudioEffect[0] * 100).toInt()
         sb_rb_depth.setOnSeekBarChangeListener(this)
-        sb_rb_depth.progress = (customEffect[1] * 100).toInt()
+        sb_rb_depth.progress = (AudioEffect[1] * 100).toInt()
         sb_rb_grain.setOnSeekBarChangeListener(this)
-        sb_rb_grain.progress = (customEffect[2] * 100).toInt()
+        sb_rb_grain.progress = (AudioEffect[2] * 100).toInt()
         sb_min_delay.setOnSeekBarChangeListener(this)
-        sb_min_delay.progress = (customEffect[3] * 100).toInt()
+        sb_min_delay.progress = (AudioEffect[3] * 100).toInt()
         sb_max_delay.setOnSeekBarChangeListener(this)
-        sb_max_delay.progress = (customEffect[4] * 100).toInt()
+        sb_max_delay.progress = (AudioEffect[4] * 100).toInt()
         sb_cmp_limit.setOnSeekBarChangeListener(this)
-        sb_cmp_limit.progress = (customEffect[5] * 100).toInt()
+        sb_cmp_limit.progress = (AudioEffect[5] * 100).toInt()
         sb_cmp_range.setOnSeekBarChangeListener(this)
-        sb_cmp_range.progress = (customEffect[6] * 100).toInt()
+        sb_cmp_range.progress = (AudioEffect[6] * 100).toInt()
         sb_cmp_grain.setOnSeekBarChangeListener(this)
-        sb_cmp_grain.progress = (customEffect[7] * 100).toInt()
+        sb_cmp_grain.progress = (AudioEffect[7] * 100).toInt()
         close_btn.setOnClickListener { hide() }
     }
 
@@ -51,39 +52,39 @@ class CustomEffectView : FrameLayout, SeekBar.OnSeekBarChangeListener {
     override fun onStopTrackingTouch(p0: SeekBar?) {
         when (p0?.id) {
             R.id.sb_rb_ratio -> {
-                customEffect[0] = p0.progress / 100f
+                AudioEffect[0] = p0.progress / 100f
             }
             R.id.sb_rb_depth -> {
-                customEffect[1] = p0.progress / 100f
+                AudioEffect[1] = p0.progress / 100f
             }
             R.id.sb_rb_grain -> {
-                customEffect[2] = p0.progress / 100f
+                AudioEffect[2] = p0.progress / 100f
             }
             R.id.sb_min_delay -> {
-                customEffect[3] = p0.progress / 100f
+                AudioEffect[3] = p0.progress / 100f
             }
             R.id.sb_max_delay -> {
-                customEffect[4] = p0.progress / 100f
+                AudioEffect[4] = p0.progress / 100f
             }
             R.id.sb_cmp_limit -> {
-                customEffect[5] = p0.progress / 100f
+                AudioEffect[5] = p0.progress / 100f
             }
             R.id.sb_cmp_range -> {
-                customEffect[6] = p0.progress / 100f
+                AudioEffect[6] = p0.progress / 100f
             }
             R.id.sb_cmp_grain -> {
-                customEffect[7] = p0.progress / 100f
+                AudioEffect[7] = p0.progress / 100f
             }
 
             else -> {
             }
         }
-        listener?.onCustomEffectChanged(customEffect)
+        listener?.onCustomEffectChanged(15)
     }
 
     fun show() {
         visibility = View.VISIBLE
-        listener?.onCustomEffectChanged(customEffect)
+        listener?.onCustomEffectChanged(15)
     }
 
     fun hide() {
@@ -95,26 +96,9 @@ class CustomEffectView : FrameLayout, SeekBar.OnSeekBarChangeListener {
     }
 
 
-    companion object {
-
-        @JvmStatic
-        private val customEffect = floatArrayOf(
-                0.5f,
-                0.5f,
-                0.5f,
-                0.5f,
-                0.5f,
-                0.5f,
-                0.5f,
-                0.5f,
-                0.5f,
-                0.5f
-        )
-    }
-
     interface CustomEffectChangedListener {
 
-        fun onCustomEffectChanged(customEffect: FloatArray)
+        fun onCustomEffectChanged(index: Int)
 
     }
 }

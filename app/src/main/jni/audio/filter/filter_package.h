@@ -44,9 +44,7 @@ public:
 
     void setPitch(float pitch);
 
-    void setEffect(int type);
-
-    void setCustomEffect(float *arr);
+    void setEffect(float *arr);
 
     void destroy();
 

@@ -29,9 +29,7 @@ class PlayerJni {
 
     external fun setEcho(isEcho: Boolean)
 
-    external fun setFilter(type: Int)
-
-    external fun setCustomFilter(floatArray: FloatArray)
+    external fun setFilter(floatArray: FloatArray)
 
     external fun setVolume(volume: Float, track: Int)
 

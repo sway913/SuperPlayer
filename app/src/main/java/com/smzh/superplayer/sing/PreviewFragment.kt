@@ -2,8 +2,6 @@ package com.smzh.superplayer.sing
 
 import android.graphics.Rect
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,7 +23,6 @@ import com.smzh.superplayer.widget.CustomEffectView
 import com.smzh.superplayer.widget.CustomSeekBar
 import com.smzh.superplayer.widget.SingControlView
 import kotlinx.android.synthetic.main.fragment_preview.*
-import kotlinx.android.synthetic.main.layout_song_item.*
 
 class PreviewFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekListener, SingControlView.SingControlListener,
         AudioFilterAdapter.AudioEffectSelectListener, CustomEffectView.CustomEffectChangedListener {
@@ -127,13 +124,17 @@ class PreviewFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.Seek
     override fun onAudioEffectSelect(audioEffect: AudioEffect) {
         if (audioEffect.index == 15) {
             custom_view.show()
-            return
+        } else {
+            val effect = SingParam.AudioEffect
+            effect[effect.size - 1] = audioEffect.index.toFloat()
+            viewModel.setFilter(effect)
         }
-        viewModel.setEffect(audioEffect.index)
     }
 
-    override fun onCustomEffectChanged(customEffect: FloatArray) {
-        viewModel.setCustomEffect(customEffect)
+    override fun onCustomEffectChanged(index: Int) {
+        val effect = SingParam.AudioEffect
+        effect[effect.size - 1] = index.toFloat()
+        viewModel.setFilter(effect)
     }
 
     override fun onDestroyView() {

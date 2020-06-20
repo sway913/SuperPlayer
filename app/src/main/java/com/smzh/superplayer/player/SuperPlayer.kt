@@ -61,12 +61,8 @@ class SuperPlayer {
     }
 
 
-    fun setFilter(type: Int) {
-        handler.post { playerJni.setFilter(type) }
-    }
-
-    fun setCustomFilter(floatArray: FloatArray) {
-        handler.post { playerJni.setCustomFilter(floatArray) }
+    fun setFilter(floatArray: FloatArray) {
+        handler.post { playerJni.setFilter(floatArray) }
     }
 
     fun setVolume(volume: Float, track: Tracker) {

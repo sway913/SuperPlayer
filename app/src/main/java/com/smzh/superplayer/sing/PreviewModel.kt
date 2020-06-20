@@ -124,12 +124,8 @@ class PreviewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener 
         SingParam.pitch = pitch
     }
 
-    fun setEffect(index: Int) {
-        player.setFilter(index)
-    }
-
-    fun setCustomEffect(floatArray: FloatArray) {
-        player.setCustomFilter(floatArray)
+    fun setFilter(floatArray: FloatArray) {
+        player.setFilter(floatArray)
     }
 
     override fun onCompleted() {

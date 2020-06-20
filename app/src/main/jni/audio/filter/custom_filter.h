@@ -39,7 +39,7 @@ public:
 
 private:
 
-    void initChain(float *arr);
+    void initChain(const float *arr);
 
     void destroyChain();
 
@@ -52,6 +52,8 @@ private:
     sox_effects_chain_t *effect_chain{nullptr};
 
     bool inited{false};
+
+    float dryWetMix{0.5};
 
 };
 

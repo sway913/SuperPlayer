@@ -16,6 +16,8 @@ object SingParam {
     val testVocalPath: String
     const val vocalGain = 4F
 
+    val AudioEffect = floatArrayOf(0.5f, 0.96f, 0.5f, 0.76f, 0.08f, 0.62f, 0.33f, 0.92f, 14f)
+
     init {
 
         cachePath.run {

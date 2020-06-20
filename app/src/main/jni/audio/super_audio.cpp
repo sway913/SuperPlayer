@@ -91,15 +91,9 @@ void SuperAudio::seek(int64_t millis) {
     }
 }
 
-void SuperAudio::setFilter(int type) {
+void SuperAudio::setFilter(float *arr) {
     if (audio_engine) {
-        audio_engine->setFilter(type);
-    }
-}
-
-void SuperAudio::setCustomFilter(float *arr) {
-    if (audio_engine) {
-        audio_engine->setCustomFilter(arr);
+        audio_engine->setFilter(arr);
     }
 }
 

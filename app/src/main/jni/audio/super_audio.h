@@ -69,9 +69,7 @@ public:
 
     void setVolume(float volume, int track);
 
-    void setFilter(int type);
-
-    void setCustomFilter(float* arr);
+    void setFilter(float* arr);
 
     void setPitch(float pitch);
 
