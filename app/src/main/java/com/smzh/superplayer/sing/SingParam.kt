@@ -15,6 +15,7 @@ object SingParam {
     val decodePath: String
     val testVocalPath: String
     const val vocalGain = 4F
+    val lyricPath: String
 
     val AudioEffect = floatArrayOf(0.5f, 0.96f, 0.5f, 0.76f, 0.08f, 0.62f, 0.33f, 0.92f, 14f)
 
@@ -27,6 +28,7 @@ object SingParam {
             mixPath = this + "mix.aac"
             decodePath = this + "decode.pcm"
             testVocalPath = this + "test_vocal.pcm"
+            lyricPath = this + "lyric.html"
         }
         filePath.run {
             val file = File(this)

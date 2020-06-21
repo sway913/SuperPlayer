@@ -116,7 +116,6 @@ class SingViewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener
         player.setPitch(pitch)
     }
 
-
     @Suppress("UNCHECKED_CAST")
     class SingFactory(val song: Song) : ViewModelProvider.NewInstanceFactory() {
 

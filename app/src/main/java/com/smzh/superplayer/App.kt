@@ -2,6 +2,7 @@ package com.smzh.superplayer
 
 import android.app.Application
 import android.content.Context
+import com.smzh.superplayer.http.HttpManager
 
 class App : Application() {
 
@@ -11,6 +12,11 @@ class App : Application() {
 
     init {
         context = this
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        HttpManager.init()
     }
 
 }

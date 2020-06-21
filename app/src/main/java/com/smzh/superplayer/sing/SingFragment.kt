@@ -1,33 +1,36 @@
 package com.smzh.superplayer.sing
 
+import android.annotation.SuppressLint
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.view.Gravity
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo.IME_ACTION_SEND
-import android.widget.PopupWindow
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.smzh.superplayer.MainActivity.Companion.SONG
 import com.smzh.superplayer.R
 import com.smzh.superplayer.databinding.FragmentSingBinding
-import com.smzh.superplayer.dp2px
+import com.smzh.superplayer.http.HttpManager
 import com.smzh.superplayer.sing.SingViewModel.Companion.STATE_PAUSE
 import com.smzh.superplayer.sing.SingViewModel.Companion.STATE_SING
 import com.smzh.superplayer.widget.CustomSeekBar
 import com.smzh.superplayer.widget.SingControlView
 import kotlinx.android.synthetic.main.fragment_sing.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Element
+
 
 class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekListener, SingControlView.SingControlListener {
 
     private lateinit var viewModel: SingViewModel
     private lateinit var binding: FragmentSingBinding
-
-    private val lyricTxt by lazy { StringBuilder() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,8 +57,9 @@ class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekLis
             if (lyric_input.text == null) {
                 return@setOnClickListener
             }
-            viewModel.lyric.value = lyricTxt.append(lyric_input.text).append("\n").toString()
-            lyric_input?.text = null
+            GlobalScope.launch(Dispatchers.Main) {
+                loadLyric(lyric_input.text.toString())
+            }
         }
         viewModel.singComplete.observe(viewLifecycleOwner, Observer {
             gotoPreview()
@@ -146,6 +150,31 @@ class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekLis
 
     override fun onDestroyView() {
         super.onDestroyView()
+    }
+
+    @SuppressLint("SetJavaScriptEnabled")
+    private suspend fun loadLyric(songName: String) {
+
+        val finalLyric = withContext(Dispatchers.IO) {
+            var lyric = "未搜索到歌词"
+            try {
+                val ret = HttpManager.httpApi.getLyricListHtml(songName).await()
+                val dom = Jsoup.parse(ret)
+                val ss: Element = dom.select("div.ss").first()
+                val link = ss.selectFirst("a")
+                val path = link.attr("href")
+
+                val ret2 = HttpManager.httpApi.getLyricHtml(path).await()
+                val dom2 = Jsoup.parse(ret2)
+                val ss2: Element = dom2.select("div.center").first()
+                val txt: Element = ss2.select("p").first()
+                lyric = txt.text().replace(" ", "\n")
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            lyric
+        }
+        viewModel.lyric.postValue(finalLyric)
     }
 
     companion object {

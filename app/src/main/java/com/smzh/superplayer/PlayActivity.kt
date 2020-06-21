@@ -1,17 +1,13 @@
 package com.smzh.superplayer
 
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.exoplayer2.*
-import com.google.android.exoplayer2.source.ConcatenatingMediaSource
-import com.google.android.exoplayer2.source.ExtractorMediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
@@ -19,12 +15,12 @@ import com.smzh.superplayer.database.AppDataBase
 import com.smzh.superplayer.sing.Song
 import io.reactivex.Observable
 import io.reactivex.ObservableOnSubscribe
-import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_play.*
 import java.util.concurrent.TimeUnit
+
 
 class PlayActivity : AppCompatActivity() {
 
@@ -74,6 +70,8 @@ class PlayActivity : AppCompatActivity() {
 
         btn_share.setOnClickListener {
             val intent = Intent().apply {
+                val comp = ComponentName("com.tencent.mm", "com.tencent.mm.ui.tools.ShareToTimeLineUI")
+                intent.component = comp
                 action = Intent.ACTION_SEND
                 type = "audio/*"
                 putExtra(Intent.EXTRA_STREAM,Uri.parse(song.path))
