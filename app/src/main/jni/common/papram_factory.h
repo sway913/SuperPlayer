@@ -50,6 +50,7 @@ public:
         jmethodID vocal_vol_id = env->GetMethodID(cls, "getVocalVolume", "()F");
         jmethodID acc_vol_id = env->GetMethodID(cls, "getAccVolume", "()F");
         jmethodID pitch_id = env->GetMethodID(cls, "getPitch", "()F");
+        jmethodID effect_id = env->GetMethodID(cls, "getEffect", "()[F");
 
         auto j_acc_path = static_cast<jstring>(env->CallObjectMethod(obj, acc_path_id));
         auto j_vocal_path = static_cast<jstring>(env->CallObjectMethod(obj, vocal_path_id));
@@ -57,16 +58,20 @@ public:
         float vocal_vol = env->CallFloatMethod(obj, vocal_vol_id);
         float acc_vol = env->CallFloatMethod(obj, acc_vol_id);
         float pitch = env->CallFloatMethod(obj, pitch_id);
+        jfloatArray j_effect = static_cast<jfloatArray>(env->CallObjectMethod(obj, effect_id));
 
         const char *acc_path = env->GetStringUTFChars(j_acc_path, nullptr);
         const char *vocal_path = env->GetStringUTFChars(j_vocal_path, nullptr);
         const char *out_path = env->GetStringUTFChars(j_out_path, nullptr);
 
-        std::shared_ptr<MergerParam> sp_param = std::make_shared<MergerParam>(acc_path, vocal_path, out_path, vocal_vol, acc_vol, pitch);
+        float *effect = env->GetFloatArrayElements(j_effect, nullptr);
+
+        std::shared_ptr<MergerParam> sp_param = std::make_shared<MergerParam>(acc_path, vocal_path, out_path, vocal_vol, acc_vol, pitch, effect);
 
         env->ReleaseStringChars(j_acc_path, reinterpret_cast<const jchar *>(acc_path));
         env->ReleaseStringChars(j_vocal_path, reinterpret_cast<const jchar *>(vocal_path));
         env->ReleaseStringChars(j_out_path, reinterpret_cast<const jchar *>(out_path));
+        env->ReleaseFloatArrayElements(j_effect, effect, 0);
         env->DeleteLocalRef(cls);
         return sp_param;
     }

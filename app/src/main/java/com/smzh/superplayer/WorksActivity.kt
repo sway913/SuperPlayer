@@ -22,7 +22,6 @@ class WorksActivity : AppCompatActivity(), SongAdapter.ChooseSongListener {
             adapter = SongAdapter(this@WorksActivity, true)
         }
         supportActionBar?.title = "我的歌曲"
-        loaSong()
     }
 
     override fun onResume() {

@@ -5,7 +5,8 @@ class MergerParam(private val aacPath: String,
                   private val outPath: String,
                   private val vocalVolume: Float,
                   private val accVolume: Float,
-                  private val pitch: Float) {
+                  private val pitch: Float,
+                  private val effect: FloatArray) {
 
 
     fun getAccPath(): String {
@@ -32,5 +33,7 @@ class MergerParam(private val aacPath: String,
         return pitch
     }
 
-
+    fun getEffect(): FloatArray {
+        return effect
+    }
 }

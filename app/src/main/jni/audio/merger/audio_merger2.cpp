@@ -24,6 +24,7 @@ void AudioMerger2::mergerFun() {
     vocal_filter = new FilterPackage();
     vocal_filter->init(Vocal, 44100, 2);
     vocal_filter->setVolume(sp_param->getVocalVolume());
+    vocal_filter->setEffect(sp_param->getEffect());
 
     acc_filter = new FilterPackage();
     acc_filter->init(Acc, 44100, 2);

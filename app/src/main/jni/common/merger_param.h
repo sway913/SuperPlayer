@@ -17,6 +17,7 @@ private:
     float vocal_volume{1.0f};
     float acc_volume{1.0f};
     float pitch{0.0f};
+    float *effect{nullptr};
 
     static inline void copyPath(char *&dst, const char *src) {
         size_t len = strlen(src);
@@ -28,13 +29,18 @@ private:
 
 public:
 
-    MergerParam(const char *accPath, const char *vocalPath, const char *outPath, float vocalVolume, float accVolume, float pitch_) {
+    MergerParam(const char *accPath, const char *vocalPath, const char *outPath, float vocalVolume,
+                float accVolume, float pitch_, float *arr) {
         copyPath(acc_path, accPath);
         copyPath(vocal_path, vocalPath);
         copyPath(out_path, outPath);
         this->vocal_volume = vocalVolume;
         this->acc_volume = accVolume;
         this->pitch = pitch_;
+        effect = new float[9];
+        for (int i = 0; i < 9; ++i) {
+            effect[i] = arr[i];
+        }
     }
 
     const char *getAccPath() const {
@@ -61,10 +67,15 @@ public:
         return pitch;
     }
 
+    float *getEffect() const {
+        return effect;
+    }
+
     virtual ~MergerParam() {
         DELETEARR(acc_path)
         DELETEARR(vocal_path)
         DELETEARR(out_path)
+        DELETEARR(effect)
     }
 };
 

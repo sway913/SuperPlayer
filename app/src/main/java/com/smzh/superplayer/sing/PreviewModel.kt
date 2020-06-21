@@ -72,7 +72,7 @@ class PreviewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener 
     fun prepare() {
         val audioParam = AudioParam(isRecorder = false,
                 accPath = song.path ?: "",
-                vocalPath = SingParam.testVocalPath,
+                vocalPath = SingParam.vocalPath,
                 decodePath = SingParam.decodePath)
         player.addPlayerListener(this)
         player.prepare(audioParam)
@@ -144,7 +144,8 @@ class PreviewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener 
                 SingParam.mixPath,
                 SingParam.vocalFactor * SingParam.vocalGain,
                 SingParam.accFactor,
-                SingParam.pitch)
+                SingParam.pitch,
+                SingParam.AudioEffect)
         player.startMerge(mergerParam)
         handler.postDelayed(mergerRunnable, 100)
     }
