@@ -5,11 +5,13 @@
 #include "common/papram_factory.h"
 #include "audio/merger/audio_merger2.h"
 #include "common/merger_param.h"
+#include "video/super_video.h"
 
 extern "C" {
 
 std::unique_ptr<SuperAudio> super_audio = nullptr;
 std::unique_ptr<AudioMerger2> audio_merger = nullptr;
+std::unique_ptr<SuperVideo> super_video = nullptr;
 
 JNIEXPORT void JNICALL
 Java_com_smzh_superplayer_player_PlayerJni_prepare(JNIEnv *env, jobject clazz, jobject audio_param) {
@@ -98,10 +100,34 @@ JNIEXPORT void JNICALL Java_com_smzh_superplayer_player_PlayerJni_startMerge(JNI
 }
 
 JNIEXPORT jint JNICALL Java_com_smzh_superplayer_player_PlayerJni_getMergeProgress(JNIEnv *env, jobject clazz) {
+    int progress = 0;
     if (audio_merger) {
-        return audio_merger->getProgress();
+        progress = audio_merger->getProgress();
     }
-    return 0;
+    if (progress >= 100) {
+        audio_merger = nullptr;
+    }
+    return progress;
 }
+
+JNIEXPORT void JNICALL Java_com_smzh_superplayer_player_PlayerJni_onSurfaceCreate(JNIEnv *env, jobject clazz, jobject surface, jint width, jint height) {
+    super_video = std::make_unique<SuperVideo>(env);
+    super_video->createSurface(surface, width, height);
+}
+
+
+JNIEXPORT void JNICALL Java_com_smzh_superplayer_player_PlayerJni_onSurfaceDestroy(JNIEnv *env, jobject clazz) {
+    if (super_video) {
+        super_video->destroySurface();
+    }
+    super_video = nullptr;
+}
+
+JNIEXPORT void JNICALL Java_com_smzh_superplayer_player_PlayerJni_onFrameAvailable(JNIEnv *env, jobject clazz) {
+    if (super_video) {
+        super_video->onFrameAvailable();
+    }
+}
+
 }
 

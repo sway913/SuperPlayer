@@ -1,5 +1,7 @@
 package com.smzh.superplayer.player
 
+import android.view.Surface
+import com.smzh.superplayer.video.GLView
 import java.util.*
 
 class PlayerJni {
@@ -43,6 +45,11 @@ class PlayerJni {
 
     external fun getMergeProgress(): Int
 
+    external fun onSurfaceCreate(surface: Surface, width: Int, height: Int)
+
+    external fun onSurfaceDestroy()
+
+    external fun onFrameAvailable()
 
     fun setPlayerListener(listener: PlayerStateListener) {
         if (!listeners.contains(listener)) {

@@ -21,6 +21,13 @@
         android:layout_height="match_parent"
         tools:context=".sing.SingFragment">
 
+        <com.smzh.superplayer.video.GLView
+            android:id="@+id/gl_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:visible="@{vm.isVideoMode}"
+            tools:visibility="gone" />
+
         <LinearLayout
             android:id="@+id/top_bar"
             android:layout_width="match_parent"
@@ -88,9 +95,6 @@
             android:layout_width="120dp"
             android:layout_height="40dp"
             android:layout_marginBottom="100dp"
-            android:gravity="center"
-            android:onClick="@{listener}"
-            android:text="音频"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -184,7 +188,7 @@
             app:layout_constraintEnd_toStartOf="@+id/lyric_enter"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/top_bar"
-            app:visible="@{vm.singState == 0}" />
+            app:visible="@{vm.singState == 0 &amp;&amp; !vm.isVideoMode}" />
 
         <Button
             android:id="@+id/lyric_enter"
@@ -198,14 +202,15 @@
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/top_bar"
-            app:visible="@{vm.singState == 0}" />
+            app:visible="@{vm.singState == 0 &amp;&amp; !vm.isVideoMode}" />
 
         <androidx.core.widget.NestedScrollView
             android:id="@+id/lyric_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="120dp"
-            android:layout_marginBottom="150dp">
+            android:layout_marginBottom="150dp"
+            app:visible="@{vm.singState == 0 &amp;&amp; !vm.isVideoMode}">
 
             <TextView
                 android:id="@+id/tv_lyric"
@@ -226,8 +231,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
-            android:visibility="gone"
             android:background="#ffffffff"
+            android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@+id/progress_bar" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

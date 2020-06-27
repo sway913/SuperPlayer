@@ -4,13 +4,16 @@ import android.content.Context
 import android.media.AudioManager
 import android.os.Handler
 import android.os.HandlerThread
+import android.view.Surface
 import com.smzh.superplayer.App
+import com.smzh.superplayer.video.SuperCamera
 
 class SuperPlayer {
 
     private var handler: Handler
     private var playerJni: PlayerJni
     private val outSample: Int
+    private lateinit var superCamera: SuperCamera
 
     companion object {
         val instance = SingletonHolder.holder
@@ -87,6 +90,18 @@ class SuperPlayer {
 
     fun getMergeProgress(): Int {
         return playerJni.getMergeProgress()
+    }
+
+    fun createSurface(surface: Surface, width: Int, height: Int) {
+        handler.post { playerJni.onSurfaceCreate(surface, width, height) }
+    }
+
+    fun destorySurface() {
+        handler.post { playerJni.onSurfaceDestroy() }
+    }
+
+    fun onFrameAvailable() {
+        playerJni.onFrameAvailable()
     }
 
     fun addPlayerListener(listener: PlayerJni.PlayerStateListener) {

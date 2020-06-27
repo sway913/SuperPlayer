@@ -68,7 +68,7 @@ class SwitchButton : View {
             doSwitchAnim(!selectAudio)
             listener?.onModeChanged(!selectAudio)
         }
-        return super.onTouchEvent(event)
+        return true
     }
 
     private fun doSwitchAnim(toVideo: Boolean) {

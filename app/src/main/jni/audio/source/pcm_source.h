@@ -37,7 +37,7 @@ public:
 
     int getIndex() override final;
 
-    void setFilter(FilterPackage *filterPacage);
+    void setFilter(FilterPackage *filterPacage) override ;
 
     void setObserver(std::function<void(long, int)>) override final;
 

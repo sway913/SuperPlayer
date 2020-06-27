@@ -12,6 +12,7 @@ import com.smzh.superplayer.player.AudioParam
 import com.smzh.superplayer.player.PlayerJni
 import com.smzh.superplayer.player.SuperPlayer
 import com.smzh.superplayer.player.SuperPlayer.Tracker
+import com.smzh.superplayer.video.GLView
 
 class SingViewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener {
 
@@ -25,6 +26,7 @@ class SingViewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener
     val songName = MutableLiveData<String>()
     val singComplete = MutableLiveData<Boolean>()
     val lyric = MutableLiveData<String>()
+    val isVideoMode = MutableLiveData<Boolean>()
     val handler = Handler(Looper.getMainLooper())
 
     private val runnable = object : Runnable {
@@ -45,6 +47,7 @@ class SingViewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener
         songName.value = song.name
         singPercent.value = "准备就绪"
         lyric.value = "如果戴上耳机\n效果会更好哦"
+        isVideoMode.value = false
     }
 
     fun prepare() {

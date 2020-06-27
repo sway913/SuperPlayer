@@ -15,10 +15,9 @@
 
 
 inline void JOIN(std::future<void> &result) {
-    std::future_status futureStatus;
-    do {
-        futureStatus = result.wait_for(std::chrono::milliseconds(20));
-    } while (futureStatus != std::future_status::ready);
+    if (result.valid()) {
+        result.wait();
+    }
 }
 
 static inline short mixAudioSample(short a, short b) {
@@ -28,8 +27,10 @@ static inline short mixAudioSample(short a, short b) {
 
 static inline void mixAudioBuffer(short *a, short *b, int len) {
     for (int i = 0; i < len; ++i) {
-        int tmp = a[i] < 0 && b[i] < 0 ? ((int) a[i] + (int) b[i]) - (((int) a[i] * (int) b[i]) / INT16_MIN) : (a[i] > 0 && b[i] > 0 ? ((int) a[i] + (int) b[i]) - (((int) a[i] * (int) b[i]) / INT16_MAX) : a[i] + b[i]);
-        a[i] =  static_cast<int16_t>(tmp > INT16_MAX ? INT16_MAX : (tmp < INT16_MIN ? INT16_MIN : tmp));
+        int tmp =
+                a[i] < 0 && b[i] < 0 ? ((int) a[i] + (int) b[i]) - (((int) a[i] * (int) b[i]) / INT16_MIN) : (a[i] > 0 && b[i] > 0 ? ((int) a[i] + (int) b[i]) - (((int) a[i] * (int) b[i]) / INT16_MAX)
+                                                                                                                                   : a[i] + b[i]);
+        a[i] = static_cast<int16_t>(tmp > INT16_MAX ? INT16_MAX : (tmp < INT16_MIN ? INT16_MIN : tmp));
     }
 }
 

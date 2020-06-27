@@ -1,5 +1,6 @@
 package com.smzh.superplayer.sing
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
@@ -7,6 +8,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -18,6 +20,8 @@ import com.smzh.superplayer.sing.SingViewModel.Companion.STATE_PAUSE
 import com.smzh.superplayer.sing.SingViewModel.Companion.STATE_SING
 import com.smzh.superplayer.widget.CustomSeekBar
 import com.smzh.superplayer.widget.SingControlView
+import com.smzh.superplayer.widget.SwitchButton
+import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.fragment_sing.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -27,7 +31,8 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 
 
-class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekListener, SingControlView.SingControlListener {
+class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekListener, SingControlView.SingControlListener,
+        SwitchButton.OnModeChangeListener {
 
     private lateinit var viewModel: SingViewModel
     private lateinit var binding: FragmentSingBinding
@@ -61,6 +66,7 @@ class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekLis
                 loadLyric(lyric_input.text.toString())
             }
         }
+        btn_switch.setOnModeChangeListener(this)
         viewModel.singComplete.observe(viewLifecycleOwner, Observer {
             gotoPreview()
         })
@@ -102,10 +108,6 @@ class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekLis
             R.id.btn_restart -> {
                 viewModel.seek(0)
             }
-
-            R.id.btn_switch -> {
-
-            }
         }
     }
 
@@ -143,13 +145,25 @@ class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekLis
         activity?.finish()
     }
 
+    override fun onModeChanged(isVideoMode: Boolean) {
+        if (isVideoMode) {
+            val disposable = RxPermissions(activity!!)
+                    .request(Manifest.permission.CAMERA)
+                    .subscribe { granted ->
+                        if (granted) {
+                            viewModel.isVideoMode.value = isVideoMode
+                        } else {
+                            Toast.makeText(context!!, "未获取权限", Toast.LENGTH_LONG).show()
+                        }
+                    }
+        } else {
+            viewModel.isVideoMode.value = isVideoMode
+        }
+    }
+
     override fun onBackPressed() {
         viewModel.stop()
         super.onBackPressed()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
     }
 
     @SuppressLint("SetJavaScriptEnabled")

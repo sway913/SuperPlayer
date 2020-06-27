@@ -11,6 +11,7 @@ add_compile_options(
 
 file(GLOB_RECURSE common_src src/main/jni/common/*)
 file(GLOB_RECURSE audio_src src/main/jni/audio/*)
+file(GLOB_RECURSE video_src src/main/jni/video/*)
 
 
 add_library(
@@ -19,6 +20,7 @@ add_library(
         src/main/jni/super_player_jni.cpp
         ${common_src}
         ${audio_src}
+        ${video_src}
 )
 
 
@@ -32,6 +34,9 @@ target_link_libraries(
         thirdpart
         ${libs}
         ${log-lib}
+        GLESv2
+        EGL
+        -landroid
 )
 
 ADD_SUBDIRECTORY(src/main/jni/thirdpart)
