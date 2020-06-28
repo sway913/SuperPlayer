@@ -35,17 +35,12 @@ void GlView::guardedRun() {
                 render->onSurfaceCreate(width, height);
                 render->onDraw();
                 eglCore->swapBuffer();
-//                usleep(16000);
-//                msg_queue->push(MSG_DRAW);
                 break;
             case MSG_DRAW:
                 if (eglCore && render) {
                     render->onDraw();
                     eglCore->swapBuffer();
                 }
-//                usleep(16000);
-//                msg_queue->push(MSG_DRAW);
-                LOGI("glview draw");
                 break;
             case MSG_DESTROY:
                 if (eglCore && render) {

@@ -18,7 +18,19 @@ public:
 
     void bindTexture(GLuint textureId) override;
 
+
+    virtual void onInit();
+
+    virtual void preDraw();
+
+    void setMatirx(float* mtx);
+
     virtual ~SourceFilter();
+
+private:
+
+    float *matrix{nullptr};
+    GLuint glMatrix{0};
 
 };
 

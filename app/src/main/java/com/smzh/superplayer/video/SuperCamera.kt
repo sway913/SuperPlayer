@@ -3,8 +3,8 @@ package com.smzh.superplayer.video
 
 open class SuperCamera() {
 
-    open fun open() {
-
+    open fun open(): IntArray {
+        return intArrayOf()
     }
 
     open fun close() {

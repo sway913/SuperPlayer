@@ -3,6 +3,8 @@
 //
 
 #include "camera.h"
+#include "../../common/matrix.h"
+#include "../transform.h"
 
 Camera::Camera(JNIEnv *env) : env(env) {
     env->GetJavaVM(&javaVm);
@@ -11,7 +13,7 @@ Camera::Camera(JNIEnv *env) : env(env) {
     jobject camera = env->NewObject(clazz, general_id);
     jCamera = env->NewGlobalRef(camera);
 
-    open_id = env->GetMethodID(clazz, "open", "()V");
+    open_id = env->GetMethodID(clazz, "open", "()[I");
     close_id = env->GetMethodID(clazz, "close", "()V");
     update_id = env->GetMethodID(clazz, "updateImage", "()V");
     switch_id = env->GetMethodID(clazz, "switchCamera", "()V");
@@ -20,6 +22,8 @@ Camera::Camera(JNIEnv *env) : env(env) {
     env->DeleteLocalRef(clazz);
 
     sourceFilter = new SourceFilter();
+    parameter = new int[3];
+    matrix = new float[16];
 }
 
 void Camera::open(int w, int h) {
@@ -29,7 +33,10 @@ void Camera::open(int w, int h) {
     if (needAttach) {
         javaVm->AttachCurrentThread(&env, nullptr);
     }
-    env->CallVoidMethod(jCamera, open_id);
+    auto p = (jintArray) env->CallObjectMethod(jCamera, open_id);
+    jint *param = env->GetIntArrayElements(p, nullptr);
+    memcpy(parameter, param, sizeof(int) * 3);
+    env->ReleaseIntArrayElements(p, param, 0);
     if (needAttach) {
         javaVm->DetachCurrentThread();
     }
@@ -44,6 +51,16 @@ void Camera::updateImage() {
         javaVm->AttachCurrentThread(&env, nullptr);
     }
     env->CallVoidMethod(jCamera, update_id);
+
+    matrixSetIdentityM(matrix);
+    if (parameter[0] == 1) {
+        rotateZd(matrix, 270);
+    } else {
+        matrixScaleM(matrix, -1, 1, 1);
+        rotateZd(matrix, 270);
+    }
+    Transform::cropViewport(matrix, parameter[1], parameter[2], out_width, out_height);
+    sourceFilter->setMatirx(matrix);
 
     switch (cmd) {
         case Close:
@@ -96,4 +113,6 @@ GLuint Camera::produceFrame() {
 Camera::~Camera() {
     env = nullptr;
     javaVm = nullptr;
+    DELETEARR(parameter)
+    DELETEARR(matrix)
 }

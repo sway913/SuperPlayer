@@ -30,7 +30,7 @@ public:
 
     void switchCamera();
 
-     GLuint produceFrame() override;
+    GLuint produceFrame() override;
 
     virtual ~Camera();
 
@@ -53,6 +53,8 @@ private:
     SourceFilter *sourceFilter{nullptr};
     int out_width{0};
     int out_height{0};
+    int *parameter{nullptr};
+    float *matrix{nullptr};
 
 };
 
