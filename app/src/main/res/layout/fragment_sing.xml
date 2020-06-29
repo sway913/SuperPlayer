@@ -25,6 +25,7 @@
             android:id="@+id/gl_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:onClick="@{listener}"
             app:visible="@{vm.isVideoMode}"
             tools:visibility="gone" />
 
@@ -197,6 +198,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="20dp"
             android:gravity="center"
+            android:onClick="@{listener}"
             android:text="搜索"
             android:textColor="#cc000000"
             android:textSize="14sp"
@@ -234,5 +236,73 @@
             android:background="#ffffffff"
             android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@+id/progress_bar" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="50dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toTopOf="@+id/btn_switch"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:visible="@{vm.singState == 0 &amp;&amp; vm.isVideoMode}">
+
+            <TextView
+                android:id="@+id/tv_beauty"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:gravity="center"
+                android:onClick="@{listener}"
+                android:text="美颜"
+                android:textColor="#ffffffff"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tv_filter"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:gravity="center"
+                android:onClick="@{listener}"
+                android:text="滤镜"
+                android:textColor="#ffffffff"
+                android:textSize="16sp" />
+
+
+            <TextView
+                android:id="@+id/tv_sticker"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:gravity="center"
+                android:onClick="@{listener}"
+                android:text="贴纸"
+                android:textColor="#ffffffff"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tv_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:gravity="center"
+                android:onClick="@{listener}"
+                android:text="切换"
+                android:textColor="#ffffffff"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/bottom_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -57,15 +57,6 @@ class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekLis
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         progress_bar.setPlayStatusListener(this)
-        sing_control.setListener(this)
-        lyric_enter.setOnClickListener {
-            if (lyric_input.text == null) {
-                return@setOnClickListener
-            }
-            GlobalScope.launch(Dispatchers.Main) {
-                loadLyric(lyric_input.text.toString())
-            }
-        }
         btn_switch.setOnModeChangeListener(this)
         viewModel.singComplete.observe(viewLifecycleOwner, Observer {
             gotoPreview()
@@ -108,6 +99,49 @@ class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekLis
             R.id.btn_restart -> {
                 viewModel.seek(0)
             }
+            R.id.lyric_enter -> {
+                if (lyric_input.text == null) {
+                    return
+                }
+                GlobalScope.launch(Dispatchers.Main) {
+                    loadLyric(lyric_input.text.toString())
+                }
+            }
+            R.id.gl_view -> {
+                hideBottomFragmentIfNeed()
+            }
+            R.id.tv_beauty -> {
+                showBottomFragment(1)
+            }
+            R.id.tv_filter -> {
+
+            }
+            R.id.tv_sticker -> {
+
+            }
+            R.id.tv_switch -> {
+
+            }
+        }
+    }
+
+    private fun hideBottomFragmentIfNeed(): Boolean {
+        val fragment = childFragmentManager.findFragmentByTag("bottom_fragment") ?: return false
+        if (fragment.isHidden) {
+            return false
+        }
+        childFragmentManager.beginTransaction().hide(fragment).commitAllowingStateLoss()
+        return true
+    }
+
+    private fun showBottomFragment(index: Int) {
+        val fragment = childFragmentManager.findFragmentByTag("bottom_fragment")
+        if (fragment == null) {
+            childFragmentManager.beginTransaction()
+                    .add(R.id.bottom_container, BottomFragment.newInstance(), "bottom_fragment")
+                    .commitAllowingStateLoss()
+        } else {
+            childFragmentManager.beginTransaction().show(fragment).commitAllowingStateLoss()
         }
     }
 
@@ -162,6 +196,9 @@ class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekLis
     }
 
     override fun onBackPressed() {
+        if (hideBottomFragmentIfNeed()) {
+            return
+        }
         viewModel.stop()
         super.onBackPressed()
     }
