@@ -25,6 +25,8 @@ public:
 
     void onFrameAvailable();
 
+    void switchCamera();
+
     virtual ~SuperVideo();
 
 private:

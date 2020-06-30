@@ -114,13 +114,13 @@ class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekLis
                 showBottomFragment(1)
             }
             R.id.tv_filter -> {
-
+                showBottomFragment(2)
             }
             R.id.tv_sticker -> {
-
+                showBottomFragment(3)
             }
             R.id.tv_switch -> {
-
+                viewModel.switchCamera()
             }
         }
     }
@@ -131,6 +131,7 @@ class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekLis
             return false
         }
         childFragmentManager.beginTransaction().hide(fragment).commitAllowingStateLoss()
+        viewModel.hideAllButtom.value = false
         return true
     }
 
@@ -143,6 +144,7 @@ class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekLis
         } else {
             childFragmentManager.beginTransaction().show(fragment).commitAllowingStateLoss()
         }
+        viewModel.hideAllButtom.value = true
     }
 
     override fun seek(millis: Long) {

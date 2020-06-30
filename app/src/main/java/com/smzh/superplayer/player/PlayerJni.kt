@@ -51,6 +51,8 @@ class PlayerJni {
 
     external fun onFrameAvailable()
 
+    external fun switchCamera()
+
     fun setPlayerListener(listener: PlayerStateListener) {
         if (!listeners.contains(listener)) {
             listeners.add(listener)

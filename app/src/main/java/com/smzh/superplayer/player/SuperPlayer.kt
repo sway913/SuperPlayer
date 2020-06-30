@@ -104,6 +104,10 @@ class SuperPlayer {
         playerJni.onFrameAvailable()
     }
 
+    fun switchCamera() {
+        handler.post { playerJni.switchCamera() }
+    }
+
     fun addPlayerListener(listener: PlayerJni.PlayerStateListener) {
         playerJni.setPlayerListener(listener)
     }

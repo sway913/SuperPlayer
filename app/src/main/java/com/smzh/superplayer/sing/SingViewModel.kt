@@ -27,6 +27,7 @@ class SingViewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener
     val singComplete = MutableLiveData<Boolean>()
     val lyric = MutableLiveData<String>()
     val isVideoMode = MutableLiveData<Boolean>()
+    val hideAllButtom = MutableLiveData<Boolean>()
     val handler = Handler(Looper.getMainLooper())
 
     private val runnable = object : Runnable {
@@ -48,6 +49,7 @@ class SingViewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener
         singPercent.value = "准备就绪"
         lyric.value = "如果戴上耳机\n效果会更好哦"
         isVideoMode.value = false
+        hideAllButtom.value = false
     }
 
     fun prepare() {
@@ -117,6 +119,10 @@ class SingViewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener
 
     fun setPitch(pitch: Float) {
         player.setPitch(pitch)
+    }
+
+    fun switchCamera() {
+        player.switchCamera()
     }
 
     @Suppress("UNCHECKED_CAST")

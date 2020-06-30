@@ -13,11 +13,6 @@ class Camera1 : SuperCamera() {
     private val parameter = IntArray(3)
 
     override fun open(): IntArray {
-        cameraId = if (Camera.getNumberOfCameras() > 1) {
-            Camera.CameraInfo.CAMERA_FACING_FRONT
-        } else {
-            Camera.CameraInfo.CAMERA_FACING_BACK
-        }
         camera = Camera.open(cameraId)
         parameter[0] = cameraId
         try {
@@ -56,7 +51,7 @@ class Camera1 : SuperCamera() {
         }
     }
 
-    override fun switchCamera() {
+    override fun switchCamera(): IntArray {
         if (Camera.getNumberOfCameras() > 1) {
             cameraId = if (isFront()) {
                 Camera.CameraInfo.CAMERA_FACING_BACK
@@ -64,6 +59,8 @@ class Camera1 : SuperCamera() {
                 Camera.CameraInfo.CAMERA_FACING_FRONT
             }
         }
+        close()
+        return open()
     }
 
     override fun isFront(): Boolean {

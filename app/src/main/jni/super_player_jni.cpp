@@ -129,5 +129,11 @@ JNIEXPORT void JNICALL Java_com_smzh_superplayer_player_PlayerJni_onFrameAvailab
     }
 }
 
+JNIEXPORT void JNICALL Java_com_smzh_superplayer_player_PlayerJni_switchCamera(JNIEnv *env, jobject clazz) {
+    if (super_video) {
+        super_video->switchCamera();
+    }
+}
+
 }
 

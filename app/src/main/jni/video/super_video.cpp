@@ -28,6 +28,12 @@ void SuperVideo::onFrameAvailable() {
     glView->requestRender();
 }
 
+void SuperVideo::switchCamera() {
+    if (dynamic_cast<Camera *>(source)) {
+        ((Camera *) source)->switchCamera();
+    }
+}
+
 SuperVideo::~SuperVideo() {
     DELETEOBJ(glView)
     DELETEOBJ(render)

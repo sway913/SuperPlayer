@@ -15,8 +15,8 @@ open class SuperCamera() {
 
     }
 
-    open fun switchCamera() {
-
+    open fun switchCamera(): IntArray {
+        return intArrayOf()
     }
 
     open fun isFront(): Boolean {

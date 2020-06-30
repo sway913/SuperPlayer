@@ -16,7 +16,7 @@ Camera::Camera(JNIEnv *env) : env(env) {
     open_id = env->GetMethodID(clazz, "open", "()[I");
     close_id = env->GetMethodID(clazz, "close", "()V");
     update_id = env->GetMethodID(clazz, "updateImage", "()V");
-    switch_id = env->GetMethodID(clazz, "switchCamera", "()V");
+    switch_id = env->GetMethodID(clazz, "switchCamera", "()[I");
     start_id = env->GetMethodID(clazz, "startPreview", "(I)V");
 
     env->DeleteLocalRef(clazz);
@@ -62,17 +62,26 @@ void Camera::updateImage() {
     Transform::cropViewport(matrix, parameter[1], parameter[2], out_width, out_height);
     sourceFilter->setMatirx(matrix);
 
-    switch (cmd) {
-        case Close:
+    Cmd c = cmd;
+    switch (c) {
+        case Close: {
             env->CallVoidMethod(jCamera, close_id);
             env->DeleteGlobalRef(jCamera);
             jCamera = nullptr;
             sourceFilter->destroy();
             DELETEOBJ(sourceFilter)
+            cmd = None;
             break;
-        case Switch_:
-            env->CallVoidMethod(jCamera, switch_id);
+        }
+        case Switch_: {
+            auto p = (jintArray) env->CallObjectMethod(jCamera, switch_id);
+            jint *param = env->GetIntArrayElements(p, nullptr);
+            memcpy(parameter, param, sizeof(int) * 3);
+            env->ReleaseIntArrayElements(p, param, 0);
+            env->CallVoidMethod(jCamera, start_id, textureId);
+            cmd = None;
             break;
+        }
         default:
             break;
     }
