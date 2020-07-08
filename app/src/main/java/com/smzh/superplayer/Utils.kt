@@ -4,11 +4,15 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothProfile
 import android.content.Context
 import android.content.res.Resources
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.os.Build
 import android.provider.MediaStore
 import com.smzh.superplayer.sing.Song
+import java.io.IOException
+import java.io.InputStream
 
 fun dp2px(context: Context, dp: Int): Int {
     val resources: Resources = context.getResources()
@@ -77,4 +81,13 @@ fun isWirelessHeadsetOn(): Boolean {
 
 fun isHeadSetOn(context: Context): Boolean {
     return isWiredHeadsetOn(context) || isWirelessHeadsetOn()
+}
+
+fun loadBitmapSync(assetFileName: String): Bitmap? {
+    return try {
+        val inputStream: InputStream = App.context.getAssets().open(assetFileName)
+        BitmapFactory.decodeStream(inputStream)
+    } catch (e: IOException) {
+        null
+    }
 }

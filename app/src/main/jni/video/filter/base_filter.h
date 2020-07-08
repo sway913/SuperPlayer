@@ -33,6 +33,8 @@ class BaseFilter : public IFilter {
 
 public:
 
+    BaseFilter();
+
     BaseFilter(const char *vertexShader, const char *fragShader);
 
     virtual GLuint draw(GLuint textureId, int w, int h);

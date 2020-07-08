@@ -14,8 +14,10 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.smzh.superplayer.MainActivity.Companion.SONG
 import com.smzh.superplayer.R
+import com.smzh.superplayer.database.Filter
 import com.smzh.superplayer.databinding.FragmentSingBinding
 import com.smzh.superplayer.http.HttpManager
+import com.smzh.superplayer.player.VideoEffect
 import com.smzh.superplayer.sing.SingViewModel.Companion.STATE_PAUSE
 import com.smzh.superplayer.sing.SingViewModel.Companion.STATE_SING
 import com.smzh.superplayer.widget.CustomSeekBar
@@ -32,7 +34,7 @@ import org.jsoup.nodes.Element
 
 
 class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekListener, SingControlView.SingControlListener,
-        SwitchButton.OnModeChangeListener {
+        SwitchButton.OnModeChangeListener, BottomFragment.onFilterChangeListener {
 
     private lateinit var viewModel: SingViewModel
     private lateinit var binding: FragmentSingBinding
@@ -72,6 +74,7 @@ class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekLis
                 }
             }
         })
+        viewModel.loadResource()
     }
 
     override fun onClick(v: View?) {
@@ -136,13 +139,17 @@ class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekLis
     }
 
     private fun showBottomFragment(index: Int) {
-        val fragment = childFragmentManager.findFragmentByTag("bottom_fragment")
+        var fragment = childFragmentManager.findFragmentByTag("bottom_fragment")
         if (fragment == null) {
+            fragment = BottomFragment.newInstance(index)
             childFragmentManager.beginTransaction()
-                    .add(R.id.bottom_container, BottomFragment.newInstance(), "bottom_fragment")
+                    .add(R.id.bottom_container, fragment, "bottom_fragment")
                     .commitAllowingStateLoss()
         } else {
             childFragmentManager.beginTransaction().show(fragment).commitAllowingStateLoss()
+            if (fragment is BottomFragment) {
+                fragment.setIndex(index)
+            }
         }
         viewModel.hideAllButtom.value = true
     }
@@ -195,6 +202,10 @@ class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekLis
         } else {
             viewModel.isVideoMode.value = isVideoMode
         }
+    }
+
+    override fun onFilterChange(videoEffect: VideoEffect) {
+        viewModel.setVideoEffect(videoEffect)
     }
 
     override fun onBackPressed() {

@@ -22,6 +22,12 @@ static float RECTANGLE_TEXTURE[] = {
         1.0f, 1.0f
 };
 
+BaseFilter::BaseFilter() {
+    vertex_shader = VERREX_SFADER;
+    frag_shader = FRAGMENT_SHADER;
+}
+
+
 BaseFilter::BaseFilter(const char *vertexShader, const char *fragShader) : vertex_shader(vertexShader), frag_shader(fragShader) {}
 
 

@@ -3,16 +3,27 @@ package com.smzh.superplayer.sing
 import android.os.Handler
 import android.os.Looper
 import android.text.format.DateUtils
+import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.smzh.superplayer.App
+import com.smzh.superplayer.database.FilterDataManager
 import com.smzh.superplayer.isHeadSetOn
 import com.smzh.superplayer.player.AudioParam
 import com.smzh.superplayer.player.PlayerJni
 import com.smzh.superplayer.player.SuperPlayer
 import com.smzh.superplayer.player.SuperPlayer.Tracker
-import com.smzh.superplayer.video.GLView
+import com.smzh.superplayer.player.VideoEffect
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
 
 class SingViewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener {
 
@@ -123,6 +134,39 @@ class SingViewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener
 
     fun switchCamera() {
         player.switchCamera()
+    }
+
+    fun setVideoEffect(videoEffect: VideoEffect) {
+        player.setVideoEffect(videoEffect)
+    }
+
+    fun loadResource() {
+        viewModelScope.launch(Dispatchers.Main) {
+            copyFilterFiles()
+            Toast.makeText(App.context, "资源加载完成", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private suspend fun copyFilterFiles() = withContext(Dispatchers.IO) {
+        FilterDataManager.getFilterList().forEach {
+            val file = File(SingParam.lookupPicPath, it.name + ".png")
+            if (!file.exists()) {
+                try {
+                    val input = App.context.assets.open("newlookupfilter/" + it.name + ".png")
+                    val fos = FileOutputStream(file)
+                    val buffer = ByteArray(1024)
+                    var byteCount: Int
+                    while (input.read(buffer).also { it1 -> byteCount = it1 } != -1) {
+                        fos.write(buffer, 0, byteCount)
+                    }
+                    fos.flush()
+                    input.close()
+                    fos.close()
+                } catch (e: IOException) {
+                    Log.d("filter file load", e.toString())
+                }
+            }
+        }
     }
 
     @Suppress("UNCHECKED_CAST")

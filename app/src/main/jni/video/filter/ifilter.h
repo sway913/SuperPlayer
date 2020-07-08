@@ -5,6 +5,7 @@
 #ifndef SUPERPLAYER_IFILTER_H
 #define SUPERPLAYER_IFILTER_H
 
+#include <GLES2/gl2.h>
 
 class IFilter {
 

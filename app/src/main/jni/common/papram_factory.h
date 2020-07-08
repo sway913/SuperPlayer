@@ -8,6 +8,7 @@
 #include <jni.h>
 #include "merger_param.h"
 #include "audio_param.h"
+#include "../video/video_effect.h"
 
 class ParamFactory {
 
@@ -72,6 +73,22 @@ public:
         env->ReleaseStringChars(j_vocal_path, reinterpret_cast<const jchar *>(vocal_path));
         env->ReleaseStringChars(j_out_path, reinterpret_cast<const jchar *>(out_path));
         env->ReleaseFloatArrayElements(j_effect, effect, 0);
+        env->DeleteLocalRef(cls);
+        return sp_param;
+    }
+
+    static std::shared_ptr<VideoEffect> generalVideoEffect(JNIEnv *env, jobject obj) {
+        jclass cls = env->GetObjectClass(obj);
+        jmethodID white_id = env->GetMethodID(cls, "getWhiteLevel", "()F");
+        jmethodID smooth_id = env->GetMethodID(cls, "getSmoothLevel", "()F");
+        jmethodID path_id = env->GetMethodID(cls, "getLookupTablePath", "()Ljava/lang/String;");
+
+        float white_level = env->CallFloatMethod(obj, white_id);
+        float smooth_level = env->CallFloatMethod(obj, smooth_id);
+        auto j_path = static_cast<jstring>(env->CallObjectMethod(obj, path_id));
+        const char *path = env->GetStringUTFChars(j_path, nullptr);
+        std::shared_ptr<VideoEffect> sp_param = std::make_shared<VideoEffect>(white_level, smooth_level, path);
+        env->ReleaseStringChars(j_path, (const jchar *) path);
         env->DeleteLocalRef(cls);
         return sp_param;
     }

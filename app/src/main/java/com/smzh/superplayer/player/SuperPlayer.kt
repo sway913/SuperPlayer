@@ -108,6 +108,10 @@ class SuperPlayer {
         handler.post { playerJni.switchCamera() }
     }
 
+    fun setVideoEffect(videoEffect: VideoEffect){
+        handler.post { playerJni.setVideoEffect(videoEffect) }
+    }
+
     fun addPlayerListener(listener: PlayerJni.PlayerStateListener) {
         playerJni.setPlayerListener(listener)
     }

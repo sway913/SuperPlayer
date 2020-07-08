@@ -18,12 +18,11 @@ public:
 
     void bindTexture(GLuint textureId) override;
 
+    virtual void onInit() override;
 
-    virtual void onInit();
+    virtual void preDraw() override;
 
-    virtual void preDraw();
-
-    void setMatirx(float* mtx);
+    void setMatirx(float *mtx);
 
     virtual ~SourceFilter();
 

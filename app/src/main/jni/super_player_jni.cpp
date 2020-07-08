@@ -135,5 +135,12 @@ JNIEXPORT void JNICALL Java_com_smzh_superplayer_player_PlayerJni_switchCamera(J
     }
 }
 
+JNIEXPORT void JNICALL Java_com_smzh_superplayer_player_PlayerJni_setVideoEffect(JNIEnv *env, jobject clazz, jobject effect) {
+    if (super_video) {
+        auto param = ParamFactory::generalVideoEffect(env, effect);
+        super_video->setEffect(param);
+    }
+}
+
 }
 

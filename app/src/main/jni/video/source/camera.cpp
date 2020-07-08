@@ -40,6 +40,16 @@ void Camera::open(int w, int h) {
     if (needAttach) {
         javaVm->DetachCurrentThread();
     }
+
+    matrixSetIdentityM(matrix);
+    if (parameter[0] == 1) {
+        rotateZd(matrix, 270);
+    } else {
+        matrixScaleM(matrix, -1, 1, 1);
+        rotateZd(matrix, 270);
+    }
+    Transform::cropViewport(matrix, parameter[1], parameter[2], out_width, out_height);
+
 }
 
 void Camera::updateImage() {
@@ -51,15 +61,6 @@ void Camera::updateImage() {
         javaVm->AttachCurrentThread(&env, nullptr);
     }
     env->CallVoidMethod(jCamera, update_id);
-
-    matrixSetIdentityM(matrix);
-    if (parameter[0] == 1) {
-        rotateZd(matrix, 270);
-    } else {
-        matrixScaleM(matrix, -1, 1, 1);
-        rotateZd(matrix, 270);
-    }
-    Transform::cropViewport(matrix, parameter[1], parameter[2], out_width, out_height);
     sourceFilter->setMatirx(matrix);
 
     Cmd c = cmd;
@@ -71,6 +72,7 @@ void Camera::updateImage() {
             sourceFilter->destroy();
             DELETEOBJ(sourceFilter)
             cmd = None;
+            LOGI("camera closed");
             break;
         }
         case Switch_: {
@@ -80,6 +82,16 @@ void Camera::updateImage() {
             env->ReleaseIntArrayElements(p, param, 0);
             env->CallVoidMethod(jCamera, start_id, textureId);
             cmd = None;
+
+            matrixSetIdentityM(matrix);
+            if (parameter[0] == 1) {
+                rotateZd(matrix, 270);
+            } else {
+                matrixScaleM(matrix, -1, 1, 1);
+                rotateZd(matrix, 270);
+            }
+            Transform::cropViewport(matrix, parameter[1], parameter[2], out_width, out_height);
+
             break;
         }
         default:

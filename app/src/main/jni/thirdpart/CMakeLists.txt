@@ -12,8 +12,10 @@ target_link_libraries(
         oboe
         soundtouch
         sox
+        png
 )
 
 ADD_SUBDIRECTORY(oboe-1.3)
 ADD_SUBDIRECTORY(soundtouch)
 ADD_SUBDIRECTORY(sox)
+ADD_SUBDIRECTORY(libpng)

@@ -33,8 +33,6 @@ void GlView::guardedRun() {
                 eglCore->init(window);
                 eglCore->makeCurrent();
                 render->onSurfaceCreate(width, height);
-                render->onDraw();
-                eglCore->swapBuffer();
                 break;
             case MSG_DRAW:
                 if (eglCore && render) {
@@ -70,7 +68,12 @@ void GlView::setRender(Render *render_) {
 }
 
 void GlView::requestRender() {
-    if (msg_queue->size() == 0) {
+    int msg;
+    if (msg_queue->peek(msg)) {
+        if (msg != MSG_DRAW) {
+            msg_queue->push(MSG_DRAW);
+        }
+    } else {
         msg_queue->push(MSG_DRAW);
     }
     cond.notify_all();

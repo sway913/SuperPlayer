@@ -12,15 +12,20 @@ SuperVideo::SuperVideo(JNIEnv *env) : env(env) {
 
     render->setSource(source);
     glView->setRender(render);
+
+    combine_filter = std::make_shared<CombineFilter>();
+    render->setFilter(combine_filter);
 }
 
 void SuperVideo::createSurface(jobject surface, int width, int height) {
-    source->open(width, height);
     glView->createSurface(env, surface, width, height);
+    source->open(width, height);
+    glView->requestRender();
 }
 
 void SuperVideo::destroySurface() {
     source->close();
+    glView->requestRender();
     glView->destroySurface();
 }
 
@@ -34,8 +39,14 @@ void SuperVideo::switchCamera() {
     }
 }
 
+void SuperVideo::setEffect(std::shared_ptr<VideoEffect> &effect) {
+    combine_filter->setEffect(effect);
+    LOGI("super video set effect");
+}
+
 SuperVideo::~SuperVideo() {
     DELETEOBJ(glView)
     DELETEOBJ(render)
     DELETEOBJ(source)
+    combine_filter = nullptr;
 }

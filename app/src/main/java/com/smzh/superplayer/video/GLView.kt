@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import com.smzh.superplayer.player.SuperPlayer
+import com.smzh.superplayer.sing.SingParam
 
 class GLView : SurfaceView, SurfaceHolder.Callback {
 
@@ -29,6 +30,7 @@ class GLView : SurfaceView, SurfaceHolder.Callback {
 
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
         player.createSurface(holder.surface, width, height)
+        player.setVideoEffect(SingParam.videoEffect)
     }
 
 

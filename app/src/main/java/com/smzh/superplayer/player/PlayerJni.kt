@@ -53,6 +53,8 @@ class PlayerJni {
 
     external fun switchCamera()
 
+    external fun setVideoEffect(videoEffect: VideoEffect)
+
     fun setPlayerListener(listener: PlayerStateListener) {
         if (!listeners.contains(listener)) {
             listeners.add(listener)

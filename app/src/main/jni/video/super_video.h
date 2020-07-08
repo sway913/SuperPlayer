@@ -12,6 +12,8 @@
 #include "render.h"
 #include "source/camera.h"
 #include "source/test_source.h"
+#include "video_effect.h"
+#include "filter/combine_filter.h"
 
 class SuperVideo {
 
@@ -27,6 +29,8 @@ public:
 
     void switchCamera();
 
+    void setEffect(std::shared_ptr<VideoEffect> & effect);
+
     virtual ~SuperVideo();
 
 private:
@@ -36,6 +40,7 @@ private:
     Source *source{nullptr};
     JNIEnv *env{nullptr};
     JavaVM *javaVm{nullptr};
+    std::shared_ptr<CombineFilter> combine_filter{nullptr};
 
 };
 
