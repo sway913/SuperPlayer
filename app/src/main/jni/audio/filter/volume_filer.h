@@ -6,10 +6,10 @@
 #define SUPERPLAYER_VOLUME_FILER_H
 
 
-#include "ifilter.h"
+#include "a_filter.h"
 #include "../../common/common_tools.h"
 
-class VolumeFilter : public IFilter {
+class VolumeFilter : public AFilter {
 
 private:
 

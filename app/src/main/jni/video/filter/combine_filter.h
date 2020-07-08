@@ -6,7 +6,7 @@
 #define SUPERPLAYER_COMBINE_FILTER_H
 
 
-#include "ifilter.h"
+#include "v_filter.h"
 #include "../video_effect.h"
 #include <list>
 #include <mutex>
@@ -16,13 +16,13 @@
 
 using namespace std;
 
-class CombineFilter : public IFilter {
+class CombineFilter : public VFilter {
 
 public:
 
     CombineFilter();
 
-    virtual GLuint draw(GLuint textureId, int w, int h);
+    virtual GLuint draw(GLuint textureId, int w, int h) override ;
 
     virtual void destroy() override;
 
@@ -32,7 +32,7 @@ public:
 
 private:
 
-    list<IFilter *> filters{};
+    list<VFilter *> filters{};
 
     mutex _mutex;
 };

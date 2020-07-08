@@ -9,7 +9,7 @@
 #include <inttypes.h>
 #include <SLES/OpenSLES.h>
 #include "../../common/android_log.h"
-#include "ifilter.h"
+#include "a_filter.h"
 
 
 extern "C" {
@@ -39,7 +39,7 @@ extern "C" {
 #define EFFECT_PRESET_ORIGINAL      14
 #define EFFECT_PRESET_TEST 99
 
-class FFFilter : public IFilter {
+class FFFilter : public AFilter {
 
 public:
 

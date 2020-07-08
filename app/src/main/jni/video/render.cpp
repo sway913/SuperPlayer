@@ -39,6 +39,6 @@ void Render::setSource(Source *s) {
     this->source = s;
 }
 
-void Render::setFilter(const std::shared_ptr<IFilter> &f) {
+void Render::setFilter(const std::shared_ptr<VFilter> &f) {
     this->filter = f;
 }

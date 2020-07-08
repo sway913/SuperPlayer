@@ -7,7 +7,7 @@
 
 
 #include <GLES2/gl2.h>
-#include "ifilter.h"
+#include "v_filter.h"
 
 const char VERREX_SFADER[] = "attribute vec4 position;\n"
                              "attribute vec4 inputTextureCoordinate;\n"
@@ -29,7 +29,7 @@ const char FRAGMENT_SHADER[] = "varying highp vec2 textureCoordinate;\n"
                                "    gl_FragColor = texture2D(inputImageTexture, textureCoordinate);\n"
                                "}";
 
-class BaseFilter : public IFilter {
+class BaseFilter : public VFilter {
 
 public:
 
@@ -37,7 +37,7 @@ public:
 
     BaseFilter(const char *vertexShader, const char *fragShader);
 
-    virtual GLuint draw(GLuint textureId, int w, int h);
+    virtual GLuint draw(GLuint textureId, int w, int h) override;
 
     virtual void destroy() override;
 

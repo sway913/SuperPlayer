@@ -8,7 +8,7 @@
 
 #include <memory>
 #include "source/source.h"
-#include "filter/ifilter.h"
+#include "filter/v_filter.h"
 
 class Render {
 
@@ -22,15 +22,15 @@ public:
 
     void setSource(Source *s);
 
-    void setFilter(const std::shared_ptr<IFilter> &f);
+    void setFilter(const std::shared_ptr<VFilter> &f);
 
 
 private:
 
     Source *source{nullptr};
 
-    std::shared_ptr<IFilter> filter{nullptr};
-    IFilter *outRenderFilter{nullptr};
+    std::shared_ptr<VFilter> filter{nullptr};
+    VFilter *outRenderFilter{nullptr};
 
     int width{0};
     int height{0};

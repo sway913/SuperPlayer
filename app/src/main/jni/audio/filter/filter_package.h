@@ -6,7 +6,7 @@
 #define SUPERPLAYER_FILTER_PACKAGE_H
 
 #include <list>
-#include "ifilter.h"
+#include "a_filter.h"
 #include "volume_filer.h"
 #include "pitch_filter.h"
 #include "ff_filter.h"
@@ -30,7 +30,7 @@ class FilterPackage {
 
 private:
 
-    list<IFilter *> filters{};
+    list<AFilter *> filters{};
     mutex _mutex;
     FilterType filter_type{None};
 

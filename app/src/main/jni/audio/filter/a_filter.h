@@ -2,10 +2,10 @@
 // Created by ldr on 2020/6/17.
 //
 
-#ifndef SUPERPLAYER_IFILTER_H
-#define SUPERPLAYER_IFILTER_H
+#ifndef SUPERPLAYER_A_FILTER_H
+#define SUPERPLAYER_A_FILTER_H
 
-class IFilter {
+class AFilter {
 
 public:
 
@@ -15,10 +15,10 @@ public:
 
     virtual void destroy() = 0;
 
-    virtual ~IFilter() {
+    virtual ~AFilter() {
 
     }
 
 };
 
-#endif //SUPERPLAYER_IFILTER_H
+#endif //SUPERPLAYER_A_FILTER_H

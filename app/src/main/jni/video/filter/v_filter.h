@@ -2,12 +2,12 @@
 // Created by Lvlingling on 2020/6/25.
 //
 
-#ifndef SUPERPLAYER_IFILTER_H
-#define SUPERPLAYER_IFILTER_H
+#ifndef SUPERPLAYER_V_FILTER_H
+#define SUPERPLAYER_V_FILTER_H
 
 #include <GLES2/gl2.h>
 
-class IFilter {
+class VFilter {
 
 public:
 
@@ -15,10 +15,10 @@ public:
 
     virtual void destroy() = 0;
 
-    virtual ~IFilter() {
+    virtual ~VFilter() {
 
     }
 
 };
 
-#endif //SUPERPLAYER_IFILTER_H
+#endif //SUPERPLAYER_V_FILTER_H

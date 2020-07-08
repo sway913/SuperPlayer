@@ -5,11 +5,11 @@
 #ifndef SUPERPLAYER_PITCH_FILTER_H
 #define SUPERPLAYER_PITCH_FILTER_H
 
-#include "ifilter.h"
+#include "a_filter.h"
 #include "../../thirdpart/soundtouch/include/SoundTouch.h"
 
 using namespace soundtouch;
-class PitchFilter : public IFilter {
+class PitchFilter : public AFilter {
 
 private:
 

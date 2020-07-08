@@ -5,7 +5,7 @@
 #ifndef SUPERPLAYER_CUSTOM_FILTER_H
 #define SUPERPLAYER_CUSTOM_FILTER_H
 
-#include "ifilter.h"
+#include "a_filter.h"
 #include "../../common/common_tools.h"
 
 
@@ -21,7 +21,7 @@ extern "C" {
 #include <cassert>
 #include <cstdlib>
 
-class CustomFilter : public IFilter {
+class CustomFilter : public AFilter {
 
 public:
 
