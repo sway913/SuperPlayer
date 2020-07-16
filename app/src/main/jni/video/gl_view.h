@@ -37,6 +37,7 @@ private:
     void guardedRun();
 
     ANativeWindow *window{nullptr};
+    EGLSurface eglSurface{nullptr};
     int width{0};
     int height{0};
     EglCore *eglCore{nullptr};

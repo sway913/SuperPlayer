@@ -30,19 +30,22 @@ void GlView::guardedRun() {
         switch (msg) {
             case MSG_CTEATE:
                 eglCore = new EglCore();
-                eglCore->init(window);
-                eglCore->makeCurrent();
+                eglCore->init();
+                eglSurface = eglCore->createEGLSurface(window);
+                eglCore->makeCurrent(eglSurface);
                 render->onSurfaceCreate(width, height);
                 break;
             case MSG_DRAW:
                 if (eglCore && render) {
+                    eglCore->makeCurrent(eglSurface);
                     render->onDraw();
-                    eglCore->swapBuffer();
+                    eglCore->swapBuffer(eglSurface);
                 }
                 break;
             case MSG_DESTROY:
                 if (eglCore && render) {
                     render->onSurfaceDestroy();
+                    eglCore->destroyEGLSurface(eglSurface);
                     eglCore->destroy();
                     DELETEOBJ(eglCore)
                 }

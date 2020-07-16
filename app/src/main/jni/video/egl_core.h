@@ -21,18 +21,28 @@ public:
 
     EglCore(EglCore &&) = delete;
 
-    bool init(ANativeWindow *window);
+    bool init(EGLContext share_context = nullptr);
 
-    void makeCurrent();
+    void makeCurrent(EGLSurface surface);
 
-    void swapBuffer();
+    void swapBuffer(EGLSurface surface);
+
+    EGLSurface createEGLSurface(ANativeWindow *window);
+
+    void destroyEGLSurface(EGLSurface surface);
 
     void destroy();
 
+    EGLContext getContext();
+
+    EGLConfig getConfig();
+
 private:
 
+    EGLConfig getEGLConfig();
+
     EGLDisplay _display{nullptr};
-    EGLSurface _surface{nullptr};
+    EGLConfig _config{nullptr};
     EGLContext _context{nullptr};
 
 

@@ -5,11 +5,13 @@
 #include "egl_core.h"
 #include "../common/android_log.h"
 
-bool EglCore::init(ANativeWindow *window) {
-    GLint majorVersion;
-    GLint minorVersion;
-    EGLint width;
-    EGLint height;
+bool EglCore::init(EGLContext share_context) {
+    if (_display != EGL_NO_DISPLAY) {
+        return false;
+    }
+    if (!share_context) {
+        share_context = EGL_NO_DISPLAY;
+    }
 
     _display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
     if (EGL_NO_DISPLAY == _display) {
@@ -17,21 +19,55 @@ bool EglCore::init(ANativeWindow *window) {
         return false;
     }
 
+    GLint majorVersion, minorVersion;
+
     if (!eglInitialize(_display, &majorVersion, &minorVersion)) {
         LOGI("egl initialize fail");
         return false;
     }
 
+    EGLConfig config = getEGLConfig();
+
+    if (config) {
+        EGLint context_attrs[] = {
+                EGL_CONTEXT_CLIENT_VERSION, 2,
+                EGL_NONE
+        };
+
+        EGLContext context = eglCreateContext(_display, config, share_context, context_attrs);
+        if (eglGetError() == EGL_SUCCESS) {
+            _config = config;
+            _context = context;
+        }
+
+        GLint value;
+        eglQueryContext(_display, _context, EGL_CONTEXT_CLIENT_VERSION, &value);
+    }
+    return EGL_NO_CONTEXT != _context;
+}
+
+EGLSurface EglCore::createEGLSurface(ANativeWindow *window) {
+    EGLint width, height;
+    EGLSurface surface = eglCreateWindowSurface(_display, _config, window, nullptr);
+    if (EGL_NO_SURFACE == surface) {
+        LOGI("egl create surface error");
+        return nullptr;
+    }
+
+    if (!eglQuerySurface(_display, surface, EGL_WIDTH, &width) ||
+        !eglQuerySurface(_display, surface, EGL_HEIGHT, &height)) {
+        LOGI("egl query surface fail");
+        return nullptr;
+    }
+    return surface;
+}
+
+void EglCore::destroyEGLSurface(EGLSurface surface) {
+    eglDestroySurface(_display, surface);
+}
+
+EGLConfig EglCore::getEGLConfig() {
     EGLint config_attrs[] = {
-//            EGL_BLUE_SIZE, 8,
-//            EGL_GREEN_SIZE, 8,
-//            EGL_RED_SIZE, 8,
-//            EGL_ALPHA_SIZE, 8,
-//            EGL_DEPTH_SIZE, 0,
-//            EGL_STENCIL_SIZE, 0,
-//            EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-//            EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-//            EGL_NONE
             EGL_BUFFER_SIZE, 32,
             EGL_ALPHA_SIZE, 8,
             EGL_BLUE_SIZE, 8,
@@ -47,54 +83,38 @@ bool EglCore::init(ANativeWindow *window) {
     EGLConfig eglConfig;
     if (!eglChooseConfig(_display, config_attrs, &eglConfig, 1, &num_configs)) {
         LOGI("egl choose config error");
-        return -1;
+        return nullptr;
     }
-
-    _surface = eglCreateWindowSurface(_display, eglConfig, window, nullptr);
-    if (EGL_NO_SURFACE == _surface) {
-        LOGI("egl create surface error");
-        return false;
-    }
-
-    if (!eglQuerySurface(_display, _surface, EGL_WIDTH, &width) ||
-        !eglQuerySurface(_display, _surface, EGL_HEIGHT, &height)) {
-        LOGI("egl query surface fail");
-        return false;
-    }
-
-    EGLint context_attrs[] = {
-            EGL_CONTEXT_CLIENT_VERSION, 2,
-            EGL_NONE
-    };
-
-    _context = eglCreateContext(_display, eglConfig, EGL_NO_CONTEXT, context_attrs);
-    if (EGL_NO_CONTEXT != _context) {
-        LOGI("egl create context error");
-    }
-    return EGL_NO_CONTEXT != _context;
+    return eglConfig;
 }
 
 
-void EglCore::makeCurrent() {
-    if (!eglMakeCurrent(_display, _surface, _surface, _context)) {
+void EglCore::makeCurrent(EGLSurface surface) {
+    if (!eglMakeCurrent(_display, surface, surface, _context)) {
         LOGI("egl make current error");
     }
 }
 
 
-void EglCore::swapBuffer() {
-    if (!eglSwapBuffers(_display, _surface)) {
+void EglCore::swapBuffer(EGLSurface surface) {
+    if (!eglSwapBuffers(_display, surface)) {
         LOGI("egl swap error");
     }
+}
+
+EGLContext EglCore::getContext() {
+    return _context;
+}
+
+EGLConfig EglCore::getConfig() {
+    return _config;
 }
 
 
 void EglCore::destroy() {
     eglMakeCurrent(_display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
     eglDestroyContext(_display, _context);
-    eglDestroySurface(_display, _surface);
     eglTerminate(_display);
     _display = EGL_NO_DISPLAY;
-    _surface = EGL_NO_SURFACE;
     _context = EGL_NO_CONTEXT;
 }
