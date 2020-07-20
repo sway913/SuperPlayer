@@ -123,9 +123,9 @@ class VideoEncoder(w: Int, h: Int, bitRate: Int, frameRate: Int, outPath: String
         }
     }
 
-    fun signalInputEnd() {
+    private fun signalInputEnd() {
         synchronized(lock) {
-            if (hasStop && isAlive) {
+            if (hasStop) {
                 Log.i(TAG, "signalInputEnd")
                 try {
                     codec.signalEndOfInputStream()
@@ -146,6 +146,7 @@ class VideoEncoder(w: Int, h: Int, bitRate: Int, frameRate: Int, outPath: String
         hasStop = true
         encodeFrame()
         join()
+        signalInputEnd()
         codec.stop()
         codec.release()
         muxer.stop()

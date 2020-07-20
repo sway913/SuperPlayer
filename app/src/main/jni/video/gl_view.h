@@ -32,6 +32,8 @@ public:
 
     void setRender(Render *render_);
 
+    EglCore *getEglCore();
+
 private:
 
     void guardedRun();

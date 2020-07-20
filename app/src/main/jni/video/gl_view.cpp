@@ -70,6 +70,10 @@ void GlView::setRender(Render *render_) {
     this->render = render_;
 }
 
+EglCore * GlView::getEglCore() {
+    return eglCore;
+}
+
 void GlView::requestRender() {
     int msg;
     if (msg_queue->peek(msg)) {

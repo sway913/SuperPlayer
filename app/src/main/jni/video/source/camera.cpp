@@ -20,6 +20,7 @@ Camera::Camera(JNIEnv *env) : env(env) {
     start_id = env->GetMethodID(clazz, "startPreview", "(I)V");
 
     env->DeleteLocalRef(clazz);
+    env->DeleteLocalRef(camera);
 
     sourceFilter = new SourceFilter();
     parameter = new int[3];
