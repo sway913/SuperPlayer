@@ -29,7 +29,11 @@ public:
 
     void switchCamera();
 
-    void setEffect(std::shared_ptr<VideoEffect> & effect);
+    void setEffect(std::shared_ptr<VideoEffect> &effect);
+
+    void startRecord();
+
+    void stopRecord();
 
     virtual ~SuperVideo();
 

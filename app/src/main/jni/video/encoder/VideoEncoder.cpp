@@ -10,3 +10,5 @@ VideoEncoder *VideoEncoder::getEncoder(JNIEnv *env, bool is_support_media_codec)
     }
     return nullptr;
 }
+
+VideoEncoder::~VideoEncoder() = default;

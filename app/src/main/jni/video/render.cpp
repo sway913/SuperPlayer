@@ -4,11 +4,15 @@
 
 #include "render.h"
 #include "../common/common_tools.h"
-#include "filter/out_filter.h"
+#include "filter/movie_writer_filter.h"
 #include "../common/android_log.h"
 
+Render::Render(JNIEnv *env) {
+    movieWriterFilter = new MovieWriterFilter();
+}
+
+
 void Render::onSurfaceCreate(int w, int h) {
-    outRenderFilter = new OutFilter();
     this->width = w;
     this->height = h;
 }
@@ -21,14 +25,13 @@ void Render::onDraw() {
         if (filter) {
             textureId = filter->draw(textureId, width, height);
         }
-        outRenderFilter->draw(textureId, width, height);
+        movieWriterFilter->draw(textureId, width, height);
     }
 }
 
 
 void Render::onSurfaceDestroy() {
-    outRenderFilter->destroy();
-    DELETEOBJ(outRenderFilter)
+    movieWriterFilter->destroy();
     if (filter) {
         filter->destroy();
         filter = nullptr;
@@ -41,4 +44,16 @@ void Render::setSource(Source *s) {
 
 void Render::setFilter(const std::shared_ptr<VFilter> &f) {
     this->filter = f;
+}
+
+void Render::startRecord() {
+
+}
+
+void Render::stopRecord() {
+
+}
+
+Render::~Render() {
+    DELETEOBJ(movieWriterFilter)
 }

@@ -7,7 +7,7 @@
 SuperVideo::SuperVideo(JNIEnv *env) : env(env) {
     env->GetJavaVM(&javaVm);
     glView = new GlView();
-    render = new Render();
+    render = new Render(env);
     source = new Camera(env);
 
     render->setSource(source);
@@ -42,6 +42,14 @@ void SuperVideo::switchCamera() {
 void SuperVideo::setEffect(std::shared_ptr<VideoEffect> &effect) {
     combine_filter->setEffect(effect);
     LOGI("super video set effect");
+}
+
+void SuperVideo::startRecord() {
+    render->startRecord();
+}
+
+void SuperVideo::stopRecord() {
+    render->stopRecord();
 }
 
 SuperVideo::~SuperVideo() {

@@ -16,11 +16,7 @@ public:
 
     void start() override;
 
-    void resume() override;
-
     void encodeFrame() override;
-
-    void pause() override;
 
     void stop() override;
 

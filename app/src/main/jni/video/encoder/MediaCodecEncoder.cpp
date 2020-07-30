@@ -21,14 +21,6 @@ void MediaCodecEncoder::start() {
 
 }
 
-void MediaCodecEncoder::resume() {
-
-}
-
-void MediaCodecEncoder::pause() {
-
-}
-
 void MediaCodecEncoder::stop() {
 
 }
