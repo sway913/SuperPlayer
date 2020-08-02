@@ -55,6 +55,7 @@ class VideoEncoder(w: Int, h: Int, bitRate: Int, frameRate: Int, outPath: String
         trackIndex = -1
         bufferInfo = MediaCodec.BufferInfo()
         start()
+        Log.d(TAG, "encode param width:$w, height: $h, path: $outPath, bitRate: $bitRate, frameRate: $frameRate")
     }
 
     fun getInputSurface(): Surface {
@@ -143,13 +144,17 @@ class VideoEncoder(w: Int, h: Int, bitRate: Int, frameRate: Int, outPath: String
     }
 
     fun stopEncoder() {
-        hasStop = true
-        encodeFrame()
-        join()
-        signalInputEnd()
-        codec.stop()
-        codec.release()
-        muxer.stop()
-        muxer.release()
+        try {
+            hasStop = true
+            encodeFrame()
+            join()
+            signalInputEnd()
+            codec.stop()
+            codec.release()
+            muxer.stop()
+            muxer.release()
+        } catch (e: Exception) {
+
+        }
     }
 }

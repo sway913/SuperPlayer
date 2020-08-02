@@ -11,9 +11,7 @@ class VideoEncoder {
 
 public:
 
-    static VideoEncoder *getEncoder(JNIEnv *env, bool is_support_media_codec = true);
-
-    virtual void start() = 0;
+    static VideoEncoder *getEncoder(JNIEnv *env, const char *path, int w, int h, bool is_support_media_codec = true);
 
     virtual void encodeFrame() = 0;
 

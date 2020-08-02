@@ -10,12 +10,13 @@
 #include <jni.h>
 #include "../source/source.h"
 #include "../filter/v_filter.h"
+#include "../filter/movie_writer_filter.h"
 
 class Render {
 
 public:
 
-    Render(JNIEnv *env);
+    Render();
 
     void onSurfaceCreate(int w, int h);
 
@@ -27,9 +28,13 @@ public:
 
     void setFilter(const std::shared_ptr<VFilter> &f);
 
-    void startRecord();
+    void start(JNIEnv *env, const char *video_path);
 
-    void stopRecord();
+    void stop();
+
+    void resume();
+
+    void pause();
 
     virtual ~Render();
 
@@ -38,7 +43,7 @@ private:
     Source *source{nullptr};
 
     std::shared_ptr<VFilter> filter{nullptr};
-    VFilter *movieWriterFilter{nullptr};
+    MovieWriterFilter *movieWriterFilter{nullptr};
 
     int width{0};
     int height{0};

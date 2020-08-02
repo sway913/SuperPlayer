@@ -4,7 +4,9 @@ class AudioParam(private val isRecorder: Boolean = false,
                  private val vocalPath: String = "",
                  private val accPath: String = "",
                  private val guidePath: String = "",
-                 private val decodePath: String = "") {
+                 private val decodePath: String = "",
+                 private val videoPath: String = "",
+                 private val withVideo: Boolean = false) {
 
     private var outSample: Int = 0
 
@@ -35,4 +37,13 @@ class AudioParam(private val isRecorder: Boolean = false,
     fun getGuidePath(): String {
         return guidePath;
     }
+
+    fun isVideoMode(): Boolean {
+        return withVideo
+    }
+
+    fun getVideoPath(): String {
+        return videoPath;
+    }
+
 }

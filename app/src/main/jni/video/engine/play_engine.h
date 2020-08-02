@@ -14,11 +14,15 @@ public:
 
     PlayEngine(JNIEnv *env);
 
-    void start() override;
-
     void stop() override;
 
     void initGlView() override;
+
+    void prepare(JNIEnv *env, const char *path) override;
+
+    void resume() override;
+
+    void pause() override;
 
 };
 

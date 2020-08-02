@@ -19,13 +19,17 @@ public:
 
     void setGlView(GlView *v);
 
-    virtual void start() = 0;
-
     virtual void stop() = 0;
 
     virtual void switchCamera();
 
     virtual void setEffect(std::shared_ptr<VideoEffect> &effect);
+
+    virtual void prepare(JNIEnv *env, const char *path) = 0;
+
+    virtual void resume() = 0;
+
+    virtual void pause() = 0;
 
     virtual ~VideoEngine();
 

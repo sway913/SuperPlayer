@@ -16,9 +16,15 @@ std::unique_ptr<SuperVideo> super_video = nullptr;
 JNIEXPORT void JNICALL
 Java_com_smzh_superplayer_player_PlayerJni_prepare(JNIEnv *env, jobject clazz, jobject audio_param) {
     super_audio = std::make_unique<SuperAudio>(env, clazz);
+    std::shared_ptr<AudioParam> spParam = ParamFactory::generalAudioParam(env, audio_param);
     if (super_audio) {
-        std::shared_ptr<AudioParam> spParam = ParamFactory::generalAudioParam(env, audio_param);
         super_audio->prepare(spParam);
+    }
+    if (spParam->isWithVideo()) {
+        if (!super_video) {
+            super_video = std::make_unique<SuperVideo>(env);
+        }
+        super_video->prepare(env, spParam->getVideoPath());
     }
 }
 
@@ -26,17 +32,26 @@ JNIEXPORT void JNICALL Java_com_smzh_superplayer_player_PlayerJni_start(JNIEnv *
     if (super_audio) {
         super_audio->start();
     }
+    if (super_video) {
+        super_video->resume();
+    }
 }
 
 JNIEXPORT void JNICALL Java_com_smzh_superplayer_player_PlayerJni_resume(JNIEnv *jniEnv, jobject clazz) {
     if (super_audio) {
         super_audio->resume();
     }
+    if (super_video) {
+        super_video->resume();
+    }
 }
 
 JNIEXPORT void JNICALL Java_com_smzh_superplayer_player_PlayerJni_pause(JNIEnv *jniEnv, jobject clazz) {
     if (super_audio) {
         super_audio->pause();
+    }
+    if (super_video) {
+        super_video->pause();
     }
 }
 
@@ -45,6 +60,10 @@ JNIEXPORT void JNICALL Java_com_smzh_superplayer_player_PlayerJni_stop(JNIEnv *e
         super_audio->stop();
     }
     super_audio = nullptr;
+
+    if(super_video) {
+        super_video->stop();
+    }
 }
 
 JNIEXPORT void JNICALL Java_com_smzh_superplayer_player_PlayerJni_setEcho(JNIEnv *env, jobject clazz, jboolean isEcho) {
@@ -111,7 +130,9 @@ JNIEXPORT jint JNICALL Java_com_smzh_superplayer_player_PlayerJni_getMergeProgre
 }
 
 JNIEXPORT void JNICALL Java_com_smzh_superplayer_player_PlayerJni_onSurfaceCreate(JNIEnv *env, jobject clazz, jobject surface, jint width, jint height) {
-    super_video = std::make_unique<SuperVideo>(env);
+    if (!super_video) {
+        super_video = std::make_unique<SuperVideo>(env);
+    }
     super_video->createSurface(surface, width, height);
 }
 
@@ -136,10 +157,11 @@ JNIEXPORT void JNICALL Java_com_smzh_superplayer_player_PlayerJni_switchCamera(J
 }
 
 JNIEXPORT void JNICALL Java_com_smzh_superplayer_player_PlayerJni_setVideoEffect(JNIEnv *env, jobject clazz, jobject effect) {
-    if (super_video) {
-        auto param = ParamFactory::generalVideoEffect(env, effect);
-        super_video->setEffect(param);
+    if (!super_video) {
+        super_video = std::make_unique<SuperVideo>(env);
     }
+    auto param = ParamFactory::generalVideoEffect(env, effect);
+    super_video->setEffect(param);
 }
 
 }

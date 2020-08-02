@@ -16,6 +16,8 @@ object SingParam {
     val mixPath: String
     val decodePath: String
     val testVocalPath: String
+    val videoPath: String
+
     const val vocalGain = 4F
     val lyricPath: String
     val lookupPicPath: String
@@ -33,6 +35,7 @@ object SingParam {
             decodePath = this + "decode.pcm"
             testVocalPath = this + "test_vocal.pcm"
             lyricPath = this + "lyric.html"
+            videoPath = this + "video.mp4"
         }
         filePath.run {
             val file = File(this)

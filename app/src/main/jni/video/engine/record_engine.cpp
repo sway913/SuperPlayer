@@ -7,23 +7,23 @@
 
 
 RecordEngine::RecordEngine(JNIEnv *env) : VideoEngine(env) {
-    render = new Render(env);
+    render = new Render();
     source = new Camera(env);
     combine_filter = std::make_shared<CombineFilter>();
     render->setFilter(combine_filter);
     render->setSource(source);
 }
 
+void RecordEngine::prepare(JNIEnv *env, const char *path) {
+    render->start(env, path);
+}
+
 void RecordEngine::initGlView() {
     glView->setRender(render);
 }
 
-void RecordEngine::start() {
-
-}
-
 void RecordEngine::stop() {
-
+    render->stop();
 }
 
 void RecordEngine::switchCamera() {
@@ -34,6 +34,14 @@ void RecordEngine::switchCamera() {
 
 void RecordEngine::setEffect(std::shared_ptr<VideoEffect> &effect) {
     combine_filter->setEffect(effect);
+}
+
+void RecordEngine::resume() {
+    render->resume();
+}
+
+void RecordEngine::pause() {
+    render->pause();
 }
 
 RecordEngine::~RecordEngine() {

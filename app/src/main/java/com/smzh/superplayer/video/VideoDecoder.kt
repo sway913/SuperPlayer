@@ -9,7 +9,6 @@ class VideoDecoder(private val filePath: String,
                    private val outSurface: Surface) {
 
     private val bufferInfo = MediaCodec.BufferInfo()
-    private var isStopped = false
     private var width = 0
     private var height = 0
     private val mediaExtractor: MediaExtractor = MediaExtractor()

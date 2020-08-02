@@ -66,7 +66,9 @@ class SingViewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener
     fun prepare() {
         val audioParam = AudioParam(isRecorder = true,
                 accPath = song.path ?: "",
-                vocalPath = SingParam.vocalPath)
+                vocalPath = SingParam.vocalPath,
+                withVideo = isVideoMode.value ?: false,
+                videoPath = SingParam.videoPath)
         player.addPlayerListener(this)
         player.prepare(audioParam)
         singState.postValue(STATE_PREPARE)

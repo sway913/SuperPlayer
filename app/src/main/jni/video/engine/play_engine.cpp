@@ -9,10 +9,19 @@ PlayEngine::PlayEngine(JNIEnv *env) : VideoEngine(env) {}
 void PlayEngine::initGlView() {
 
 }
-void PlayEngine::start() {
+
+void PlayEngine::stop() {
 
 }
 
-void PlayEngine::stop() {
+void PlayEngine::prepare(JNIEnv *env, const char *path) {
+
+}
+
+void PlayEngine::resume() {
+
+}
+
+void PlayEngine::pause() {
 
 }

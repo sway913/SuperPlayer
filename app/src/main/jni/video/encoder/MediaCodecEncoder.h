@@ -7,18 +7,20 @@
 
 
 #include "VideoEncoder.h"
+#include <android/native_window.h>
+#include <android/native_window_jni.h>
 
 class MediaCodecEncoder : public VideoEncoder {
 
 public:
 
-    MediaCodecEncoder(JNIEnv *env);
-
-    void start() override;
+    MediaCodecEncoder(JNIEnv *env, int w, int h, const char *path);
 
     void encodeFrame() override;
 
     void stop() override;
+
+    ANativeWindow *getEncodeWindow();
 
 private:
 
@@ -26,6 +28,8 @@ private:
     jobject video_encoder{nullptr};
     jmethodID encode_id{nullptr};
     jmethodID stop_id{nullptr};
+    ANativeWindow *encodeWindow{nullptr};
+    jmethodID get_surface_id{nullptr};
 };
 
 

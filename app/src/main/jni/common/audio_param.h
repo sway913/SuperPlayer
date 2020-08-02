@@ -18,6 +18,8 @@ private:
     char *vocal_path{nullptr};
     char *decode_path{nullptr};
     int out_sample{0};
+    bool withVideo{false};
+    char *video_path{nullptr};
 
     static inline void copyPath(char *&dst, const char *src) {
         size_t len = strlen(src);
@@ -29,13 +31,16 @@ private:
 
 public:
 
-    AudioParam(bool isRecorder, int outSample, const char *accPath, const char *guidePath, const char *vocalPath, const char *decodePath) {
+    AudioParam(bool isRecorder, int outSample, const char *accPath, const char *guidePath, const char *vocalPath,
+               const char *decodePath, bool with_video, const char *videoPath) {
         this->is_recorder = isRecorder;
         this->out_sample = outSample;
+        this->withVideo = with_video;
         copyPath(acc_path, accPath);
         copyPath(guide_path, guidePath);
         copyPath(vocal_path, vocalPath);
         copyPath(decode_path, decodePath);
+        copyPath(video_path, videoPath);
     }
 
     bool isRecorder() const {
@@ -62,11 +67,20 @@ public:
         return out_sample;
     }
 
+    bool isWithVideo() const {
+        return withVideo;
+    }
+
+    char *getVideoPath() const {
+        return video_path;
+    }
+
     virtual ~AudioParam() {
         DELETEARR(acc_path)
         DELETEARR(guide_path)
         DELETEARR(vocal_path)
         DELETEARR(decode_path)
+        DELETEARR(video_path)
     }
 };
 

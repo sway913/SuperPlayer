@@ -19,6 +19,8 @@ public:
 
     SuperVideo(JNIEnv *env);
 
+    void prepare(JNIEnv *env, const char *path);
+
     void createSurface(jobject surface, int width, int height);
 
     void destroySurface();
@@ -29,9 +31,11 @@ public:
 
     void setEffect(std::shared_ptr<VideoEffect> &effect);
 
-    void startRecord();
+    void resume();
 
-    void stopRecord();
+    void pause();
+
+    void stop();
 
     virtual ~SuperVideo();
 

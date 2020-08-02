@@ -96,7 +96,7 @@ class SuperPlayer {
         handler.post { playerJni.onSurfaceCreate(surface, width, height) }
     }
 
-    fun destorySurface() {
+    fun destroySurface() {
         handler.post { playerJni.onSurfaceDestroy() }
     }
 

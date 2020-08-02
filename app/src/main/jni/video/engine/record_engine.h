@@ -17,8 +17,6 @@ public:
 
     RecordEngine(JNIEnv *env);
 
-    void start() override;
-
     void stop() override;
 
     void initGlView() override;
@@ -26,6 +24,12 @@ public:
     void switchCamera() override;
 
     void setEffect(std::shared_ptr<VideoEffect> &effect) override;
+
+    void prepare(JNIEnv *env, const char *path) override;
+
+    void resume() override;
+
+    void pause() override;
 
     virtual ~RecordEngine();
 

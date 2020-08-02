@@ -4,15 +4,13 @@
 
 #include "render.h"
 #include "../../common/common_tools.h"
-#include "../filter/movie_writer_filter.h"
 #include "../../common/android_log.h"
 
-Render::Render(JNIEnv *env) {
-    movieWriterFilter = new MovieWriterFilter(env);
-}
+Render::Render() = default;
 
 
 void Render::onSurfaceCreate(int w, int h) {
+    movieWriterFilter = new MovieWriterFilter();
     this->width = w;
     this->height = h;
     if (source) {
@@ -43,7 +41,6 @@ void Render::onSurfaceDestroy() {
         filter->destroy();
         filter = nullptr;
     }
-
 }
 
 void Render::setSource(Source *s) {
@@ -54,12 +51,20 @@ void Render::setFilter(const std::shared_ptr<VFilter> &f) {
     this->filter = f;
 }
 
-void Render::startRecord() {
-
+void Render::start(JNIEnv *env, const char *video_path) {
+    movieWriterFilter->startRecord(env, video_path);
 }
 
-void Render::stopRecord() {
+void Render::stop() {
+    movieWriterFilter->stopRecord();
+}
 
+void Render::resume() {
+    movieWriterFilter->resume();
+}
+
+void Render::pause() {
+    movieWriterFilter->pause();
 }
 
 Render::~Render() {

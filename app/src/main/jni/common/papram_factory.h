@@ -22,6 +22,9 @@ public:
         jmethodID vocal_path_id = env->GetMethodID(cls, "getVocalPath", "()Ljava/lang/String;");
         jmethodID guide_path_id = env->GetMethodID(cls, "getGuidePath", "()Ljava/lang/String;");
         jmethodID decode_path_id = env->GetMethodID(cls, "getDecodePath", "()Ljava/lang/String;");
+        jmethodID is_video_id = env->GetMethodID(cls, "isVideoMode", "()Z");
+        jmethodID video_path_id = env->GetMethodID(cls, "getVideoPath", "()Ljava/lang/String;");
+
 
         bool is_recorder = env->CallBooleanMethod(obj, is_recorder_id);
         int out_sample = env->CallIntMethod(obj, sample_id);
@@ -29,15 +32,21 @@ public:
         auto j_guide_path = static_cast<jstring>(env->CallObjectMethod(obj, guide_path_id));
         auto j_vocal_path = static_cast<jstring>(env->CallObjectMethod(obj, vocal_path_id));
         auto j_decode_path = static_cast<jstring>(env->CallObjectMethod(obj, decode_path_id));
+        auto j_video_path = static_cast<jstring>(env->CallObjectMethod(obj, video_path_id));
         const char *acc_path = env->GetStringUTFChars(j_acc_path, nullptr);
         const char *guide_path = env->GetStringUTFChars(j_guide_path, nullptr);
         const char *vocal_path = env->GetStringUTFChars(j_vocal_path, nullptr);
         const char *decode_path = env->GetStringUTFChars(j_decode_path, nullptr);
-        std::shared_ptr<AudioParam> sp_param = std::make_shared<AudioParam>(is_recorder, out_sample, acc_path, guide_path, vocal_path, decode_path);
+        const char *video_path = env->GetStringUTFChars(j_video_path, nullptr);
+        bool is_video = env->CallBooleanMethod(obj, is_video_id);
+
+        std::shared_ptr<AudioParam> sp_param = std::make_shared<AudioParam>(is_recorder, out_sample, acc_path, guide_path, vocal_path,
+                                                                            decode_path, is_video, video_path);
         env->ReleaseStringChars(j_acc_path, reinterpret_cast<const jchar *>(acc_path));
         env->ReleaseStringChars(j_guide_path, reinterpret_cast<const jchar *>(guide_path));
         env->ReleaseStringChars(j_vocal_path, reinterpret_cast<const jchar *>(vocal_path));
         env->ReleaseStringChars(j_decode_path, reinterpret_cast<const jchar *>(decode_path));
+        env->ReleaseStringChars(j_video_path, reinterpret_cast<const jchar *>(video_path));
         env->DeleteLocalRef(cls);
         return sp_param;
     }

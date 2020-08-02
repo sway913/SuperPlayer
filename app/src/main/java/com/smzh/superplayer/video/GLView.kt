@@ -35,6 +35,6 @@ class GLView : SurfaceView, SurfaceHolder.Callback {
 
 
     override fun surfaceDestroyed(holder: SurfaceHolder?) {
-        player.destorySurface()
+        player.destroySurface()
     }
 }

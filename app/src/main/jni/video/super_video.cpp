@@ -10,6 +10,10 @@ SuperVideo::SuperVideo(JNIEnv *env) : env(env) {
     videoEngine->setGlView(glView);
 }
 
+void SuperVideo::prepare(JNIEnv *env, const char *path) {
+    videoEngine->prepare(env, path);
+}
+
 void SuperVideo::createSurface(jobject surface, int width, int height) {
     glView->createSurface(env, surface, width, height);
     glView->requestRender();
@@ -32,11 +36,15 @@ void SuperVideo::setEffect(std::shared_ptr<VideoEffect> &effect) {
     videoEngine->setEffect(effect);
 }
 
-void SuperVideo::startRecord() {
-    videoEngine->start();
+void SuperVideo::resume() {
+    videoEngine->resume();
 }
 
-void SuperVideo::stopRecord() {
+void SuperVideo::pause() {
+    videoEngine->pause();
+}
+
+void SuperVideo::stop() {
     videoEngine->stop();
 }
 
@@ -44,4 +52,5 @@ SuperVideo::~SuperVideo() {
     videoEngine->setGlView(nullptr);
     DELETEOBJ(glView)
     DELETEOBJ(videoEngine)
+    LOGI("~ Super_Video");
 }
