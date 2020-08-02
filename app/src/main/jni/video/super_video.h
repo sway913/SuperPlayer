@@ -7,13 +7,11 @@
 
 
 #include <jni.h>
-#include "gl_view.h"
 #include "../common/common_tools.h"
-#include "render.h"
-#include "source/camera.h"
-#include "source/test_source.h"
-#include "video_effect.h"
+#include "utils/video_effect.h"
 #include "filter/combine_filter.h"
+#include "opengl/gl_view.h"
+#include "engine/video_engine.h"
 
 class SuperVideo {
 
@@ -39,13 +37,9 @@ public:
 
 private:
 
+    VideoEngine *videoEngine{nullptr};
     GlView *glView{nullptr};
-    Render *render{nullptr};
-    Source *source{nullptr};
     JNIEnv *env{nullptr};
-    JavaVM *javaVm{nullptr};
-    std::shared_ptr<CombineFilter> combine_filter{nullptr};
-
 };
 
 

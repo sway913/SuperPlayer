@@ -3,7 +3,7 @@
 //
 
 #include "base_filter.h"
-#include "../opengl_utils.h"
+#include "../opengl/opengl_utils.h"
 #include <sstream>
 #include <thread>
 

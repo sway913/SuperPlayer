@@ -3,7 +3,7 @@
 //
 
 #include "test_source.h"
-#include "../opengl_utils.h"
+#include "../opengl/opengl_utils.h"
 
 
 GLuint program1;

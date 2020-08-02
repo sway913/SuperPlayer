@@ -7,7 +7,7 @@
 
 
 #include "v_filter.h"
-#include "../video_effect.h"
+#include "../utils/video_effect.h"
 #include <list>
 #include <mutex>
 #include "smooth_filter.h"

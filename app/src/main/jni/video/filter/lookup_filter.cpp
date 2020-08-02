@@ -3,7 +3,7 @@
 //
 
 #include "lookup_filter.h"
-#include "../opengl_utils.h"
+#include "../opengl/opengl_utils.h"
 #include "../../common/common_tools.h"
 
 LookupFilter::LookupFilter() : BaseFilter(VERREX_SFADER, LOOK_FRAG) {

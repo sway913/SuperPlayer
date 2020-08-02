@@ -5,26 +5,17 @@
 #include "super_video.h"
 
 SuperVideo::SuperVideo(JNIEnv *env) : env(env) {
-    env->GetJavaVM(&javaVm);
     glView = new GlView();
-    render = new Render(env);
-    source = new Camera(env);
-
-    render->setSource(source);
-    glView->setRender(render);
-
-    combine_filter = std::make_shared<CombineFilter>();
-    render->setFilter(combine_filter);
+    videoEngine = VideoEngine::getVideoEngine(env, 0);
+    videoEngine->setGlView(glView);
 }
 
 void SuperVideo::createSurface(jobject surface, int width, int height) {
     glView->createSurface(env, surface, width, height);
-    source->open(width, height);
     glView->requestRender();
 }
 
 void SuperVideo::destroySurface() {
-    source->close();
     glView->requestRender();
     glView->destroySurface();
 }
@@ -34,27 +25,23 @@ void SuperVideo::onFrameAvailable() {
 }
 
 void SuperVideo::switchCamera() {
-    if (dynamic_cast<Camera *>(source)) {
-        ((Camera *) source)->switchCamera();
-    }
+    videoEngine->switchCamera();
 }
 
 void SuperVideo::setEffect(std::shared_ptr<VideoEffect> &effect) {
-    combine_filter->setEffect(effect);
-    LOGI("super video set effect");
+    videoEngine->setEffect(effect);
 }
 
 void SuperVideo::startRecord() {
-    render->startRecord();
+    videoEngine->start();
 }
 
 void SuperVideo::stopRecord() {
-    render->stopRecord();
+    videoEngine->stop();
 }
 
 SuperVideo::~SuperVideo() {
+    videoEngine->setGlView(nullptr);
     DELETEOBJ(glView)
-    DELETEOBJ(render)
-    DELETEOBJ(source)
-    combine_filter = nullptr;
+    DELETEOBJ(videoEngine)
 }

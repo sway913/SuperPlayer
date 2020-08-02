@@ -5,7 +5,7 @@
 #ifndef SUPERPLAYER_VIDEO_EFFECT_H
 #define SUPERPLAYER_VIDEO_EFFECT_H
 
-#include "../common/common_tools.h"
+#include "../../common/common_tools.h"
 
 class VideoEffect {
 

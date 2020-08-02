@@ -10,9 +10,9 @@
 #include <jni.h>
 #include "egl_core.h"
 #include <future>
-#include "../common/common_tools.h"
-#include "render.h"
-#include "../common/lock_free_queue.h"
+#include "../../common/common_tools.h"
+#include "../../common/lock_free_queue.h"
+#include "../render/render.h"
 
 constexpr int MSG_CTEATE = 1;
 constexpr int MSG_DRAW = 2;

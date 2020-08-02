@@ -8,7 +8,7 @@
 #include <jni.h>
 #include "merger_param.h"
 #include "audio_param.h"
-#include "../video/video_effect.h"
+#include "../video/utils/video_effect.h"
 
 class ParamFactory {
 

@@ -7,7 +7,7 @@
 
 
 #include <jni.h>
-#include "../opengl_utils.h"
+#include "../opengl/opengl_utils.h"
 #include "../filter/source_filter.h"
 #include "../../common/common_tools.h"
 #include "source.h"

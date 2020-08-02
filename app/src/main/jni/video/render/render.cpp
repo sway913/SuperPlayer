@@ -3,18 +3,22 @@
 //
 
 #include "render.h"
-#include "../common/common_tools.h"
-#include "filter/movie_writer_filter.h"
-#include "../common/android_log.h"
+#include "../../common/common_tools.h"
+#include "../filter/movie_writer_filter.h"
+#include "../../common/android_log.h"
 
 Render::Render(JNIEnv *env) {
-    movieWriterFilter = new MovieWriterFilter();
+    movieWriterFilter = new MovieWriterFilter(env);
 }
 
 
 void Render::onSurfaceCreate(int w, int h) {
     this->width = w;
     this->height = h;
+    if (source) {
+        source->open(w, h);
+    }
+
 }
 
 
@@ -31,11 +35,15 @@ void Render::onDraw() {
 
 
 void Render::onSurfaceDestroy() {
+    if (source) {
+        source->close();
+    }
     movieWriterFilter->destroy();
     if (filter) {
         filter->destroy();
         filter = nullptr;
     }
+
 }
 
 void Render::setSource(Source *s) {

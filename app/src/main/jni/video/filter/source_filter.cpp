@@ -5,7 +5,7 @@
 #include "source_filter.h"
 #include "../../common/common_tools.h"
 #include "../../common/android_log.h"
-#include "../opengl_utils.h"
+#include "../opengl/opengl_utils.h"
 
 const char gVertexShader[] =
         "attribute vec4 position;\n"

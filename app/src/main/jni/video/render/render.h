@@ -8,8 +8,8 @@
 
 #include <memory>
 #include <jni.h>
-#include "source/source.h"
-#include "filter/v_filter.h"
+#include "../source/source.h"
+#include "../filter/v_filter.h"
 
 class Render {
 

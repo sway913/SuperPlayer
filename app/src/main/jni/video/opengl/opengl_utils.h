@@ -8,7 +8,7 @@
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
 #include <cstdlib>
-#include "../common/android_log.h"
+#include "../../common/android_log.h"
 
 class OpenGLUtils {
 

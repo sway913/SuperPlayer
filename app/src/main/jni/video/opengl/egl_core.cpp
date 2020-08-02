@@ -3,7 +3,7 @@
 //
 
 #include "egl_core.h"
-#include "../common/android_log.h"
+#include "../../common/android_log.h"
 
 bool EglCore::init(EGLContext share_context) {
     if (_display != EGL_NO_DISPLAY) {
