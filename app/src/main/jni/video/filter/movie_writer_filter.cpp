@@ -35,12 +35,19 @@ GLuint MovieWriterFilter::draw(GLuint textureId, int w, int h) {
         }
         // Make screen surface be current surface
         eglMakeCurrent(mEGLDisplay, mEGLScreenSurface, mEGLScreenSurface, mEGLContext);
-    } else if(eglSurface) {
+    }
+    return ret;
+}
+
+void MovieWriterFilter::destroy() {
+    if (eglSurface) {
         eglCore->destroyEGLSurface(eglSurface);
         eglCore->destroy();
         DELETEOBJ(eglCore)
     }
-    return ret;
+    if (videoEncoder) {
+        videoEncoder->stop();
+    }
 }
 
 void MovieWriterFilter::bindFrameBuffer(int w, int h) {
@@ -57,21 +64,13 @@ void MovieWriterFilter::startRecord(JNIEnv *env, const char *video_path) {
 }
 
 void MovieWriterFilter::stopRecord() {
-    pause();
-    if (videoEncoder) {
-        videoEncoder->stop();
-    }
-}
-
-void MovieWriterFilter::resume() {
-    this->is_recording = true;
-}
-
-void MovieWriterFilter::pause() {
     this->is_recording = false;
 }
 
+void MovieWriterFilter::setState(bool isPause) {
+    this->is_recording = !isPause;
+}
+
 MovieWriterFilter::~MovieWriterFilter() {
-    videoEncoder->stop();
     DELETEOBJ(videoEncoder)
 }

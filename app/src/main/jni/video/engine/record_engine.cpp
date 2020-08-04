@@ -37,11 +37,11 @@ void RecordEngine::setEffect(std::shared_ptr<VideoEffect> &effect) {
 }
 
 void RecordEngine::resume() {
-    render->resume();
+    render->setState(false);
 }
 
 void RecordEngine::pause() {
-    render->pause();
+    render->setState(true);
 }
 
 RecordEngine::~RecordEngine() {

@@ -32,9 +32,7 @@ public:
 
     void stop();
 
-    void resume();
-
-    void pause();
+    void setState(bool isPause);
 
     virtual ~Render();
 

@@ -59,12 +59,8 @@ void Render::stop() {
     movieWriterFilter->stopRecord();
 }
 
-void Render::resume() {
-    movieWriterFilter->resume();
-}
-
-void Render::pause() {
-    movieWriterFilter->pause();
+void Render::setState(bool isPause) {
+    movieWriterFilter->setState(isPause);
 }
 
 Render::~Render() {

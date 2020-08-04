@@ -22,13 +22,13 @@ public:
 
     GLuint draw(GLuint textureId, int w, int h) override;
 
+    void destroy() override;
+
     void startRecord(JNIEnv *env, const char *video_path);
 
     void stopRecord();
 
-    void resume();
-
-    void pause();
+    void setState(bool isPause);
 
     virtual ~MovieWriterFilter();
 
