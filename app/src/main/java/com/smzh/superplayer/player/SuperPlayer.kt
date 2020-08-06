@@ -93,11 +93,11 @@ class SuperPlayer {
     }
 
     fun createSurface(surface: Surface, width: Int, height: Int) {
-        handler.post { playerJni.onSurfaceCreate(surface, width, height) }
+        playerJni.onSurfaceCreate(surface, width, height)
     }
 
     fun destroySurface() {
-        handler.post { playerJni.onSurfaceDestroy() }
+        playerJni.onSurfaceDestroy()
     }
 
     fun onFrameAvailable() {
@@ -108,7 +108,7 @@ class SuperPlayer {
         handler.post { playerJni.switchCamera() }
     }
 
-    fun setVideoEffect(videoEffect: VideoEffect){
+    fun setVideoEffect(videoEffect: VideoEffect) {
         handler.post { playerJni.setVideoEffect(videoEffect) }
     }
 

@@ -19,7 +19,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import java.io.*
 
-class PreviewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener {
+class PreviewModel(val song: Song, val isVideo: Boolean) : ViewModel(), PlayerJni.PlayerStateListener {
 
     private val player by lazy { SuperPlayer.instance }
     val currentMs = MutableLiveData<Long>()
@@ -30,11 +30,13 @@ class PreviewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener 
     val mergerSuccess = MutableLiveData<Boolean>()
     val playState = MutableLiveData<Int>()
     val handler = Handler(Looper.getMainLooper())
+    val isVideoMode = MutableLiveData<Boolean>()
 
     init {
         songName.value = song.name
         progressText.value = "准备就绪"
         playState.value = STATE_IDLE
+        isVideoMode.value = isVideo
     }
 
     private val runnable = object : Runnable {
@@ -181,9 +183,9 @@ class PreviewModel(val song: Song) : ViewModel(), PlayerJni.PlayerStateListener 
 
 
     @Suppress("UNCHECKED_CAST")
-    class PreviewFactory(val song: Song) : ViewModelProvider.NewInstanceFactory() {
+    class PreviewFactory(val song: Song, private val isVideo: Boolean) : ViewModelProvider.NewInstanceFactory() {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return PreviewModel(song) as T
+            return PreviewModel(song, isVideo) as T
         }
     }
 

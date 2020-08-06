@@ -19,6 +19,15 @@
         android:layout_height="match_parent"
         tools:context=".sing.PreviewFragment">
 
+        <com.smzh.superplayer.video.GLView
+            android:id="@+id/video_preview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:background="#00000000"
+            app:visible="@{false}"
+            tools:visibility="gone" />
+
         <LinearLayout
             android:id="@+id/top_bar"
             android:layout_width="match_parent"
@@ -103,9 +112,9 @@
                 android:background="@null"
                 android:gravity="center"
                 android:onClick="@{listener}"
-                android:text="音量"
+                android:text="调音"
                 android:textSize="14sp"
-                android:visibility="gone" />
+                app:visible="@{vm.isVideoMode}" />
 
             <View
                 android:layout_width="0dp"
@@ -180,7 +189,9 @@
             android:id="@+id/custom_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="gone" />
+            android:visibility="gone"
+            tools:layout_editor_absoluteX="0dp"
+            tools:layout_editor_absoluteY="0dp" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

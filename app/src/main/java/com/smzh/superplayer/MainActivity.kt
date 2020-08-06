@@ -101,5 +101,6 @@ class MainActivity : AppCompatActivity(), SongAdapter.ChooseSongListener {
 
     companion object {
         const val SONG = "song"
+        const val IS_VIDEO = "is_video"
     }
 }

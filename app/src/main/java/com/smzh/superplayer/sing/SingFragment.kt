@@ -184,7 +184,7 @@ class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekLis
 
     private fun gotoPreview() {
         viewModel.stop()
-        PreviewActivity.start(context!!, viewModel.song)
+        PreviewActivity.start(context!!, viewModel.song, viewModel.isVideoMode.value ?: false)
         activity?.finish()
     }
 

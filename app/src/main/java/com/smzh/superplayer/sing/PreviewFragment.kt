@@ -1,17 +1,21 @@
 package com.smzh.superplayer.sing
 
+import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.smzh.superplayer.App
+import com.smzh.superplayer.MainActivity.Companion.IS_VIDEO
 import com.smzh.superplayer.MainActivity.Companion.SONG
 import com.smzh.superplayer.R
 import com.smzh.superplayer.WorksActivity
@@ -34,7 +38,8 @@ class PreviewFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.Seek
         super.onCreate(savedInstanceState)
         arguments?.let {
             val song = it.getParcelable<Song>(SONG)!!
-            viewModel = ViewModelProvider(this, PreviewModel.PreviewFactory(song))[PreviewModel::class.java]
+            val isVideo = it.getBoolean(IS_VIDEO, false)
+            viewModel = ViewModelProvider(this, PreviewModel.PreviewFactory(song, isVideo))[PreviewModel::class.java]
         }
     }
 
@@ -52,7 +57,11 @@ class PreviewFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.Seek
         play_control.setListener(this)
         custom_view.setCustomEffectChangeListener(this)
         effect_view.run {
-            layoutManager = GridLayoutManager(context, 5, GridLayoutManager.VERTICAL, false)
+            layoutManager = if (!viewModel.isVideo)
+                GridLayoutManager(context, 5, GridLayoutManager.VERTICAL, false)
+            else {
+                LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+            }
             adapter = AudioFilterAdapter(this@PreviewFragment)
             addItemDecoration(EffectItemDecoration())
         }
@@ -76,6 +85,22 @@ class PreviewFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.Seek
                 }
             }
         })
+        if (viewModel.isVideo) {
+            ((progress_bar.layoutParams) as ConstraintLayout.LayoutParams).run {
+                bottomToTop = R.id.effect_view
+                topToBottom = ConstraintLayout.LayoutParams.UNSET
+            }
+            ((effect_view.layoutParams) as ConstraintLayout.LayoutParams).run {
+                bottomToTop = R.id.bottom_bar
+                topToBottom = ConstraintLayout.LayoutParams.UNSET
+                topMargin = dp2px(requireContext(), 10)
+            }
+            ((play_control.layoutParams) as ConstraintLayout.LayoutParams).run {
+                topToBottom = ConstraintLayout.LayoutParams.UNSET
+                bottomToTop = R.id.bottom_bar
+            }
+            play_control.visibility = View.GONE
+        }
     }
 
     override fun onClick(v: View?) {
@@ -89,6 +114,20 @@ class PreviewFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.Seek
                 viewModel.stop()
                 SingActivity.start(context!!, viewModel.song)
                 activity?.finish()
+            }
+            R.id.btn_volume -> {
+                btn_volume.isSelected = !btn_volume.isSelected
+                play_control.visibility = if (btn_volume.isSelected) {
+                    btn_volume.setTextColor(Color.GRAY)
+                    effect_view.visibility = View.GONE
+                    progress_bar.visibility =View.GONE
+                    View.VISIBLE
+                } else {
+                    btn_volume.setTextColor(Color.BLACK)
+                    effect_view.visibility = View.VISIBLE
+                    progress_bar.visibility = View.VISIBLE
+                    View.GONE
+                }
             }
         }
     }
@@ -162,10 +201,11 @@ class PreviewFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.Seek
     companion object {
 
         @JvmStatic
-        fun newInstance(song: Song) =
+        fun newInstance(song: Song, isVideo: Boolean = false) =
                 PreviewFragment().apply {
                     arguments = Bundle().apply {
                         putParcelable(SONG, song)
+                        putBoolean(IS_VIDEO, isVideo)
                     }
                 }
     }
