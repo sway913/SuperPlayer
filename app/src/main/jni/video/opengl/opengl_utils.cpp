@@ -11,7 +11,7 @@ GLuint OpenGLUtils::loadShader(GLenum shaderType, const char *pSource) {
         glCompileShader(shader);
         GLint compiled = 0;
         glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
-        if (!compiled) {
+        if (compiled == GL_FALSE) {
             GLint infoLen = 0;
             glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLen);
             if (infoLen) {
@@ -32,8 +32,6 @@ GLuint OpenGLUtils::loadShader(GLenum shaderType, const char *pSource) {
             }
             glDeleteShader(shader);
             shader = 0;
-        } else {
-            LOGI("compile shader error");
         }
     } else {
         LOGI("create shader error");

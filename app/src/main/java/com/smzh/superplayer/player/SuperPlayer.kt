@@ -92,12 +92,12 @@ class SuperPlayer {
         return playerJni.getMergeProgress()
     }
 
-    fun createSurface(surface: Surface, width: Int, height: Int) {
-        playerJni.onSurfaceCreate(surface, width, height)
+    fun createSurface(surface: Surface, width: Int, height: Int, mode: Int) {
+        handler.post { playerJni.onSurfaceCreate(surface, width, height, mode) }
     }
 
     fun destroySurface() {
-        playerJni.onSurfaceDestroy()
+        handler.post { playerJni.onSurfaceDestroy() }
     }
 
     fun onFrameAvailable() {

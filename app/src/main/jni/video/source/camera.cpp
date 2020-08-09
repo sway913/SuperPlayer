@@ -64,41 +64,23 @@ void Camera::updateImage() {
     env->CallVoidMethod(jCamera, update_id);
     sourceFilter->setMatirx(matrix);
 
-    Cmd c = cmd;
-    switch (c) {
-        case Close: {
-            env->CallVoidMethod(jCamera, close_id);
-            env->DeleteGlobalRef(jCamera);
-            jCamera = nullptr;
-            sourceFilter->destroy();
-            DELETEOBJ(sourceFilter)
-            cmd = None;
-            LOGI("camera closed");
-            break;
-        }
-        case Switch_: {
-            auto p = (jintArray) env->CallObjectMethod(jCamera, switch_id);
-            jint *param = env->GetIntArrayElements(p, nullptr);
-            memcpy(parameter, param, sizeof(int) * 3);
-            env->ReleaseIntArrayElements(p, param, 0);
-            env->CallVoidMethod(jCamera, start_id, textureId);
-            cmd = None;
+    if (cmd == Switch_) {
+        auto p = (jintArray) env->CallObjectMethod(jCamera, switch_id);
+        jint *param = env->GetIntArrayElements(p, nullptr);
+        memcpy(parameter, param, sizeof(int) * 3);
+        env->ReleaseIntArrayElements(p, param, 0);
+        env->CallVoidMethod(jCamera, start_id, textureId);
+        cmd = None;
 
-            matrixSetIdentityM(matrix);
-            if (parameter[0] == 1) {
-                rotateZd(matrix, 270);
-            } else {
-                matrixScaleM(matrix, -1, 1, 1);
-                rotateZd(matrix, 270);
-            }
-            Transform::cropViewport(matrix, parameter[1], parameter[2], out_width, out_height);
-
-            break;
+        matrixSetIdentityM(matrix);
+        if (parameter[0] == 1) {
+            rotateZd(matrix, 270);
+        } else {
+            matrixScaleM(matrix, -1, 1, 1);
+            rotateZd(matrix, 270);
         }
-        default:
-            break;
+        Transform::cropViewport(matrix, parameter[1], parameter[2], out_width, out_height);
     }
-
     if (needAttach) {
         javaVm->DetachCurrentThread();
     }
@@ -106,7 +88,20 @@ void Camera::updateImage() {
 
 
 void Camera::close() {
-    cmd = Close;
+    if (jCamera == nullptr) {
+        return;
+    }
+    int needAttach = javaVm->GetEnv((void **) &env, JNI_VERSION_1_6) == JNI_EDETACHED;
+    if (needAttach) {
+        javaVm->AttachCurrentThread(&env, nullptr);
+    }
+    env->CallVoidMethod(jCamera, close_id);
+    sourceFilter->destroy();
+    LOGI("camera closed");
+
+    if (needAttach) {
+        javaVm->DetachCurrentThread();
+    }
 }
 
 
@@ -133,8 +128,21 @@ GLuint Camera::produceFrame() {
 }
 
 Camera::~Camera() {
+    if (jCamera == nullptr) {
+        return;
+    }
+    int needAttach = javaVm->GetEnv((void **) &env, JNI_VERSION_1_6) == JNI_EDETACHED;
+    if (needAttach) {
+        javaVm->AttachCurrentThread(&env, nullptr);
+    }
+    env->DeleteGlobalRef(jCamera);
+    jCamera = nullptr;
     env = nullptr;
     javaVm = nullptr;
+    if (needAttach) {
+        javaVm->DetachCurrentThread();
+    }
+    DELETEOBJ(sourceFilter)
     DELETEARR(parameter)
     DELETEARR(matrix)
 }

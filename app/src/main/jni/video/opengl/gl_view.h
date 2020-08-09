@@ -34,6 +34,8 @@ public:
 
     EglCore *getEglCore();
 
+    virtual ~GlView();
+
 private:
 
     void guardedRun();

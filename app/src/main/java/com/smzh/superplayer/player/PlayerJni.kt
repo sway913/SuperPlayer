@@ -45,7 +45,7 @@ class PlayerJni {
 
     external fun getMergeProgress(): Int
 
-    external fun onSurfaceCreate(surface: Surface, width: Int, height: Int)
+    external fun onSurfaceCreate(surface: Surface, width: Int, height: Int, mode: Int)
 
     external fun onSurfaceDestroy()
 

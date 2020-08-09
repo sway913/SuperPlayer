@@ -70,7 +70,7 @@ void GlView::setRender(Render *render_) {
     this->render = render_;
 }
 
-EglCore * GlView::getEglCore() {
+EglCore *GlView::getEglCore() {
     return eglCore;
 }
 
@@ -84,4 +84,8 @@ void GlView::requestRender() {
         msg_queue->push(MSG_DRAW);
     }
     cond.notify_all();
+}
+
+GlView::~GlView() {
+    LOGI("~ GlView");
 }

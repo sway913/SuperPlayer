@@ -4,28 +4,17 @@
 
 #include "super_video.h"
 
-SuperVideo::SuperVideo(JNIEnv *env) : env(env) {
-    glView = new GlView();
-    videoEngine = VideoEngine::getVideoEngine(env, 0);
-    videoEngine->setGlView(glView);
+SuperVideo::SuperVideo(JNIEnv *env, int mode) {
+    videoEngine = VideoEngine::getVideoEngine(env, mode);
+
 }
 
 void SuperVideo::prepare(JNIEnv *env, const char *path) {
     videoEngine->prepare(env, path);
 }
 
-void SuperVideo::createSurface(jobject surface, int width, int height) {
-    glView->createSurface(env, surface, width, height);
-    glView->requestRender();
-}
-
-void SuperVideo::destroySurface() {
-    glView->requestRender();
-    glView->destroySurface();
-}
-
-void SuperVideo::onFrameAvailable() {
-    glView->requestRender();
+void SuperVideo::setGlView(GlView *v) {
+    videoEngine->setGlView(v);
 }
 
 void SuperVideo::switchCamera() {
@@ -50,7 +39,6 @@ void SuperVideo::stop() {
 
 SuperVideo::~SuperVideo() {
     videoEngine->setGlView(nullptr);
-    DELETEOBJ(glView)
     DELETEOBJ(videoEngine)
     LOGI("~ Super_Video");
 }

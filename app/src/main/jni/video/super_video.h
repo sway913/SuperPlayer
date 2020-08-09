@@ -17,15 +17,11 @@ class SuperVideo {
 
 public:
 
-    SuperVideo(JNIEnv *env);
+    SuperVideo(JNIEnv *env, int mode);
 
     void prepare(JNIEnv *env, const char *path);
 
-    void createSurface(jobject surface, int width, int height);
-
-    void destroySurface();
-
-    void onFrameAvailable();
+    void setGlView(GlView *v);
 
     void switchCamera();
 
@@ -42,8 +38,7 @@ public:
 private:
 
     VideoEngine *videoEngine{nullptr};
-    GlView *glView{nullptr};
-    JNIEnv *env{nullptr};
+
 };
 
 

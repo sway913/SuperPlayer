@@ -16,7 +16,6 @@ class Camera : public Source {
 
     enum Cmd {
         None,
-        Close,
         Switch_,
     };
 

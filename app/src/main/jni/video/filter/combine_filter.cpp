@@ -28,7 +28,6 @@ void CombineFilter::destroy() {
     for (auto &filter:filters) {
         filter->destroy();
     }
-    filters.clear();
 }
 
 void CombineFilter::setEffect(std::shared_ptr<VideoEffect> &effect) {
@@ -46,4 +45,6 @@ void CombineFilter::setEffect(std::shared_ptr<VideoEffect> &effect) {
     }
 }
 
-CombineFilter::~CombineFilter() = default;
+CombineFilter::~CombineFilter() {
+    filters.clear();
+};

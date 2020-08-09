@@ -20,6 +20,7 @@ void RecordEngine::prepare(JNIEnv *env, const char *path) {
 
 void RecordEngine::initGlView() {
     glView->setRender(render);
+    glView->requestRender();
 }
 
 void RecordEngine::stop() {

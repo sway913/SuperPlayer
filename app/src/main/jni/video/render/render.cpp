@@ -16,7 +16,6 @@ void Render::onSurfaceCreate(int w, int h) {
     if (source) {
         source->open(w, h);
     }
-
 }
 
 

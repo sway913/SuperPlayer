@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.SurfaceHolder
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
@@ -17,9 +18,11 @@ import com.smzh.superplayer.R
 import com.smzh.superplayer.database.Filter
 import com.smzh.superplayer.databinding.FragmentSingBinding
 import com.smzh.superplayer.http.HttpManager
+import com.smzh.superplayer.player.SuperPlayer
 import com.smzh.superplayer.player.VideoEffect
 import com.smzh.superplayer.sing.SingViewModel.Companion.STATE_PAUSE
 import com.smzh.superplayer.sing.SingViewModel.Companion.STATE_SING
+import com.smzh.superplayer.video.GLView
 import com.smzh.superplayer.widget.CustomSeekBar
 import com.smzh.superplayer.widget.SingControlView
 import com.smzh.superplayer.widget.SwitchButton
@@ -34,7 +37,7 @@ import org.jsoup.nodes.Element
 
 
 class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekListener, SingControlView.SingControlListener,
-        SwitchButton.OnModeChangeListener, BottomFragment.onFilterChangeListener {
+        SwitchButton.OnModeChangeListener, BottomFragment.onFilterChangeListener, GLView.SurfaceHolderListener {
 
     private lateinit var viewModel: SingViewModel
     private lateinit var binding: FragmentSingBinding
@@ -60,6 +63,7 @@ class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekLis
         super.onViewCreated(view, savedInstanceState)
         progress_bar.setPlayStatusListener(this)
         btn_switch.setOnModeChangeListener(this)
+        gl_view.setSurfaceHolderListener(this)
         viewModel.singComplete.observe(viewLifecycleOwner, Observer {
             gotoPreview()
         })
@@ -239,6 +243,14 @@ class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekLis
             lyric
         }
         viewModel.lyric.postValue(finalLyric)
+    }
+
+    override fun onSurfaceCreate(holder: SurfaceHolder, w: Int, h: Int) {
+        SuperPlayer.instance.createSurface(holder.surface, w, h, 0)
+    }
+
+    override fun onSurfaceDestroy() {
+        SuperPlayer.instance.destroySurface()
     }
 
     companion object {
