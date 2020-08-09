@@ -6,21 +6,17 @@
 #include "../source/camera.h"
 
 
-RecordEngine::RecordEngine(JNIEnv *env) : VideoEngine(env) {
-    render = new Render();
+RecordEngine::RecordEngine(JNIEnv *env, const std::shared_ptr<GlView> &gl_view) : VideoEngine(env, gl_view) {
     source = new Camera(env);
     combine_filter = std::make_shared<CombineFilter>();
+    render = new Render();
     render->setFilter(combine_filter);
     render->setSource(source);
+    glView->setRender(render);
 }
 
 void RecordEngine::prepare(JNIEnv *env, const char *path) {
     render->start(env, path);
-}
-
-void RecordEngine::initGlView() {
-    glView->setRender(render);
-    glView->requestRender();
 }
 
 void RecordEngine::stop() {
@@ -47,6 +43,6 @@ void RecordEngine::pause() {
 
 RecordEngine::~RecordEngine() {
     DELETEOBJ(source)
-    DELETEOBJ(render);
+    DELETEOBJ(render)
     combine_filter = nullptr;
 }

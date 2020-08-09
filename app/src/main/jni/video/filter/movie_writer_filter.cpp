@@ -6,6 +6,7 @@
 #include "../../common/common_tools.h"
 #include "../../common/android_log.h"
 #include "../encoder/MediaCodecEncoder.h"
+#include "../opengl/opengl_utils.h"
 #include <EGL/egl.h>
 
 MovieWriterFilter::MovieWriterFilter() : BaseFilter() {
@@ -40,6 +41,7 @@ GLuint MovieWriterFilter::draw(GLuint textureId, int w, int h) {
 }
 
 void MovieWriterFilter::destroy() {
+    BaseFilter::destroy();
     if (eglSurface) {
         eglCore->destroyEGLSurface(eglSurface);
         eglCore->destroy();

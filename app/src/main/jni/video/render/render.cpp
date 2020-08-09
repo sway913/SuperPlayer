@@ -6,18 +6,18 @@
 #include "../../common/common_tools.h"
 #include "../../common/android_log.h"
 
-Render::Render() = default;
+Render::Render() {
+    movieWriterFilter = new MovieWriterFilter();
+}
 
 
 void Render::onSurfaceCreate(int w, int h) {
-    movieWriterFilter = new MovieWriterFilter();
     this->width = w;
     this->height = h;
     if (source) {
         source->open(w, h);
     }
 }
-
 
 void Render::onDraw() {
     GLuint textureId;

@@ -4,11 +4,7 @@
 
 #include "play_engine.h"
 
-PlayEngine::PlayEngine(JNIEnv *env) : VideoEngine(env) {}
-
-void PlayEngine::initGlView() {
-
-}
+PlayEngine::PlayEngine(JNIEnv *env, const std::shared_ptr<GlView> &gl_view) : VideoEngine(env, gl_view) {}
 
 void PlayEngine::stop() {
 

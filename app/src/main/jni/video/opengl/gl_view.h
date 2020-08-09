@@ -14,7 +14,7 @@
 #include "../../common/lock_free_queue.h"
 #include "../render/render.h"
 
-constexpr int MSG_CTEATE = 1;
+constexpr int MSG_CREATE = 1;
 constexpr int MSG_DRAW = 2;
 constexpr int MSG_DESTROY = 3;
 constexpr int QUEUE_SIZE = 16;

@@ -4,17 +4,12 @@
 
 #include "super_video.h"
 
-SuperVideo::SuperVideo(JNIEnv *env, int mode) {
-    videoEngine = VideoEngine::getVideoEngine(env, mode);
-
+SuperVideo::SuperVideo(JNIEnv *env, const std::shared_ptr<GlView> &gl_view, int mode) {
+    videoEngine = VideoEngine::getVideoEngine(env, gl_view, mode);
 }
 
 void SuperVideo::prepare(JNIEnv *env, const char *path) {
     videoEngine->prepare(env, path);
-}
-
-void SuperVideo::setGlView(GlView *v) {
-    videoEngine->setGlView(v);
 }
 
 void SuperVideo::switchCamera() {
@@ -38,7 +33,6 @@ void SuperVideo::stop() {
 }
 
 SuperVideo::~SuperVideo() {
-    videoEngine->setGlView(nullptr);
     DELETEOBJ(videoEngine)
     LOGI("~ Super_Video");
 }

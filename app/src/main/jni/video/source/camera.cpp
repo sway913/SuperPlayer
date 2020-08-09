@@ -62,7 +62,7 @@ void Camera::updateImage() {
         javaVm->AttachCurrentThread(&env, nullptr);
     }
     env->CallVoidMethod(jCamera, update_id);
-    sourceFilter->setMatirx(matrix);
+    sourceFilter->setMatrix(matrix);
 
     if (cmd == Switch_) {
         auto p = (jintArray) env->CallObjectMethod(jCamera, switch_id);
@@ -88,6 +88,8 @@ void Camera::updateImage() {
 
 
 void Camera::close() {
+    sourceFilter->destroy();
+
     if (jCamera == nullptr) {
         return;
     }
@@ -96,12 +98,12 @@ void Camera::close() {
         javaVm->AttachCurrentThread(&env, nullptr);
     }
     env->CallVoidMethod(jCamera, close_id);
-    sourceFilter->destroy();
     LOGI("camera closed");
 
     if (needAttach) {
         javaVm->DetachCurrentThread();
     }
+    start_preview = false;
 }
 
 

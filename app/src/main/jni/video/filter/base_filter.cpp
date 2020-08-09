@@ -39,7 +39,7 @@ void BaseFilter::init() {
         glUniformTexture = glGetUniformLocation(programId, "inputImageTexture");
         onInit();
         initialized = true;
-        LOGI("load program id %d, positon %d, coordinate %d, texture %d", programId, glAttrPosition, glAttrTextureCoordinate, glUniformTexture);
+        LOGI("load %s program id %d, positon %d, coordinate %d, texture %d", typeid(*this).name(), programId, glAttrPosition, glAttrTextureCoordinate, glUniformTexture);
     }
 }
 
@@ -93,11 +93,13 @@ void BaseFilter::preDraw() {
 }
 
 void BaseFilter::destroy() {
-    initialized = false;
-    if (programId > 0) {
-        glDeleteProgram(programId);
-    }
-    if (frame_buffer > 0) {
-        OpenGLUtils::destroyFrameBuffers(frame_buffer, texture_id);
+    if (initialized) {
+        initialized = false;
+        if (programId > 0) {
+            glDeleteProgram(programId);
+        }
+        if (frame_buffer > 0) {
+            OpenGLUtils::destroyFrameBuffers(frame_buffer, texture_id);
+        }
     }
 }

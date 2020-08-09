@@ -12,7 +12,7 @@ extern "C" {
 std::unique_ptr<SuperAudio> super_audio = nullptr;
 std::unique_ptr<AudioMerger2> audio_merger = nullptr;
 std::unique_ptr<SuperVideo> super_video = nullptr;
-std::unique_ptr<GlView> gl_view = nullptr;
+std::shared_ptr<GlView> gl_view = nullptr;
 int mode_ = -1;
 
 JNIEXPORT void JNICALL
@@ -22,10 +22,7 @@ Java_com_smzh_superplayer_player_PlayerJni_prepare(JNIEnv *env, jobject clazz, j
     if (super_audio) {
         super_audio->prepare(spParam);
     }
-    if (spParam->isWithVideo()) {
-        if (!super_video) {
-            super_video = std::make_unique<SuperVideo>(env, mode_);
-        }
+    if (spParam->isWithVideo() && super_video) {
         super_video->prepare(env, spParam->getVideoPath());
     }
 }
@@ -133,14 +130,13 @@ JNIEXPORT jint JNICALL Java_com_smzh_superplayer_player_PlayerJni_getMergeProgre
 
 JNIEXPORT void JNICALL Java_com_smzh_superplayer_player_PlayerJni_onSurfaceCreate(JNIEnv *env, jobject clazz, jobject surface, jint width, jint height, jint mode) {
     if (gl_view == nullptr) {
-        gl_view = std::make_unique<GlView>();
+        gl_view = std::make_shared<GlView>();
     }
-    gl_view->createSurface(env, surface, width, height);
     mode_ = mode;
     if (super_video == nullptr) {
-        super_video = std::make_unique<SuperVideo>(env, mode_);
+        super_video = std::make_unique<SuperVideo>(env, gl_view, mode_);
     }
-    super_video->setGlView(gl_view.get());
+    gl_view->createSurface(env, surface, width, height);
 }
 
 

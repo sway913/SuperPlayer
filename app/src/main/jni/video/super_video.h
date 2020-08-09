@@ -17,11 +17,9 @@ class SuperVideo {
 
 public:
 
-    SuperVideo(JNIEnv *env, int mode);
+    SuperVideo(JNIEnv *env, const std::shared_ptr<GlView> &gl_view, int mode);
 
     void prepare(JNIEnv *env, const char *path);
-
-    void setGlView(GlView *v);
 
     void switchCamera();
 

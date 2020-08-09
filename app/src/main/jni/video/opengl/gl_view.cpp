@@ -11,7 +11,7 @@ void GlView::createSurface(JNIEnv *env, jobject surface, int w, int h) {
     this->width = w;
     this->height = h;
     msg_queue = new LockFreeQueue<int, QUEUE_SIZE>();
-    msg_queue->push(MSG_CTEATE);
+    msg_queue->push(MSG_CREATE);
     future = std::async(std::launch::async, &GlView::guardedRun, this);
 }
 
@@ -28,12 +28,13 @@ void GlView::guardedRun() {
         int msg;
         msg_queue->pop(msg);
         switch (msg) {
-            case MSG_CTEATE:
+            case MSG_CREATE:
                 eglCore = new EglCore();
                 eglCore->init();
                 eglSurface = eglCore->createEGLSurface(window);
                 eglCore->makeCurrent(eglSurface);
                 render->onSurfaceCreate(width, height);
+                render->onDraw();
                 break;
             case MSG_DRAW:
                 if (eglCore && render) {
@@ -44,6 +45,7 @@ void GlView::guardedRun() {
                 break;
             case MSG_DESTROY:
                 if (eglCore && render) {
+                    eglCore->makeCurrent(eglSurface);
                     render->onSurfaceDestroy();
                     eglCore->destroyEGLSurface(eglSurface);
                     eglCore->destroy();
@@ -55,6 +57,7 @@ void GlView::guardedRun() {
                 break;
         }
     }
+    LOGI("GL thread quit");
 }
 
 void GlView::destroySurface() {
@@ -64,6 +67,7 @@ void GlView::destroySurface() {
     if (window) {
         ANativeWindow_release(window);
     }
+    DELETEOBJ(msg_queue)
 }
 
 void GlView::setRender(Render *render_) {

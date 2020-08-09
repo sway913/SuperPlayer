@@ -124,11 +124,11 @@ void OpenGLUtils::checkGlError(const char *op) {
 }
 
 void OpenGLUtils::destroyFrameBuffers(GLuint &frame_id, GLuint &texture_id) {
-    if (frame_id == 0) {
+    if (frame_id == 0 || texture_id == 0) {
         return;
     }
-    glDeleteTextures(1, &frame_id);
-    glDeleteFramebuffers(1, &texture_id);
+    glDeleteTextures(1, &texture_id);
+    glDeleteFramebuffers(1, &frame_id);
 }
 
 void OpenGLUtils::deleteTexture(GLuint texId) {

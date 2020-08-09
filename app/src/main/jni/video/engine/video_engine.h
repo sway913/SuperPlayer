@@ -15,9 +15,7 @@ class VideoEngine {
 
 public:
 
-    VideoEngine(JNIEnv *env);
-
-    void setGlView(GlView *v);
+    VideoEngine(JNIEnv *env,const std::shared_ptr<GlView> &gl_view);
 
     virtual void stop() = 0;
 
@@ -33,15 +31,12 @@ public:
 
     virtual ~VideoEngine();
 
-    static VideoEngine *getVideoEngine(JNIEnv *jniEnv, int mode);
+    static VideoEngine *getVideoEngine(JNIEnv *jniEnv, const std::shared_ptr<GlView> &gl_view, int mode);
 
 protected:
 
-    virtual void initGlView() = 0;
-
     JNIEnv *env{nullptr};
-    GlView *glView{nullptr};
-
+    std::shared_ptr<GlView> glView{nullptr};
 
 };
 

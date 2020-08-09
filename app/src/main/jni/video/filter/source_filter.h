@@ -22,7 +22,7 @@ public:
 
     virtual void preDraw() override;
 
-    void setMatirx(float *mtx);
+    void setMatrix(float *mtx);
 
     virtual ~SourceFilter();
 

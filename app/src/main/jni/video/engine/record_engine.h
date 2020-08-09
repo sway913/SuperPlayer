@@ -15,11 +15,9 @@ class RecordEngine : public VideoEngine {
 
 public:
 
-    RecordEngine(JNIEnv *env);
+    RecordEngine(JNIEnv *env,const std::shared_ptr<GlView> &gl_view);
 
     void stop() override;
-
-    void initGlView() override;
 
     void switchCamera() override;
 

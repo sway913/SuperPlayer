@@ -45,7 +45,7 @@ void SourceFilter::bindTexture(GLuint textureId) {
     glBindTexture(GL_TEXTURE_EXTERNAL_OES, textureId);
 }
 
-void SourceFilter::setMatirx(float *mtx) {
+void SourceFilter::setMatrix(float *mtx) {
     memcpy(matrix, mtx, sizeof(float) * 16);
 }
 
