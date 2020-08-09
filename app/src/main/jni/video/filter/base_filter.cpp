@@ -94,6 +94,8 @@ void BaseFilter::preDraw() {
 
 void BaseFilter::destroy() {
     if (initialized) {
+        width = 0;
+        height = 0;
         initialized = false;
         if (programId > 0) {
             glDeleteProgram(programId);

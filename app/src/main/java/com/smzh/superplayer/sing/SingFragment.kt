@@ -247,6 +247,7 @@ class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekLis
 
     override fun onSurfaceCreate(holder: SurfaceHolder, w: Int, h: Int) {
         SuperPlayer.instance.createSurface(holder.surface, w, h, 0)
+        viewModel.setVideoEffect(SingParam.videoEffect)
     }
 
     override fun onSurfaceDestroy() {

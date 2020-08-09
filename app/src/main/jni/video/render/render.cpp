@@ -10,7 +10,6 @@ Render::Render() {
     movieWriterFilter = new MovieWriterFilter();
 }
 
-
 void Render::onSurfaceCreate(int w, int h) {
     this->width = w;
     this->height = h;
@@ -38,7 +37,6 @@ void Render::onSurfaceDestroy() {
     movieWriterFilter->destroy();
     if (filter) {
         filter->destroy();
-        filter = nullptr;
     }
 }
 

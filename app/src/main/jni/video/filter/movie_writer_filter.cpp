@@ -15,7 +15,7 @@ MovieWriterFilter::MovieWriterFilter() : BaseFilter() {
 
 GLuint MovieWriterFilter::draw(GLuint textureId, int w, int h) {
     GLuint ret = BaseFilter::draw(textureId, w, h);
-    if (is_recording && videoEncoder) {
+    if (!stop_record && is_recording && videoEncoder) {
         EGLDisplay mEGLDisplay = eglGetCurrentDisplay();
         EGLContext mEGLContext = eglGetCurrentContext();
         EGLSurface mEGLScreenSurface = eglGetCurrentSurface(EGL_DRAW);
@@ -37,19 +37,23 @@ GLuint MovieWriterFilter::draw(GLuint textureId, int w, int h) {
         // Make screen surface be current surface
         eglMakeCurrent(mEGLDisplay, mEGLScreenSurface, mEGLScreenSurface, mEGLContext);
     }
+    if (stop_record && eglSurface) {
+        releaseRecord();
+    }
     return ret;
 }
 
-void MovieWriterFilter::destroy() {
-    BaseFilter::destroy();
+void MovieWriterFilter::releaseRecord() {
     if (eglSurface) {
         eglCore->destroyEGLSurface(eglSurface);
         eglCore->destroy();
         DELETEOBJ(eglCore)
+        eglSurface = nullptr;
     }
     if (videoEncoder) {
         videoEncoder->stop();
     }
+    LOGI("stop record video");
 }
 
 void MovieWriterFilter::bindFrameBuffer(int w, int h) {
@@ -66,7 +70,7 @@ void MovieWriterFilter::startRecord(JNIEnv *env, const char *video_path) {
 }
 
 void MovieWriterFilter::stopRecord() {
-    this->is_recording = false;
+    this->stop_record = true;
 }
 
 void MovieWriterFilter::setState(bool isPause) {

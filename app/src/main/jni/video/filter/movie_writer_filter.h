@@ -22,8 +22,6 @@ public:
 
     GLuint draw(GLuint textureId, int w, int h) override;
 
-    void destroy() override;
-
     void startRecord(JNIEnv *env, const char *video_path);
 
     void stopRecord();
@@ -34,10 +32,13 @@ public:
 
 private:
 
+    void releaseRecord();
+
     VideoEncoder *videoEncoder{nullptr};
     EGLSurface eglSurface{nullptr};
     EglCore *eglCore{nullptr};
     volatile std::atomic_bool is_recording{false};
+    volatile std::atomic_bool stop_record{false};
 
 };
 
