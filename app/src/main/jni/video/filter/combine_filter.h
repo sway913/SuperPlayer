@@ -22,7 +22,7 @@ public:
 
     CombineFilter();
 
-    virtual GLuint draw(GLuint textureId, int w, int h) override ;
+    virtual void draw(VideoFrame *frame) override ;
 
     virtual void destroy() override;
 

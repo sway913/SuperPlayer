@@ -122,4 +122,8 @@ int64_t AudioEngine::getTotalMs() {
     return total_ms;
 }
 
+long AudioEngine::getRealMs() {
+    return real_time;
+}
+
 AudioEngine::~AudioEngine() = default;

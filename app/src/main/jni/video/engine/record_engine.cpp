@@ -6,10 +6,11 @@
 #include "../source/camera.h"
 
 
-RecordEngine::RecordEngine(JNIEnv *env, const std::shared_ptr<GlView> &gl_view) : VideoEngine(env, gl_view) {
+void RecordEngine::init(JNIEnv *env, const std::shared_ptr<GlView> &gl_view) {
+    glView = gl_view;
     source = new Camera(env);
     combine_filter = std::make_shared<CombineFilter>();
-    render = new Render();
+    render = new CameraRender();
     render->setFilter(combine_filter);
     render->setSource(source);
     glView->setRender(render);

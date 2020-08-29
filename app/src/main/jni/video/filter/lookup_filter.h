@@ -57,7 +57,7 @@ public:
 
     void preDraw() override;
 
-    GLuint draw(GLuint textureId, int w, int h) override;
+    void draw(VideoFrame *frame) override;
 
     void setTablePath(char *path);
 

@@ -13,8 +13,8 @@ MovieWriterFilter::MovieWriterFilter() : BaseFilter() {
 
 }
 
-GLuint MovieWriterFilter::draw(GLuint textureId, int w, int h) {
-    GLuint ret = BaseFilter::draw(textureId, w, h);
+void MovieWriterFilter::draw(VideoFrame *frame) {
+    BaseFilter::draw(frame);
     if (!stop_record && is_recording && videoEncoder) {
         EGLDisplay mEGLDisplay = eglGetCurrentDisplay();
         EGLContext mEGLContext = eglGetCurrentContext();
@@ -28,19 +28,32 @@ GLuint MovieWriterFilter::draw(GLuint textureId, int w, int h) {
         }
         // Draw on encoder surface
         eglCore->makeCurrent(eglSurface);
-        BaseFilter::draw(textureId, w, h);
+        BaseFilter::draw(frame);
         // 绘制时可能已经停止录制了，所以需要判断一下
         if (is_recording && eglSurface != nullptr) {
+            gettimeofday(&tv, nullptr);
+            int64_t usec = tv.tv_sec * 1000 * 1000 + tv.tv_usec;
+            if(start_time ==0) {
+//                start_time = usec;
+                start_time = frame->timestamp;
+            }
+            eglCore->setPresentationTime(eglSurface, (khronos_uint64_t) (frame->timestamp - start_time));
+//            eglCore->setPresentationTime(eglSurface, (khronos_uint64_t) (usec - start_time) * 1000);
             eglCore->swapBuffer(eglSurface);
             videoEncoder->encodeFrame();
         }
         // Make screen surface be current surface
         eglMakeCurrent(mEGLDisplay, mEGLScreenSurface, mEGLScreenSurface, mEGLContext);
     }
-    if (stop_record && eglSurface) {
+    if (stop_record) {
         releaseRecord();
     }
-    return ret;
+}
+
+void MovieWriterFilter::destroy() {
+    if (stop_record) {
+        releaseRecord();
+    }
 }
 
 void MovieWriterFilter::releaseRecord() {
@@ -52,8 +65,8 @@ void MovieWriterFilter::releaseRecord() {
     }
     if (videoEncoder) {
         videoEncoder->stop();
+        DELETEOBJ(videoEncoder)
     }
-    LOGI("stop record video");
 }
 
 void MovieWriterFilter::bindFrameBuffer(int w, int h) {
@@ -77,6 +90,8 @@ void MovieWriterFilter::setState(bool isPause) {
     this->is_recording = !isPause;
 }
 
-MovieWriterFilter::~MovieWriterFilter() {
-    DELETEOBJ(videoEncoder)
+bool MovieWriterFilter::updateTexture() {
+    return false;
 }
+
+MovieWriterFilter::~MovieWriterFilter() = default;

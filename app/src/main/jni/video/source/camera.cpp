@@ -15,7 +15,7 @@ Camera::Camera(JNIEnv *env) : env(env) {
 
     open_id = env->GetMethodID(clazz, "open", "()[I");
     close_id = env->GetMethodID(clazz, "close", "()V");
-    update_id = env->GetMethodID(clazz, "updateImage", "()V");
+    update_id = env->GetMethodID(clazz, "updateImage", "()J");
     switch_id = env->GetMethodID(clazz, "switchCamera", "()[I");
     start_id = env->GetMethodID(clazz, "startPreview", "(I)V");
 
@@ -27,7 +27,7 @@ Camera::Camera(JNIEnv *env) : env(env) {
     matrix = new float[16];
 }
 
-void Camera::open(int w, int h) {
+void Camera::open(int w, int h, jobject surface) {
     this->out_width = w;
     this->out_height = h;
     int needAttach = javaVm->GetEnv((void **) &env, JNI_VERSION_1_6) == JNI_EDETACHED;
@@ -53,15 +53,15 @@ void Camera::open(int w, int h) {
 
 }
 
-void Camera::updateImage() {
+long Camera::updateImage() {
     if (jCamera == nullptr) {
-        return;
+        return 0;
     }
     int needAttach = javaVm->GetEnv((void **) &env, JNI_VERSION_1_6) == JNI_EDETACHED;
     if (needAttach) {
         javaVm->AttachCurrentThread(&env, nullptr);
     }
-    env->CallVoidMethod(jCamera, update_id);
+    long timestamp = env->CallLongMethod(jCamera, update_id);
     sourceFilter->setMatrix(matrix);
 
     if (cmd == Switch_) {
@@ -84,6 +84,7 @@ void Camera::updateImage() {
     if (needAttach) {
         javaVm->DetachCurrentThread();
     }
+    return timestamp;
 }
 
 
@@ -111,7 +112,7 @@ void Camera::switchCamera() {
     cmd = Switch_;
 }
 
-GLuint Camera::produceFrame() {
+VideoFrame *Camera::produceFrame() {
     if (!start_preview) {
         textureId = OpenGLUtils::createOEXTexture();
         LOGI("camera oex id is %d", textureId);
@@ -125,8 +126,10 @@ GLuint Camera::produceFrame() {
         }
         start_preview = true;
     }
-    updateImage();
-    return sourceFilter ? sourceFilter->draw(textureId, out_width, out_height) : textureId;
+    long timestamp = updateImage();
+    auto *frame = new VideoFrame(textureId, out_width, out_height, timestamp);
+    sourceFilter->draw(frame);
+    return frame;
 }
 
 Camera::~Camera() {

@@ -45,6 +45,7 @@ private:
     bool source_ready{false};
 
     bool isEcho{false};
+    long start_time{0};
 
 };
 

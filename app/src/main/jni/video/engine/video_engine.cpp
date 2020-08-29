@@ -6,15 +6,13 @@
 #include "record_engine.h"
 #include "play_engine.h"
 
-VideoEngine *VideoEngine::getVideoEngine(JNIEnv *jniEnv, const std::shared_ptr<GlView> &gl_view, int mode) {
+VideoEngine *VideoEngine::getVideoEngine(int mode) {
     if (mode == 0) {
-        return new RecordEngine(jniEnv, gl_view);
+        return new RecordEngine();
     } else {
-        return new PlayEngine(jniEnv, gl_view);
+        return new PlayEngine();
     }
 }
-
-VideoEngine::VideoEngine(JNIEnv *env, const std::shared_ptr<GlView> &gl_view) : env(env), glView(gl_view) {}
 
 
 void VideoEngine::switchCamera() {
@@ -24,7 +22,6 @@ void VideoEngine::switchCamera() {
 void VideoEngine::setEffect(std::shared_ptr<VideoEffect> &effect) {
 
 }
-
 
 VideoEngine::~VideoEngine() {
     glView = nullptr;

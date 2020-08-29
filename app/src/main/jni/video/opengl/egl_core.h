@@ -10,12 +10,13 @@
 #include <EGL/egl.h>
 #include <android/native_window.h>
 
+typedef EGLBoolean (EGLAPIENTRYP PFNEGLPRESENTATIONTIMEANDROIDPROC)(EGLDisplay display, EGLSurface surface, khronos_stime_nanoseconds_t time);
 
 class EglCore {
 
 public:
 
-    EglCore() = default;
+    EglCore();
 
     EglCore(const EglCore &) = delete;
 
@@ -37,6 +38,8 @@ public:
 
     EGLConfig getConfig();
 
+    int setPresentationTime(EGLSurface surface, khronos_stime_nanoseconds_t nsecs);
+
 private:
 
     EGLConfig getEGLConfig();
@@ -45,6 +48,7 @@ private:
     EGLConfig _config{nullptr};
     EGLContext _context{nullptr};
 
+    PFNEGLPRESENTATIONTIMEANDROIDPROC pfneglPresentationTimeANDROID;
 
 };
 

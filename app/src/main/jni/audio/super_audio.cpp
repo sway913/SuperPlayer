@@ -215,6 +215,13 @@ void SuperAudio::setMessage(SuperAudio::MsgState msg) {
     cond.notify_all();
 }
 
+long SuperAudio::getRealMs() {
+    if (audio_engine) {
+        return audio_engine->getRealMs();
+    }
+    return 0;
+}
+
 SuperAudio::~SuperAudio() {
     javaVm = nullptr;
     jniEnv = nullptr;

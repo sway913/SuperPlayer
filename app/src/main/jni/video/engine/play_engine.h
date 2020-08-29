@@ -12,9 +12,7 @@ class PlayEngine : public VideoEngine {
 
 public:
 
-    PlayEngine(JNIEnv *env, const std::shared_ptr<GlView> &gl_view);
-
-    void stop() override;
+    void init(JNIEnv *env, const std::shared_ptr<GlView> &gl_view) override;
 
     void prepare(JNIEnv *env, const char *path) override;
 
@@ -22,6 +20,14 @@ public:
 
     void pause() override;
 
+    void stop() override;
+
+    virtual ~PlayEngine();
+
+private:
+
+    Source *source{nullptr};
+    IRender *render{nullptr};
 };
 
 

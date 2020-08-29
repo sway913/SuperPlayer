@@ -6,14 +6,15 @@
 #define SUPERPLAYER_SOURCE_H
 
 #include <GLES2/gl2.h>
+#include "video_frame.h"
 
 class Source {
 
 public:
 
-    virtual void open(int width, int height) = 0;
+    virtual void open(int width, int height, jobject surface = nullptr) = 0;
 
-    virtual GLuint produceFrame() = 0;
+    virtual VideoFrame *produceFrame() = 0;
 
     virtual void close() = 0;
 

@@ -88,6 +88,11 @@ class SuperPlayer {
         return playerJni.getCurrentMs()
     }
 
+    fun getRealMs(): Long {
+        return playerJni.getRealMs()
+    }
+
+
     fun getMergeProgress(): Int {
         return playerJni.getMergeProgress()
     }

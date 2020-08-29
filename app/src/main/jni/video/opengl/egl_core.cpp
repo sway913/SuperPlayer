@@ -5,6 +5,10 @@
 #include "egl_core.h"
 #include "../../common/android_log.h"
 
+EglCore::EglCore() {
+    pfneglPresentationTimeANDROID = 0;
+}
+
 bool EglCore::init(EGLContext share_context) {
     if (_display != EGL_NO_DISPLAY) {
         return false;
@@ -42,6 +46,11 @@ bool EglCore::init(EGLContext share_context) {
 
         GLint value;
         eglQueryContext(_display, _context, EGL_CONTEXT_CLIENT_VERSION, &value);
+
+        pfneglPresentationTimeANDROID = (PFNEGLPRESENTATIONTIMEANDROIDPROC)eglGetProcAddress("eglPresentationTimeANDROID");
+        if (!pfneglPresentationTimeANDROID) {
+            LOGE("eglPresentationTimeANDROID is not available!");
+        }
     }
     return EGL_NO_CONTEXT != _context;
 }
@@ -100,6 +109,11 @@ void EglCore::swapBuffer(EGLSurface surface) {
     if (!eglSwapBuffers(_display, surface)) {
         LOGI("egl swap error");
     }
+}
+
+int EglCore::setPresentationTime(EGLSurface surface, khronos_stime_nanoseconds_t nsecs) {
+    pfneglPresentationTimeANDROID(_display, surface, nsecs);
+    return 0;
 }
 
 EGLContext EglCore::getContext() {

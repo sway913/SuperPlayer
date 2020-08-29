@@ -87,6 +87,8 @@ public:
 
     int64_t getCurrentMs();
 
+    long getRealMs();
+
 };
 
 

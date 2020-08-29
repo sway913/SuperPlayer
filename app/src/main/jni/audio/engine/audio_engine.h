@@ -31,8 +31,7 @@ protected:
     volatile std::atomic<bool> stopped{false};
     FilterPackage *vocal_filter{nullptr};
     FilterPackage *acc_filter{nullptr};
-
-
+    long real_time{0};
     DataCallbackResult onAudioReady(AudioStream *stream, void *data, int32_t numFrames) override;
 
     void onErrorBeforeClose(AudioStream *oboeStream, Result error) override;
@@ -54,6 +53,8 @@ public:
     virtual void stop() = 0;
 
     virtual void onSourceReady(long total_ms, int index) = 0;
+
+    virtual long getRealMs();
 
 public:
 

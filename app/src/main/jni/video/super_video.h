@@ -17,7 +17,9 @@ class SuperVideo {
 
 public:
 
-    SuperVideo(JNIEnv *env, const std::shared_ptr<GlView> &gl_view, int mode);
+    SuperVideo(int mode);
+
+    void init(JNIEnv *env, const std::shared_ptr<GlView> &gl_view);
 
     void prepare(JNIEnv *env, const char *path);
 
@@ -36,6 +38,8 @@ public:
 private:
 
     VideoEngine *videoEngine{nullptr};
+    bool initialize{false};
+    const char *video_path{nullptr};
 
 };
 

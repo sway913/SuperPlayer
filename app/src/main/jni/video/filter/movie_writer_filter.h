@@ -11,6 +11,7 @@
 #include "../opengl/egl_core.h"
 #include <android/native_window.h>
 #include <EGL/egl.h>
+#include <sys/time.h>
 
 class MovieWriterFilter : public BaseFilter {
 
@@ -20,13 +21,17 @@ public:
 
     void bindFrameBuffer(int w, int h) override;
 
-    GLuint draw(GLuint textureId, int w, int h) override;
+    void draw(VideoFrame *frame) override;
 
     void startRecord(JNIEnv *env, const char *video_path);
 
     void stopRecord();
 
     void setState(bool isPause);
+
+    bool updateTexture() override;
+
+    void destroy() override;
 
     virtual ~MovieWriterFilter();
 
@@ -39,6 +44,8 @@ private:
     EglCore *eglCore{nullptr};
     volatile std::atomic_bool is_recording{false};
     volatile std::atomic_bool stop_record{false};
+    struct timeval tv;
+    long start_time{0};
 
 };
 

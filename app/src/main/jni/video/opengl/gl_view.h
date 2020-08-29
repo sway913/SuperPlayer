@@ -12,17 +12,17 @@
 #include <future>
 #include "../../common/common_tools.h"
 #include "../../common/lock_free_queue.h"
-#include "../render/render.h"
-
-constexpr int MSG_CREATE = 1;
+#include "../render/irender.h"
+#include <queue>
 constexpr int MSG_DRAW = 2;
-constexpr int MSG_DESTROY = 3;
-constexpr int QUEUE_SIZE = 16;
+constexpr int QUEUE_SIZE = 4;
 
 
 class GlView {
 
 public:
+
+    GlView(int mode);
 
     void createSurface(JNIEnv *env, jobject surface, int width, int height);
 
@@ -30,7 +30,7 @@ public:
 
     void requestRender();
 
-    void setRender(Render *render_);
+    void setRender(IRender *render_);
 
     EglCore *getEglCore();
 
@@ -46,10 +46,13 @@ private:
     int height{0};
     EglCore *eglCore{nullptr};
     std::future<void> future;
-    Render *render{nullptr};
+    IRender *render{nullptr};
     std::mutex mutex_{};
     std::condition_variable cond{};
     LockFreeQueue<int, QUEUE_SIZE> *msg_queue{nullptr};
+
+    int mode{0};
+    bool is_exit{false};
 
 };
 

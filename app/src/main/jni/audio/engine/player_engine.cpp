@@ -14,6 +14,11 @@ DataCallbackResult PlayerEngine::onAudioReady(AudioStream *stream, void *data, i
     }
     if (mix_source && !stopped) {
         mix_source->getMixData((short *) data, numFrames, nullptr, 0);
+        ResultWithValue<FrameTimestamp> tv = stream->getTimestamp(CLOCK_MONOTONIC);
+        if(start_time == 0) {
+            start_time = tv.value().timestamp;
+        }
+        real_time = (tv.value().timestamp - start_time) / 1000 / 1000;
         if (getCurrentMs() > getTotalMs()) {
             observer->onCompleted();
         }
@@ -49,6 +54,7 @@ void PlayerEngine::start() {
     stopped = false;
     is_pause = false;
     openOutputStream();
+    LOGI("audio play engine start");
 }
 
 void PlayerEngine::onSourceReady(long ms, int index) {

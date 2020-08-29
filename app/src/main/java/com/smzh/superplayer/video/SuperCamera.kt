@@ -11,8 +11,8 @@ open class SuperCamera() {
 
     }
 
-    open fun updateImage() {
-
+    open fun updateImage():Long {
+        return 0
     }
 
     open fun switchCamera(): IntArray {

@@ -1,11 +1,13 @@
 package com.smzh.superplayer.sing
 
+import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.text.format.DateUtils
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.smzh.superplayer.App
 import com.smzh.superplayer.database.AppDataBase
 import com.smzh.superplayer.player.AudioParam
 import com.smzh.superplayer.player.MergerParam
@@ -36,7 +38,7 @@ class PreviewModel(val song: Song, val isVideo: Boolean) : ViewModel(), PlayerJn
         songName.value = song.name
         progressText.value = "准备就绪"
         playState.value = STATE_IDLE
-        isVideoMode.value = isVideo
+        isVideoMode.value = false
     }
 
     private val runnable = object : Runnable {
@@ -72,10 +74,13 @@ class PreviewModel(val song: Song, val isVideo: Boolean) : ViewModel(), PlayerJn
     }
 
     fun prepare() {
+        isVideoMode.value = isVideo
         val audioParam = AudioParam(isRecorder = false,
                 accPath = song.path ?: "",
                 vocalPath = SingParam.vocalPath,
-                decodePath = SingParam.decodePath)
+                decodePath = SingParam.decodePath,
+                withVideo = isVideo,
+                videoPath = SingParam.videoPath)
         player.addPlayerListener(this)
         player.prepare(audioParam)
         playState.postValue(STATE_PREPARE)
@@ -101,10 +106,10 @@ class PreviewModel(val song: Song, val isVideo: Boolean) : ViewModel(), PlayerJn
     }
 
     fun stop() {
-        player.stop()
         player.removePlayerListener(this)
         handler.removeCallbacksAndMessages(null)
         playState.postValue(STATE_STOP)
+        player.stop()
     }
 
     fun seek(ms: Long) {

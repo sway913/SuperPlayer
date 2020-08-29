@@ -3,7 +3,9 @@ package com.smzh.superplayer.sing
 import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.SurfaceHolder
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
@@ -21,15 +23,18 @@ import com.smzh.superplayer.R
 import com.smzh.superplayer.WorksActivity
 import com.smzh.superplayer.databinding.FragmentPreviewBinding
 import com.smzh.superplayer.dp2px
+import com.smzh.superplayer.player.SuperPlayer
 import com.smzh.superplayer.sing.PreviewModel.Companion.STATE_PAUSE
 import com.smzh.superplayer.sing.PreviewModel.Companion.STATE_PLAY
+import com.smzh.superplayer.video.GLView
 import com.smzh.superplayer.widget.CustomEffectView
 import com.smzh.superplayer.widget.CustomSeekBar
 import com.smzh.superplayer.widget.SingControlView
 import kotlinx.android.synthetic.main.fragment_preview.*
+import kotlinx.android.synthetic.main.fragment_preview.progress_bar
 
 class PreviewFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekListener, SingControlView.SingControlListener,
-        AudioFilterAdapter.AudioEffectSelectListener, CustomEffectView.CustomEffectChangedListener {
+        AudioFilterAdapter.AudioEffectSelectListener, CustomEffectView.CustomEffectChangedListener, GLView.SurfaceHolderListener {
 
     private lateinit var viewModel: PreviewModel
     private lateinit var binding: FragmentPreviewBinding
@@ -101,6 +106,7 @@ class PreviewFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.Seek
             }
             play_control.visibility = View.GONE
         }
+        video_preview.setSurfaceHolderListener(this)
     }
 
     override fun onClick(v: View?) {
@@ -112,6 +118,8 @@ class PreviewFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.Seek
             }
             R.id.btn_restart -> {
                 viewModel.stop()
+                video_preview.setSurfaceHolderListener(null)
+                SuperPlayer.instance.destroySurface()
                 SingActivity.start(context!!, viewModel.song)
                 activity?.finish()
             }
@@ -120,7 +128,7 @@ class PreviewFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.Seek
                 play_control.visibility = if (btn_volume.isSelected) {
                     btn_volume.setTextColor(Color.GRAY)
                     effect_view.visibility = View.GONE
-                    progress_bar.visibility =View.GONE
+                    progress_bar.visibility = View.GONE
                     View.VISIBLE
                 } else {
                     btn_volume.setTextColor(Color.BLACK)
@@ -187,6 +195,14 @@ class PreviewFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.Seek
         }
         viewModel.stop()
         super.onBackPressed()
+    }
+
+    override fun onSurfaceCreate(holder: SurfaceHolder, w: Int, h: Int) {
+        SuperPlayer.instance.createSurface(holder.surface, w, h, 1)
+    }
+
+    override fun onSurfaceDestroy() {
+        SuperPlayer.instance.destroySurface()
     }
 
     inner class EffectItemDecoration : RecyclerView.ItemDecoration() {

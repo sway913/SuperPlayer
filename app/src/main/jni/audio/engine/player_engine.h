@@ -27,6 +27,9 @@ public:
 private:
 
     volatile std::atomic<bool> stopped{false};
+
+    long start_time{0};
+
 };
 
 

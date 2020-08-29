@@ -35,7 +35,7 @@ class GLView : SurfaceView, SurfaceHolder.Callback {
         listener?.onSurfaceDestroy()
     }
 
-    fun setSurfaceHolderListener(listener: SurfaceHolderListener) {
+    fun setSurfaceHolderListener(listener: SurfaceHolderListener?) {
         this.listener = listener
     }
 

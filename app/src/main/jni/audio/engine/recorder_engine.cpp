@@ -31,6 +31,11 @@ DataCallbackResult RecorderEngine::onAudioReady(AudioStream *stream, void *data,
             vocal_filter->process(record_buffer.get(), framesRead);
         }
         if (mix_source) {
+            ResultWithValue<FrameTimestamp> tv = stream->getTimestamp(CLOCK_MONOTONIC);
+            if(start_time == 0) {
+                start_time = tv.value().timestamp;
+            }
+            real_time = (tv.value().timestamp - start_time) / 1000 / 1000;
             mix_source->getMixData((short *) data, numFrames, isEcho ? record_buffer.get() : nullptr, isEcho ? framesRead : 0);
         }
         observer->onProduceData(record_buffer.get(), framesRead);

@@ -23,19 +23,19 @@ public:
 
     Camera(JNIEnv *env);
 
-    void open(int w, int h) override;
+    void open(int w, int h, jobject surface) override;
 
     void close() override;
 
     void switchCamera();
 
-    GLuint produceFrame() override;
+    VideoFrame *produceFrame() override;
 
     virtual ~Camera();
 
 private:
 
-    void updateImage();
+    long updateImage();
 
     int textureId{-1};
     JNIEnv *env{nullptr};

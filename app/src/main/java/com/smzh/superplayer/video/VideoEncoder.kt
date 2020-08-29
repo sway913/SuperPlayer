@@ -14,6 +14,8 @@ class VideoEncoder(w: Int, h: Int, bitRate: Int, frameRate: Int, outPath: String
     private lateinit var surface: Surface
     private var bufferInfo: MediaCodec.BufferInfo
     private var muxer: MediaMuxer
+    private var startTime = -1L
+    private var lastPts = 0L
 
 
     private var lastPresentationTimeUs: Long = 0
@@ -141,6 +143,20 @@ class VideoEncoder(w: Int, h: Int, bitRate: Int, frameRate: Int, outPath: String
         synchronized(lock) {
             lock.notifyAll()
         }
+    }
+
+    private fun getPts(): Long {
+        var pts: Long
+        if (startTime == -1L) {
+            startTime = System.nanoTime()
+            pts = 0
+        } else {
+            pts = (System.nanoTime() - startTime) / 1000
+        }
+        if (pts <= lastPts) {
+            pts += lastPts - pts + 1000
+        }
+        return pts
     }
 
     fun stopEncoder() {

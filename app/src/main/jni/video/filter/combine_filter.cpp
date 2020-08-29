@@ -14,13 +14,11 @@ CombineFilter::CombineFilter() {
 }
 
 
-GLuint CombineFilter::draw(GLuint textureId, int w, int h) {
+void CombineFilter::draw(VideoFrame *frame) {
     lock_guard<mutex> lock(_mutex);
-    GLuint ret = textureId;
     for (auto &filter:filters) {
-        ret = filter->draw(ret, w, h);
+        filter->draw(frame);
     }
-    return ret;
 }
 
 void CombineFilter::destroy() {

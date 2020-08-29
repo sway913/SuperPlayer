@@ -37,7 +37,7 @@ public:
 
     BaseFilter(const char *vertexShader, const char *fragShader);
 
-    virtual GLuint draw(GLuint textureId, int w, int h) override;
+    virtual void draw(VideoFrame *frame) override;
 
     virtual void destroy() override;
 
@@ -50,6 +50,8 @@ protected:
     virtual void bindTexture(GLuint textureId);
 
     virtual void preDraw();
+
+    virtual bool updateTexture();
 
     GLuint programId{0};
     GLuint glAttrPosition{0};

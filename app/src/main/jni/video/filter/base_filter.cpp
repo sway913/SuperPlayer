@@ -47,9 +47,9 @@ void BaseFilter::onInit() {
 
 }
 
-GLuint BaseFilter::draw(GLuint textureId, int w, int h) {
+void BaseFilter::draw(VideoFrame *frame) {
     init();
-    bindFrameBuffer(w, h);
+    bindFrameBuffer(frame->width, frame->height);
     glUseProgram(programId);
     preDraw();
     glVertexAttribPointer(glAttrPosition, 2, GL_FLOAT, GL_FALSE, 0, RECTANGLE_VERTICES);
@@ -59,7 +59,7 @@ GLuint BaseFilter::draw(GLuint textureId, int w, int h) {
     glEnableVertexAttribArray(glAttrTextureCoordinate);
 
     glActiveTexture(GL_TEXTURE0);
-    bindTexture(textureId);
+    bindTexture(frame->textureId);
     glUniform1i(glUniformTexture, 0);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -67,7 +67,9 @@ GLuint BaseFilter::draw(GLuint textureId, int w, int h) {
     glDisableVertexAttribArray(glAttrPosition);
     glDisableVertexAttribArray(glAttrTextureCoordinate);
     bindTexture(0);
-    return texture_id;
+    if (updateTexture()) {
+        frame->textureId = texture_id;
+    }
 }
 
 void BaseFilter::bindFrameBuffer(int w, int h) {
@@ -79,7 +81,7 @@ void BaseFilter::bindFrameBuffer(int w, int h) {
     }
     glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
     glViewport(0, 0, width, height);
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
@@ -90,6 +92,10 @@ void BaseFilter::bindTexture(GLuint textureId) {
 
 void BaseFilter::preDraw() {
 
+}
+
+bool BaseFilter::updateTexture() {
+    return true;
 }
 
 void BaseFilter::destroy() {

@@ -188,6 +188,8 @@ class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekLis
 
     private fun gotoPreview() {
         viewModel.stop()
+        gl_view.setSurfaceHolderListener(null)
+        SuperPlayer.instance.destroySurface()
         PreviewActivity.start(context!!, viewModel.song, viewModel.isVideoMode.value ?: false)
         activity?.finish()
     }

@@ -34,12 +34,13 @@ class Camera1 : SuperCamera() {
     }
 
     //egl thread call
-    override fun updateImage() {
+    override fun updateImage():Long {
         try {
             surfaceTexture.updateTexImage()
         } catch (e: Exception) {
             e.printStackTrace()
         }
+        return surfaceTexture.timestamp
     }
 
     override fun startPreview(textureId: Int) {

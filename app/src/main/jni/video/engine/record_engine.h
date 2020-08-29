@@ -7,7 +7,7 @@
 
 
 #include "video_engine.h"
-#include "../render/render.h"
+#include "../render/camera_render.h"
 #include "../filter/combine_filter.h"
 
 
@@ -15,7 +15,7 @@ class RecordEngine : public VideoEngine {
 
 public:
 
-    RecordEngine(JNIEnv *env,const std::shared_ptr<GlView> &gl_view);
+    void init(JNIEnv *env, const std::shared_ptr<GlView> &gl_view) override;
 
     void stop() override;
 
@@ -34,7 +34,7 @@ public:
 private:
 
     Source *source{nullptr};
-    Render *render{nullptr};
+    CameraRender *render{nullptr};
     std::shared_ptr<CombineFilter> combine_filter{nullptr};
 
 };

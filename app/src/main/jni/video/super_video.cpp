@@ -4,8 +4,15 @@
 
 #include "super_video.h"
 
-SuperVideo::SuperVideo(JNIEnv *env, const std::shared_ptr<GlView> &gl_view, int mode) {
-    videoEngine = VideoEngine::getVideoEngine(env, gl_view, mode);
+SuperVideo::SuperVideo(int mode) {
+    videoEngine = VideoEngine::getVideoEngine(mode);
+}
+
+void SuperVideo::init(JNIEnv *env, const std::shared_ptr<GlView> &gl_view) {
+    if (!initialize) {
+        initialize = true;
+        videoEngine->init(env, gl_view);
+    }
 }
 
 void SuperVideo::prepare(JNIEnv *env, const char *path) {

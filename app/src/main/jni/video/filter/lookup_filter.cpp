@@ -27,11 +27,9 @@ void LookupFilter::preDraw() {
     }
 }
 
-GLuint LookupFilter::draw(GLuint textureId, int w, int h) {
+void LookupFilter::draw(VideoFrame *frame) {
     if (isValid) {
-        return BaseFilter::draw(textureId, w, h);
-    } else {
-        return textureId;
+        BaseFilter::draw(frame);
     }
 }
 

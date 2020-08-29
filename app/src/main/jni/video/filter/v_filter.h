@@ -6,12 +6,13 @@
 #define SUPERPLAYER_V_FILTER_H
 
 #include <GLES2/gl2.h>
+#include "../source/video_frame.h"
 
 class VFilter {
 
 public:
 
-    virtual GLuint draw(GLuint textureId, int w, int h) = 0;
+    virtual void draw(VideoFrame *frame) = 0;
 
     virtual void destroy() = 0;
 

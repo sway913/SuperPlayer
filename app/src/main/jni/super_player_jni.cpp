@@ -22,7 +22,11 @@ Java_com_smzh_superplayer_player_PlayerJni_prepare(JNIEnv *env, jobject clazz, j
     if (super_audio) {
         super_audio->prepare(spParam);
     }
-    if (spParam->isWithVideo() && super_video) {
+    if (spParam->isWithVideo()) {
+        if (super_video == nullptr) {
+            mode_ = spParam->isRecorder() ? 0 : 1;
+            super_video = std::make_unique<SuperVideo>(mode_);
+        }
         super_video->prepare(env, spParam->getVideoPath());
     }
 }
@@ -105,10 +109,19 @@ JNIEXPORT jlong JNICALL Java_com_smzh_superplayer_player_PlayerJni_getTotalMs(JN
 }
 
 JNIEXPORT jlong JNICALL Java_com_smzh_superplayer_player_PlayerJni_getCurrentMs(JNIEnv *env, jobject clazz) {
+    int64_t ms = 0;
     if (super_audio) {
-        return super_audio->getCurrentMs();
+        ms = super_audio->getCurrentMs();
     }
-    return 0;
+    return ms;
+}
+
+JNIEXPORT jlong JNICALL Java_com_smzh_superplayer_player_PlayerJni_getRealMs(JNIEnv *env, jobject clazz) {
+    long real_ms = 0;
+    if (super_audio) {
+        real_ms = super_audio->getRealMs();
+    }
+    return real_ms;
 }
 
 JNIEXPORT void JNICALL Java_com_smzh_superplayer_player_PlayerJni_startMerge(JNIEnv *env, jobject clazz, jobject param) {
@@ -129,13 +142,14 @@ JNIEXPORT jint JNICALL Java_com_smzh_superplayer_player_PlayerJni_getMergeProgre
 }
 
 JNIEXPORT void JNICALL Java_com_smzh_superplayer_player_PlayerJni_onSurfaceCreate(JNIEnv *env, jobject clazz, jobject surface, jint width, jint height, jint mode) {
-    if (gl_view == nullptr) {
-        gl_view = std::make_shared<GlView>();
-    }
     mode_ = mode;
-    if (super_video == nullptr) {
-        super_video = std::make_unique<SuperVideo>(env, gl_view, mode_);
+    if (gl_view == nullptr) {
+        gl_view = std::make_shared<GlView>(mode);
     }
+    if (super_video == nullptr) {
+        super_video = std::make_unique<SuperVideo>(mode_);
+    }
+    super_video->init(env, gl_view);
     gl_view->createSurface(env, surface, width, height);
 }
 
