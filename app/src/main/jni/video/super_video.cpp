@@ -27,6 +27,10 @@ void SuperVideo::setEffect(std::shared_ptr<VideoEffect> &effect) {
     videoEngine->setEffect(effect);
 }
 
+void SuperVideo::start() {
+    videoEngine->start();
+}
+
 void SuperVideo::resume() {
     videoEngine->resume();
 }

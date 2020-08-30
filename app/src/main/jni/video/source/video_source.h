@@ -19,6 +19,8 @@ public:
 
     void prepare(JNIEnv *env, const char *path);
 
+    void start();
+
     void open(int w, int h, jobject surface) override;
 
     void close() override;
@@ -36,6 +38,7 @@ private:
     jobject j_decoder{nullptr};
     jmethodID close_id{nullptr};
     jmethodID init_id{nullptr};
+    jmethodID  start_id{nullptr};
     const char *path{nullptr};
     std::mutex mutex_;
 

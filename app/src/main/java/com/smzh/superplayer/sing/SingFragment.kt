@@ -64,6 +64,7 @@ class SingFragment : BaseFragment(), View.OnClickListener, CustomSeekBar.SeekLis
         progress_bar.setPlayStatusListener(this)
         btn_switch.setOnModeChangeListener(this)
         gl_view.setSurfaceHolderListener(this)
+        sing_control.setListener(this)
         viewModel.singComplete.observe(viewLifecycleOwner, Observer {
             gotoPreview()
         })

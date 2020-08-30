@@ -36,7 +36,7 @@ JNIEXPORT void JNICALL Java_com_smzh_superplayer_player_PlayerJni_start(JNIEnv *
         super_audio->start();
     }
     if (super_video) {
-        super_video->resume();
+        super_video->start();
     }
 }
 

@@ -17,9 +17,11 @@ class VideoDecoder : Thread() {
     private var videoTrackIndex = 0
     private var duration = 0L
     private var lastFrameTime = 0L
-    private var hasStop = false
+    private var started = false
+    private var inited = false
 
     fun init(filePath: String, outSurface: Surface) {
+        Log.d("Video Decoder file", filePath)
         mediaExtractor.setDataSource(filePath)
         val trackCount = mediaExtractor.trackCount
         for (i in 0 until trackCount) {
@@ -45,8 +47,18 @@ class VideoDecoder : Thread() {
         mediaCodec = MediaCodec.createDecoderByType(mime)
         mediaCodec.configure(mediaFormat, outSurface, null, 0)
         mediaCodec.start()
+        inited = true
+        if (started) {
+            start()
+        }
         Log.d("Video Decode duration :", duration.toString())
-        hasStop = false
+    }
+
+    fun startDecode() {
+        started = true
+        if (!inited) {
+            return
+        }
         start()
     }
 
@@ -55,7 +67,7 @@ class VideoDecoder : Thread() {
         if (lastFrameTime == 0L) {
             lastFrameTime = System.currentTimeMillis()
         }
-        while (!hasStop) {
+        while (started) {
             drainDecoder(SuperPlayer.instance.getRealMs())
         }
     }
@@ -65,7 +77,7 @@ class VideoDecoder : Thread() {
             return
         }
 
-        while (true) {
+        while (started) {
             val inputBufferIndex = mediaCodec.dequeueInputBuffer(10000)
             if (inputBufferIndex > 0) {
                 val buffer = mediaCodec.getInputBuffer(inputBufferIndex)
@@ -118,7 +130,7 @@ class VideoDecoder : Thread() {
     }
 
     fun release() {
-        hasStop = true
+        started = false
         join()
         try {
             mediaCodec.stop()

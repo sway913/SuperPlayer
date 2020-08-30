@@ -34,6 +34,10 @@ void RecordEngine::setEffect(std::shared_ptr<VideoEffect> &effect) {
     combine_filter->setEffect(effect);
 }
 
+void RecordEngine::start() {
+    resume();
+}
+
 void RecordEngine::resume() {
     render->setState(false);
 }

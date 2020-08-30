@@ -23,6 +23,8 @@ public:
 
     void prepare(JNIEnv *env, const char *path);
 
+    void start();
+
     void switchCamera();
 
     void setEffect(std::shared_ptr<VideoEffect> &effect);

@@ -27,6 +27,7 @@ void VideoSource::prepare(JNIEnv *e, const char *p) {
 
     close_id = env->GetMethodID(clazz, "release", "()V");
     init_id = env->GetMethodID(clazz, "init", "(Ljava/lang/String;Landroid/view/Surface;)V");
+    start_id = env->GetMethodID(clazz, "startDecode", "()V");
     env->DeleteLocalRef(clazz);
     env->DeleteLocalRef(decoder);
 }
@@ -50,6 +51,21 @@ void VideoSource::open(int w, int h, jobject surface) {
     jstring p = env->NewStringUTF(path);
     env->CallVoidMethod(j_decoder, init_id, p, surface);
     env->DeleteLocalRef(p);
+    if (needAttach) {
+        javaVm->DetachCurrentThread();
+    }
+}
+
+void VideoSource::start() {
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (j_decoder == nullptr) {
+        return;
+    }
+    int needAttach = javaVm->GetEnv((void **) &env, JNI_VERSION_1_6) == JNI_EDETACHED;
+    if (needAttach) {
+        javaVm->AttachCurrentThread(&env, nullptr);
+    }
+    env->CallVoidMethod(j_decoder, start_id);
     if (needAttach) {
         javaVm->DetachCurrentThread();
     }

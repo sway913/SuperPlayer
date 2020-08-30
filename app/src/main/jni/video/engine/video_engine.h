@@ -25,6 +25,8 @@ public:
 
     virtual void prepare(JNIEnv *env, const char *path) = 0;
 
+    virtual void start() = 0;
+
     virtual void resume() = 0;
 
     virtual void pause() = 0;

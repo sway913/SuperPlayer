@@ -18,6 +18,12 @@ void PlayEngine::prepare(JNIEnv *env, const char *path) {
     ((VideoSource *) source)->prepare(env, path);
 }
 
+void PlayEngine::start() {
+    if (auto *s = dynamic_cast<VideoSource *>(source)) {
+        s->start();
+    }
+}
+
 void PlayEngine::resume() {
 
 }

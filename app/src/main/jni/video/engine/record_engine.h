@@ -19,6 +19,8 @@ public:
 
     void stop() override;
 
+    void start() override;
+
     void switchCamera() override;
 
     void setEffect(std::shared_ptr<VideoEffect> &effect) override;

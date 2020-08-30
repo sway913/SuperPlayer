@@ -16,6 +16,8 @@ public:
 
     void prepare(JNIEnv *env, const char *path) override;
 
+    void start() override;
+
     void resume() override;
 
     void pause() override;
