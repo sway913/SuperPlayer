@@ -17,6 +17,7 @@ object SingParam {
     val decodePath: String
     val testVocalPath: String
     val videoPath: String
+    val outVideoPath:String
 
     const val vocalGain = 4F
     val lyricPath: String
@@ -36,6 +37,7 @@ object SingParam {
             testVocalPath = this + "test_vocal.pcm"
             lyricPath = this + "lyric.html"
             videoPath = this + "video.mp4"
+            outVideoPath = this + "merge_video.mp4"
         }
         filePath.run {
             val file = File(this)
@@ -49,7 +51,7 @@ object SingParam {
         }
     }
 
-    private val cachePath: String
+    val cachePath: String
         get() = if (App.context.externalCacheDir == null) {
             Environment.getExternalStorageDirectory().absolutePath + File.separator + "sing" + File.separator
         } else {
@@ -57,10 +59,10 @@ object SingParam {
         }
 
     val filePath: String
-        get() = if (App.context.externalCacheDir == null) {
-            Environment.getExternalStorageDirectory().absolutePath + File.separator + "audio" + File.separator
+        get() = if (App.context.getExternalFilesDir(null) == null) {
+            Environment.getExternalStorageDirectory().absolutePath + File.separator + "media" + File.separator
         } else {
-            App.context.getExternalFilesDir(null)?.path + File.separator + "audio" + File.separator
+            App.context.getExternalFilesDir(null)?.path + File.separator + "media" + File.separator
         }
 
     val resourcePath: String

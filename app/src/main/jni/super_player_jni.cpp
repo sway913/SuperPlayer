@@ -127,7 +127,7 @@ JNIEXPORT jlong JNICALL Java_com_smzh_superplayer_player_PlayerJni_getRealMs(JNI
 JNIEXPORT void JNICALL Java_com_smzh_superplayer_player_PlayerJni_startMerge(JNIEnv *env, jobject clazz, jobject param) {
     audio_merger = std::make_unique<AudioMerger2>();
     std::shared_ptr<MergerParam> sp_param = ParamFactory::generalMergerParam(env, param);
-    audio_merger->start(sp_param);
+    audio_merger->start(env, sp_param);
 }
 
 JNIEXPORT jint JNICALL Java_com_smzh_superplayer_player_PlayerJni_getMergeProgress(JNIEnv *env, jobject clazz) {

@@ -1,23 +1,20 @@
 package com.smzh.superplayer.sing
 
-import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.text.format.DateUtils
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.smzh.superplayer.App
 import com.smzh.superplayer.database.AppDataBase
 import com.smzh.superplayer.player.AudioParam
 import com.smzh.superplayer.player.MergerParam
 import com.smzh.superplayer.player.PlayerJni
 import com.smzh.superplayer.player.SuperPlayer
-import io.reactivex.*
+import com.smzh.superplayer.video.H264_AAC_toMp4_MediaMuxer
+import io.reactivex.Observable
+import io.reactivex.ObservableOnSubscribe
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.functions.Action
-import io.reactivex.functions.Consumer
-import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import java.io.*
 
@@ -146,13 +143,18 @@ class PreviewModel(val song: Song, val isVideo: Boolean) : ViewModel(), PlayerJn
     }
 
     fun startMerger() {
-        val mergerParam = MergerParam(SingParam.decodePath,
-                SingParam.vocalPath,
-                SingParam.mixPath,
-                SingParam.vocalFactor * SingParam.vocalGain,
-                SingParam.accFactor,
-                SingParam.pitch,
-                SingParam.AudioEffect)
+        val mergerParam = MergerParam(
+                mode = if (!isVideo) 1 else 2,
+                isVideo = isVideo,
+                aacPath = SingParam.decodePath,
+                vocalPath = SingParam.vocalPath,
+                videoPath = SingParam.videoPath,
+                outPath = SingParam.mixPath,
+                outVideoPath = SingParam.outVideoPath,
+                vocalVolume = SingParam.vocalFactor * SingParam.vocalGain,
+                accVolume = SingParam.accFactor,
+                pitch = SingParam.pitch,
+                effect = SingParam.AudioEffect)
         player.startMerge(mergerParam)
         handler.postDelayed(mergerRunnable, 100)
     }
@@ -161,7 +163,7 @@ class PreviewModel(val song: Song, val isVideo: Boolean) : ViewModel(), PlayerJn
         val disposable = Observable.create(ObservableOnSubscribe<Any> { emitter ->
             var input: InputStream? = null
             var output: OutputStream? = null
-            val dstPath = SingParam.filePath + System.currentTimeMillis() + ".m4a"
+            val dstPath = SingParam.filePath + System.currentTimeMillis() + if (isVideo) ".mp4" else ".aac"
             try {
                 input = FileInputStream(SingParam.mixPath)
                 output = FileOutputStream(dstPath)

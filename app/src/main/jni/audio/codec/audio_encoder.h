@@ -15,12 +15,13 @@ extern "C" {
 #include <fstream>
 #include "../../common/common_tools.h"
 #include "../../common/circle_buffer.h"
+#include "i_audio_encoder.h"
 
 #define ENCODE_BUFFER_SIZE 4096
 #define ENCODE_SAMPLE 44100
 #define ENCODE_CHANNELS 2
 
-class AudioEncoder {
+class AudioEncoder : public IAudioEncoder {
 
 private:
     AVFormatContext *format_ctx{nullptr};
@@ -40,11 +41,11 @@ private:
 
 public:
 
-    void init(int in_sample, int in_channels, const char *file_name);
+    void init(int in_sample, int in_channels, const char *file_name) override;
 
-    void encode(short *data, int len);
+    void encode(short *data, int len) override;
 
-    void close();
+    void close() override;
 
 
 };

@@ -110,14 +110,7 @@ void GlView::requestRender() {
     if (mode == 1) {
         return;
     }
-    int msg;
-    if (msg_queue->peek(msg)) {
-        if (msg != MSG_DRAW) {
-            msg_queue->push(MSG_DRAW);
-        }
-    } else {
-        msg_queue->push(MSG_DRAW);
-    }
+    msg_queue->push(MSG_DRAW);
     cond.notify_all();
 }
 
