@@ -151,7 +151,7 @@ class H264_AAC_toMp4_MediaMuxer {
         val mediaMuxer: MediaMuxer
         val videoExtractor: MediaExtractor
         val audioExtractor: MediaExtractor
-        val maxInputSize:Int
+        val maxInputSize: Int
         try {
             audioExtractor = MediaExtractor()
             videoExtractor = MediaExtractor()
@@ -166,6 +166,7 @@ class H264_AAC_toMp4_MediaMuxer {
                 //视频信道
                 if (mineType.startsWith("video/")) {
                     videoTrackIndex = i
+                    break
                 }
             }
             var audioTrackIndex = -1
@@ -174,6 +175,7 @@ class H264_AAC_toMp4_MediaMuxer {
                 val mineType = audioFormat.getString(MediaFormat.KEY_MIME)
                 if (mineType.startsWith("audio/")) {
                     audioTrackIndex = i
+                    break
                 }
             }
             val byteBuffer = ByteBuffer.allocate(500 * 1024)
@@ -187,47 +189,43 @@ class H264_AAC_toMp4_MediaMuxer {
             val writeAudioIndex = mediaMuxer.addTrack(audiotrackFormat)
             mediaMuxer.start()
             //video
-            var sampletime: Long
-            var first_sampletime: Long
-            var second_sampletime: Long
-            run {
-                videoExtractor.readSampleData(byteBuffer, 0)
-                first_sampletime = videoExtractor.sampleTime
-                videoExtractor.advance()
-                second_sampletime = videoExtractor.sampleTime
-                sampletime = abs(second_sampletime - first_sampletime) //时间戳
-                Log.d(TAG, "sampletime$sampletime")
-            }
-            //上面只是获取时间戳，获取完后，重新选择下track
-            videoExtractor.unselectTrack(videoTrackIndex)
-            videoExtractor.selectTrack(videoTrackIndex)
+
             while (true) {
-                val readSampleCount = videoExtractor.readSampleData(byteBuffer, 0)
-                Log.d(TAG, "audio:readSampleCount:$readSampleCount")
-                if (readSampleCount < 0) {
-                    break
-                }
-                audiobufferInfo.size = readSampleCount
-                audiobufferInfo.offset = 0
-                audiobufferInfo.flags = videoExtractor.sampleFlags
-                audiobufferInfo.presentationTimeUs = audioExtractor.sampleTime
-                mediaMuxer.writeSampleData(writeVideoIndex, byteBuffer, audiobufferInfo)
                 byteBuffer.clear()
-                videoExtractor.advance()
-            }
-            //audio
-            while (true) {
-                val readSampleCount = audioExtractor.readSampleData(byteBuffer, 0)
+                val readSampleCount = videoExtractor.readSampleData(byteBuffer, 0)
                 Log.d(TAG, "audio:readSampleCount:$readSampleCount")
                 if (readSampleCount < 0) {
                     break
                 }
                 videobufferInfo.size = readSampleCount
                 videobufferInfo.offset = 0
-                videobufferInfo.flags = audioExtractor.sampleFlags
-                videobufferInfo.presentationTimeUs += sampletime
-                mediaMuxer.writeSampleData(writeAudioIndex, byteBuffer, videobufferInfo)
+                videobufferInfo.flags = videoExtractor.sampleFlags
+                videobufferInfo.presentationTimeUs = videoExtractor.sampleTime
+                mediaMuxer.writeSampleData(writeVideoIndex, byteBuffer, videobufferInfo)
+                videoExtractor.advance()
+            }
+            //audio
+            audioExtractor.readSampleData(byteBuffer, 0)
+            val first_sampletime = audioExtractor.sampleTime
+            videoExtractor.advance()
+            val second_sampletime = audioExtractor.sampleTime
+            val sampletime = abs(second_sampletime - first_sampletime) //时间戳
+            Log.d(TAG, "sampletime$sampletime")
+            //上面只是获取时间戳，获取完后，重新选择下track
+            audioExtractor.unselectTrack(audioTrackIndex)
+            audioExtractor.selectTrack(audioTrackIndex)
+            while (true) {
                 byteBuffer.clear()
+                val readSampleCount = audioExtractor.readSampleData(byteBuffer, 0)
+                Log.d(TAG, "audio:readSampleCount:$readSampleCount")
+                if (readSampleCount < 0) {
+                    break
+                }
+                audiobufferInfo.size = readSampleCount
+                audiobufferInfo.offset = 0
+                audiobufferInfo.flags = audioExtractor.sampleFlags
+                audiobufferInfo.presentationTimeUs += sampletime
+                mediaMuxer.writeSampleData(writeAudioIndex, byteBuffer, audiobufferInfo)
                 audioExtractor.advance()
             }
             Log.d(TAG, "combineVideo finished!\n")

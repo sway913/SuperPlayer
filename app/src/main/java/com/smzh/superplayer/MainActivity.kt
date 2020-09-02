@@ -36,21 +36,32 @@ class MainActivity : AppCompatActivity(), SongAdapter.ChooseSongListener {
         setContentView(R.layout.activity_main)
         initView()
 
-        disposable.add(Single.create(SingleOnSubscribe<List<Song>> {
-            it.onSuccess(getMusicData(this@MainActivity))
-        })
-                .map {
-                    Collections.sort(it)
-                    it
+        disposable.add(RxPermissions(this)
+                .request(Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .subscribe { granted ->
+                    if (granted) {
+                        disposable.add(Single.create(SingleOnSubscribe<List<Song>> {
+                            it.onSuccess(getMusicData(this@MainActivity))
+                        })
+                                .map {
+                                    Collections.sort(it)
+                                    it
+                                }
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribeBy(
+                                        onSuccess = {
+                                            ((recyclerView.adapter) as SongAdapter).refresh(it)
+                                        }
+                                )
+                        )
+                    } else {
+                        Toast.makeText(this, "未获取权限", Toast.LENGTH_LONG).show()
+                    }
                 }
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                        onSuccess = {
-                            ((recyclerView.adapter) as SongAdapter).refresh(it)
-                        }
-                )
         )
+
     }
 
     private fun initView() {
@@ -67,9 +78,7 @@ class MainActivity : AppCompatActivity(), SongAdapter.ChooseSongListener {
 
     private fun gotoSing(song: Song) {
         disposable.add(RxPermissions(this)
-                .request(Manifest.permission.RECORD_AUDIO,
-                        Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .request(Manifest.permission.RECORD_AUDIO)
                 .subscribe { granted ->
                     if (granted) {
                         SingActivity.start(this, song)

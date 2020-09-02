@@ -165,7 +165,7 @@ class PreviewModel(val song: Song, val isVideo: Boolean) : ViewModel(), PlayerJn
             var output: OutputStream? = null
             val dstPath = SingParam.filePath + System.currentTimeMillis() + if (isVideo) ".mp4" else ".aac"
             try {
-                input = FileInputStream(SingParam.mixPath)
+                input = FileInputStream(if (isVideo) SingParam.outVideoPath else SingParam.mixPath)
                 output = FileOutputStream(dstPath)
                 val buf = ByteArray(1024)
                 var bytesRead: Int

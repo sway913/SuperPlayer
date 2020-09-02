@@ -27,7 +27,7 @@ class VideoEncoder(w: Int, h: Int, bitRate: Int, frameRate: Int, outPath: String
     companion object {
 
         private const val TAG = "VideoEncoder"
-        private const val FRAME_INTERVAL = 1 // sync frame every second
+        private const val FRAME_INTERVAL = 2 // sync frame every second
         private const val DEFAULT_TIMEOUT = 10 * 1000L
     }
 
