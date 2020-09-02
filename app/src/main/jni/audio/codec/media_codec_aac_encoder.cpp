@@ -56,16 +56,15 @@ void MediaCodecAACEncoder::encode(short *data, int len) {
        len = 0;
     }
 
-    encode_byte += len;
-
     int needAttach = javaVm->GetEnv((void **) &env, JNI_VERSION_1_6) == JNI_EDETACHED;
     if (needAttach) {
         javaVm->AttachCurrentThread(&env, nullptr);
     }
     jbyteArray array = env->NewByteArray(len);
     env->SetByteArrayRegion(array, 0, len, (jbyte *) data);
-    double timestamp = (double) encode_byte / (double) (sample * channels * sizeof(short)) * 1000 * 1000;
+    double timestamp = (double) encode_byte * 1000 * 1000 / (double) (sample * channels * sizeof(short));
 //    LOGI("audio encode timestamp %f", timestamp);
+    encode_byte += len;
     env->CallVoidMethod(j_encoder, encode_id, array, (long) timestamp);
     env->DeleteLocalRef(array);
     if (needAttach) {

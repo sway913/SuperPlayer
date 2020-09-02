@@ -7,10 +7,9 @@ import android.media.MediaMuxer
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.annotation.WorkerThread
 import java.io.IOException
 import java.nio.ByteBuffer
-import kotlin.math.abs
+import kotlin.math.min
 
 
 class H264_AAC_toMp4_MediaMuxer {
@@ -151,34 +150,42 @@ class H264_AAC_toMp4_MediaMuxer {
         val mediaMuxer: MediaMuxer
         val videoExtractor: MediaExtractor
         val audioExtractor: MediaExtractor
-        val maxInputSize: Int
+        var minDuration: Long = 0
         try {
             audioExtractor = MediaExtractor()
             videoExtractor = MediaExtractor()
             mediaMuxer = MediaMuxer(outPath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
             videoExtractor.setDataSource(h264Path)
             audioExtractor.setDataSource(aacPath)
-            val trackCount = videoExtractor.trackCount
+            val videoTrackCount = videoExtractor.trackCount
+            val audioTrackCount = audioExtractor.trackCount
             var videoTrackIndex = -1
-            for (i in 0 until trackCount) {
+            var audioTrackIndex = -1
+            var maxVideoSize = 0
+            var maxAudioSize = 0
+
+            for (i in 0 until videoTrackCount) {
                 val videoFormat = videoExtractor.getTrackFormat(i)
                 val mineType = videoFormat.getString(MediaFormat.KEY_MIME)
                 //视频信道
                 if (mineType.startsWith("video/")) {
                     videoTrackIndex = i
+                    minDuration = videoFormat.getLong(MediaFormat.KEY_DURATION)
+                    maxVideoSize = videoFormat.getInteger(MediaFormat.KEY_MAX_INPUT_SIZE)
                     break
                 }
             }
-            var audioTrackIndex = -1
-            for (i in 0 until trackCount) {
+            for (i in 0 until audioTrackCount) {
                 val audioFormat = audioExtractor.getTrackFormat(i)
                 val mineType = audioFormat.getString(MediaFormat.KEY_MIME)
                 if (mineType.startsWith("audio/")) {
                     audioTrackIndex = i
+                    minDuration = min(minDuration, audioFormat.getLong(MediaFormat.KEY_DURATION))
+                    maxAudioSize = audioFormat.getInteger(MediaFormat.KEY_MAX_INPUT_SIZE)
                     break
                 }
             }
-            val byteBuffer = ByteBuffer.allocate(500 * 1024)
+
             val audiobufferInfo = MediaCodec.BufferInfo()
             val videobufferInfo = MediaCodec.BufferInfo()
             videoExtractor.selectTrack(videoTrackIndex)
@@ -190,34 +197,29 @@ class H264_AAC_toMp4_MediaMuxer {
             mediaMuxer.start()
             //video
 
+            val videoByteBuffer = ByteBuffer.allocate(maxVideoSize)
             while (true) {
-                byteBuffer.clear()
-                val readSampleCount = videoExtractor.readSampleData(byteBuffer, 0)
+                val readSampleCount = videoExtractor.readSampleData(videoByteBuffer, 0)
                 Log.d(TAG, "audio:readSampleCount:$readSampleCount")
                 if (readSampleCount < 0) {
+                    videoExtractor.unselectTrack(videoTrackIndex)
                     break
                 }
                 videobufferInfo.size = readSampleCount
                 videobufferInfo.offset = 0
                 videobufferInfo.flags = videoExtractor.sampleFlags
                 videobufferInfo.presentationTimeUs = videoExtractor.sampleTime
-                Log.d("video muxer timestamp", videobufferInfo.presentationTimeUs.toString())
-                mediaMuxer.writeSampleData(writeVideoIndex, byteBuffer, videobufferInfo)
+//                Log.d("video muxer timestamp", videobufferInfo.presentationTimeUs.toString())
+                mediaMuxer.writeSampleData(writeVideoIndex, videoByteBuffer, videobufferInfo)
                 videoExtractor.advance()
+                if (videobufferInfo.presentationTimeUs > minDuration) {
+                    break
+                }
             }
             //audio
-            audioExtractor.readSampleData(byteBuffer, 0)
-            val first_sampletime = audioExtractor.sampleTime
-            audioExtractor.advance()
-            val second_sampletime = audioExtractor.sampleTime
-            val sampletime = abs(second_sampletime - first_sampletime) //时间戳
-            Log.d(TAG, "sampletime$sampletime")
-            //上面只是获取时间戳，获取完后，重新选择下track
-            audioExtractor.unselectTrack(audioTrackIndex)
-            audioExtractor.selectTrack(audioTrackIndex)
+            val audioByteBuffer = ByteBuffer.allocate(maxAudioSize)
             while (true) {
-                byteBuffer.clear()
-                val readSampleCount = audioExtractor.readSampleData(byteBuffer, 0)
+                val readSampleCount = audioExtractor.readSampleData(audioByteBuffer, 0)
                 Log.d(TAG, "audio:readSampleCount:$readSampleCount")
                 if (readSampleCount < 0) {
                     break
@@ -225,10 +227,13 @@ class H264_AAC_toMp4_MediaMuxer {
                 audiobufferInfo.size = readSampleCount
                 audiobufferInfo.offset = 0
                 audiobufferInfo.flags = audioExtractor.sampleFlags
-                audiobufferInfo.presentationTimeUs += sampletime
-                Log.d("audio muxer timestamp", audiobufferInfo.presentationTimeUs.toString())
-                mediaMuxer.writeSampleData(writeAudioIndex, byteBuffer, audiobufferInfo)
+                audiobufferInfo.presentationTimeUs = audioExtractor.sampleTime
+//                Log.d("audio muxer timestamp", audiobufferInfo.presentationTimeUs.toString())
+                mediaMuxer.writeSampleData(writeAudioIndex, audioByteBuffer, audiobufferInfo)
                 audioExtractor.advance()
+                if (audiobufferInfo.presentationTimeUs >= minDuration) {
+                    break
+                }
             }
             Log.d(TAG, "combineVideo finished!\n")
             mediaMuxer.stop()
