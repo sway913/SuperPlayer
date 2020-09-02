@@ -201,13 +201,14 @@ class H264_AAC_toMp4_MediaMuxer {
                 videobufferInfo.offset = 0
                 videobufferInfo.flags = videoExtractor.sampleFlags
                 videobufferInfo.presentationTimeUs = videoExtractor.sampleTime
+                Log.d("video muxer timestamp", videobufferInfo.presentationTimeUs.toString())
                 mediaMuxer.writeSampleData(writeVideoIndex, byteBuffer, videobufferInfo)
                 videoExtractor.advance()
             }
             //audio
             audioExtractor.readSampleData(byteBuffer, 0)
             val first_sampletime = audioExtractor.sampleTime
-            videoExtractor.advance()
+            audioExtractor.advance()
             val second_sampletime = audioExtractor.sampleTime
             val sampletime = abs(second_sampletime - first_sampletime) //时间戳
             Log.d(TAG, "sampletime$sampletime")
@@ -225,6 +226,7 @@ class H264_AAC_toMp4_MediaMuxer {
                 audiobufferInfo.offset = 0
                 audiobufferInfo.flags = audioExtractor.sampleFlags
                 audiobufferInfo.presentationTimeUs += sampletime
+                Log.d("audio muxer timestamp", audiobufferInfo.presentationTimeUs.toString())
                 mediaMuxer.writeSampleData(writeAudioIndex, byteBuffer, audiobufferInfo)
                 audioExtractor.advance()
             }

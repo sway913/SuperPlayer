@@ -28,7 +28,7 @@ class AudioEncoder {
     }
 
     fun encodeFrame(data: ByteArray, timestamp: Long) {
-        if (data.size == 0) {
+        if (data.isEmpty()) {
             return
         }
         val inputBufferIndex = mMediaCodec.dequeueInputBuffer(1000)
@@ -87,7 +87,7 @@ class AudioEncoder {
     fun endEncode() {
         try {
             mMediaCodec.signalEndOfInputStream()
-        }catch (e:Exception){
+        } catch (e: Exception) {
 
         } finally {
             mMediaCodec.stop()

@@ -74,6 +74,7 @@ void AudioMerger2::mergerFun() {
 
     sp_param = nullptr;
     finish = true;
+    DELETEOBJ(videoMerger)
 }
 
 

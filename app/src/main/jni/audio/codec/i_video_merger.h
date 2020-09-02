@@ -11,6 +11,10 @@ public:
 
     virtual void start(const char *aacPath, const char *h264Path, const char *outPath) = 0;
 
+    virtual ~IVideoMerger() {
+
+    }
+
 };
 
 #endif //SUPERPLAYER_I_VIDEO_MERGER_H

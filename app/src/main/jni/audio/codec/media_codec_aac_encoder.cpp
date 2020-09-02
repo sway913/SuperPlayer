@@ -57,7 +57,6 @@ void MediaCodecAACEncoder::encode(short *data, int len) {
     }
 
     encode_byte += len;
-    LOGI("merger data len %ld,size %d", encode_byte, len);
 
     int needAttach = javaVm->GetEnv((void **) &env, JNI_VERSION_1_6) == JNI_EDETACHED;
     if (needAttach) {
@@ -66,6 +65,7 @@ void MediaCodecAACEncoder::encode(short *data, int len) {
     jbyteArray array = env->NewByteArray(len);
     env->SetByteArrayRegion(array, 0, len, (jbyte *) data);
     double timestamp = (double) encode_byte / (double) (sample * channels * sizeof(short)) * 1000 * 1000;
+//    LOGI("audio encode timestamp %f", timestamp);
     env->CallVoidMethod(j_encoder, encode_id, array, (long) timestamp);
     env->DeleteLocalRef(array);
     if (needAttach) {

@@ -35,6 +35,8 @@ void MediaCodecMerger::start(const char *aacPath, const char *h264Path, const ch
     if (needAttach) {
         javaVm->AttachCurrentThread(&env, nullptr);
     }
+    LOGI("video merge aac path %s \n h264 path %s \n video path %s",
+         aacPath, h264Path, outPath);
     jstring acc_path = env->NewStringUTF(aacPath);
     jstring h264_path = env->NewStringUTF(h264Path);
     jstring out_path = env->NewStringUTF(outPath);
