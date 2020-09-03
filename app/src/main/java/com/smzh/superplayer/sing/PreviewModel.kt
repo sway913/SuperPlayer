@@ -176,6 +176,7 @@ class PreviewModel(val song: Song, val isVideo: Boolean) : ViewModel(), PlayerJn
                 input?.close()
                 output?.close()
                 song.path = dstPath
+                song.isVideo = if (isVideo) 1 else 0
                 AppDataBase.instance.songDao().insert(song)
             }
             emitter.onNext(song)

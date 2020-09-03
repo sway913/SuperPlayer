@@ -16,14 +16,17 @@ data class Song(
         @ColumnInfo(name = "song_singer")
         var singer: String? = null,
         @ColumnInfo(name = "song_path")
-        var path: String? = ""
+        var path: String? = "",
+        @ColumnInfo(name = "is_video")
+        var isVideo: Int = 0
 ) : Parcelable, Comparable<Song> {
 
     constructor(parcel: Parcel) : this(
             parcel.readInt(),
             parcel.readString(),
             parcel.readString(),
-            parcel.readString()
+            parcel.readString(),
+            parcel.readInt()
     )
 
     override fun writeToParcel(dest: Parcel, flags: Int) {
@@ -31,6 +34,7 @@ data class Song(
         dest.writeString(name)
         dest.writeString(singer)
         dest.writeString(path)
+        dest.writeInt(isVideo)
     }
 
     override fun describeContents(): Int {

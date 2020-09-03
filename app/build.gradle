@@ -27,9 +27,20 @@ android {
             }
         }
     }
+    signingConfigs {
+        release {
+            keyAlias 'magic'
+            keyPassword 'super_player'
+            storePassword 'super_player'
+            v1SigningEnabled true
+            v2SigningEnabled true
+            storeFile file('../release.keystore')
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
