@@ -7,6 +7,9 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.view.animation.Animation
+import android.view.animation.RotateAnimation
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.exoplayer2.*
@@ -62,7 +65,15 @@ class PlayActivity : AppCompatActivity() {
             video_view.player = exoPlayer
             video_view.showController()
         }
-
+        if (song.isVideo == 0) {
+            progress_bar.visibility = View.VISIBLE
+        }
+        val anim = RotateAnimation(0f, 360f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
+        anim.duration = 10000
+        anim.fillAfter = true
+        anim.repeatMode = Animation.RESTART
+        anim.repeatCount = Animation.INFINITE
+        progress_bar.startAnimation(anim)
     }
 
     private fun deleteSong(song: Song) {
@@ -74,7 +85,6 @@ class PlayActivity : AppCompatActivity() {
                 .subscribe {
                     finish()
                 }
-        disposable.add(disposable1)
     }
 
     override fun onDestroy() {
@@ -82,6 +92,9 @@ class PlayActivity : AppCompatActivity() {
         exoPlayer.stop()
         exoPlayer.release()
         disposable.clear()
+        if (progress_bar.visibility == View.VISIBLE) {
+            progress_bar.clearAnimation()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
