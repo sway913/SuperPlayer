@@ -40,7 +40,7 @@ void MediaCodecEncoder::stop() {
     }
 }
 
-void MediaCodecEncoder::encodeFrame() {
+void MediaCodecEncoder::encodeFrame(uint8_t *data) {
     JNIEnv *env = nullptr;
     int needAttach = javaVm->GetEnv((void **) &env, JNI_VERSION_1_6) == JNI_EDETACHED;
     if (needAttach) {

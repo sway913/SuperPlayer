@@ -16,7 +16,7 @@ public:
 
     MediaCodecEncoder(JNIEnv *env, int w, int h, const char *path);
 
-    void encodeFrame() override;
+    void encodeFrame(uint8_t *data) override;
 
     void stop() override;
 

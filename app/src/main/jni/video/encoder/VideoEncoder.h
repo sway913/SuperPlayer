@@ -13,7 +13,7 @@ public:
 
     static VideoEncoder *getEncoder(JNIEnv *env, const char *path, int w, int h, bool is_support_media_codec = true);
 
-    virtual void encodeFrame() = 0;
+    virtual void encodeFrame(uint8_t *data = nullptr) = 0;
 
     virtual void stop() = 0;
 

@@ -1,11 +1,12 @@
 package com.smzh.superplayer.video
 
+import android.graphics.ImageFormat
 import android.graphics.SurfaceTexture
 import android.hardware.Camera
 import com.smzh.superplayer.player.SuperPlayer
 
 @Suppress("DEPRECATION")
-class Camera1 : SuperCamera() {
+class Camera1 : SuperCamera(), Camera.PreviewCallback {
 
     private var camera: Camera? = null
     private lateinit var surfaceTexture: SurfaceTexture
@@ -21,12 +22,15 @@ class Camera1 : SuperCamera() {
                 if (supportedFocusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO)) {
                     focusMode = Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO
                 }
+                previewFormat = ImageFormat.NV21
                 parameter[1] = 1080
                 parameter[2] = 1920
             }
             camera?.autoFocus { _, _ ->
 
             }
+            camera?.setPreviewCallbackWithBuffer(this)
+            camera?.addCallbackBuffer(ByteArray(1920 * 1080 * ImageFormat.getBitsPerPixel(ImageFormat.NV21) / 8))
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -34,7 +38,7 @@ class Camera1 : SuperCamera() {
     }
 
     //egl thread call
-    override fun updateImage():Long {
+    override fun updateImage(): Long {
         try {
             surfaceTexture.updateTexImage()
         } catch (e: Exception) {
@@ -66,6 +70,13 @@ class Camera1 : SuperCamera() {
 
     override fun isFront(): Boolean {
         return cameraId == Camera.CameraInfo.CAMERA_FACING_FRONT
+    }
+
+    override fun onPreviewFrame(data: ByteArray?, camera: Camera?) {
+        data?.let {
+            SuperPlayer.instance.encodePreviewData(data)
+        }
+        camera?.addCallbackBuffer(data)
     }
 
     override fun close() {

@@ -125,6 +125,10 @@ class SuperPlayer {
         playerJni.removePlayerStateListener(listener)
     }
 
+    fun encodePreviewData(byteArray: ByteArray) {
+
+    }
+
     enum class Tracker(var index: Int) {
         VOCAL(1),
         ACC(2);

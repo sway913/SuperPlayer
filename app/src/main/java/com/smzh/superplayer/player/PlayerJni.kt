@@ -57,6 +57,8 @@ class PlayerJni {
 
     external fun setVideoEffect(videoEffect: VideoEffect)
 
+    external fun encodePreviewData(byteArray: ByteArray)
+
     fun setPlayerListener(listener: PlayerStateListener) {
         if (!listeners.contains(listener)) {
             listeners.add(listener)

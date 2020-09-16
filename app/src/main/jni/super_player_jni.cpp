@@ -183,5 +183,13 @@ JNIEXPORT void JNICALL Java_com_smzh_superplayer_player_PlayerJni_setVideoEffect
     }
 }
 
+JNIEXPORT void JNICALL Java_com_smzh_superplayer_player_PlayerJni_encodePreviewData(JNIEnv *env, jobject clazz, jbyteArray data) {
+    if (super_video) {
+        jbyte *data_ = env->GetByteArrayElements(data, JNI_FALSE);
+        super_video->encodeFrame((uint8_t *) data_);
+        env->ReleaseByteArrayElements(data, data_, 0);
+    }
+}
+
 }
 
