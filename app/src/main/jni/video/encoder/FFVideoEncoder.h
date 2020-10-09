@@ -32,7 +32,7 @@ private:
 
     BlockQueue<uint8_t *> *data_queue{nullptr};
     AVFormatContext *fmt_ctx{nullptr};
-//    AVOutputFormat *fmt{nullptr};
+    AVOutputFormat *fmt{nullptr};
     AVStream *video_st{nullptr};
     AVCodecContext *codec_ctx{nullptr};
     AVCodec *av_codec{nullptr};
@@ -46,7 +46,7 @@ private:
 
     void looper();
 
-    int flush(AVFormatContext *av_fmt_ctx, unsigned int stream_index);
+    int flush();
 
 };
 
