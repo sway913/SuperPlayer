@@ -74,7 +74,7 @@ class Camera1 : SuperCamera(), Camera.PreviewCallback {
 
     override fun onPreviewFrame(data: ByteArray?, camera: Camera?) {
         data?.let {
-            SuperPlayer.instance.encodePreviewData(data)
+            SuperPlayer.instance.encodePreviewData(YuvLibs.rotateYUV420Degree270(data, parameter[1], parameter[2]))
         }
         camera?.addCallbackBuffer(data)
     }
