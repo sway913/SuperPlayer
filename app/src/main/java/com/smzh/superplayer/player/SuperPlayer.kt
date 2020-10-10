@@ -126,7 +126,7 @@ class SuperPlayer {
     }
 
     fun encodePreviewData(byteArray: ByteArray) {
-
+        playerJni.encodePreviewData(byteArray)
     }
 
     enum class Tracker(var index: Int) {
