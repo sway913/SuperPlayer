@@ -33,6 +33,8 @@ public:
 
     void destroy() override;
 
+    void encodeFrame(uint8_t *frame);
+
     virtual ~MovieWriterFilter();
 
 private:

@@ -31,6 +31,8 @@ public:
 
     virtual void setState(bool isPause) {};
 
+    virtual void encodeFrame(uint8_t *frame) {};
+
     virtual ~IRender() {};
 
 };

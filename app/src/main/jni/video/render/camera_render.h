@@ -35,6 +35,8 @@ public:
 
     void setState(bool isPause) override;
 
+    void encodeFrame(uint8_t *frame) override;
+
     virtual ~CameraRender();
 
 private:

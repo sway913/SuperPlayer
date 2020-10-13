@@ -62,6 +62,10 @@ void CameraRender::setState(bool isPause) {
     movieWriterFilter->setState(isPause);
 }
 
+void CameraRender::encodeFrame(uint8_t *frame) {
+    movieWriterFilter->encodeFrame(frame);
+}
+
 CameraRender::~CameraRender() {
     DELETEOBJ(movieWriterFilter)
 }

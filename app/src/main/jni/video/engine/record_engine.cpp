@@ -46,6 +46,12 @@ void RecordEngine::pause() {
     render->setState(true);
 }
 
+void RecordEngine::encodeFrame(uint8_t *frame) {
+    if (render) {
+        render->encodeFrame(frame);
+    }
+}
+
 RecordEngine::~RecordEngine() {
     DELETEOBJ(source)
     DELETEOBJ(render)

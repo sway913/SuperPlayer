@@ -31,6 +31,8 @@ public:
 
     void pause() override;
 
+    void encodeFrame(uint8_t *frame) override;
+
     virtual ~RecordEngine();
 
 private:

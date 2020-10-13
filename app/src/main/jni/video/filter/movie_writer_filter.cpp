@@ -7,6 +7,7 @@
 #include "../../common/android_log.h"
 #include "../encoder/MediaCodecEncoder.h"
 #include "../opengl/opengl_utils.h"
+#include "../encoder/FFVideoEncoder.h"
 #include <EGL/egl.h>
 
 MovieWriterFilter::MovieWriterFilter() : BaseFilter() {
@@ -15,7 +16,7 @@ MovieWriterFilter::MovieWriterFilter() : BaseFilter() {
 
 void MovieWriterFilter::draw(VideoFrame *frame) {
     BaseFilter::draw(frame);
-    if (!stop_record && is_recording && videoEncoder) {
+    if (!stop_record && is_recording && dynamic_cast<MediaCodecEncoder *> (videoEncoder)) {
         EGLDisplay mEGLDisplay = eglGetCurrentDisplay();
         EGLContext mEGLContext = eglGetCurrentContext();
         EGLSurface mEGLScreenSurface = eglGetCurrentSurface(EGL_DRAW);
@@ -33,7 +34,7 @@ void MovieWriterFilter::draw(VideoFrame *frame) {
         if (is_recording && eglSurface != nullptr) {
             gettimeofday(&tv, nullptr);
             int64_t usec = tv.tv_sec * 1000 * 1000 + tv.tv_usec;
-            if(start_time ==0) {
+            if (start_time == 0) {
 //                start_time = usec;
                 start_time = frame->timestamp;
             }
@@ -79,7 +80,7 @@ void MovieWriterFilter::bindFrameBuffer(int w, int h) {
 }
 
 void MovieWriterFilter::startRecord(JNIEnv *env, const char *video_path) {
-    videoEncoder = VideoEncoder::getEncoder(env, video_path, width, height, true);
+    videoEncoder = VideoEncoder::getEncoder(env, video_path, width, height, false);
 }
 
 void MovieWriterFilter::stopRecord() {
@@ -92,6 +93,12 @@ void MovieWriterFilter::setState(bool isPause) {
 
 bool MovieWriterFilter::updateTexture() {
     return false;
+}
+
+void MovieWriterFilter::encodeFrame(uint8_t *frame) {
+    if (auto *encoder = dynamic_cast<FFVideoEncoder *>(videoEncoder)) {
+        encoder->encodeFrame(frame);
+    }
 }
 
 MovieWriterFilter::~MovieWriterFilter() = default;

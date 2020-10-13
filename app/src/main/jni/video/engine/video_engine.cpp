@@ -23,6 +23,10 @@ void VideoEngine::setEffect(std::shared_ptr<VideoEffect> &effect) {
 
 }
 
+void VideoEngine::encodeFrame(uint8_t *frame) {
+
+}
+
 VideoEngine::~VideoEngine() {
     glView = nullptr;
     LOGI("~ Video Engine");

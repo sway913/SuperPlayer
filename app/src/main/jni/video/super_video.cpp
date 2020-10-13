@@ -3,10 +3,10 @@
 //
 
 #include "super_video.h"
+#include "engine/record_engine.h"
 
 SuperVideo::SuperVideo(int mode) {
     videoEngine = VideoEngine::getVideoEngine(mode);
-    this->mode = mode;
 }
 
 void SuperVideo::init(JNIEnv *env, const std::shared_ptr<GlView> &gl_view) {
@@ -18,9 +18,6 @@ void SuperVideo::init(JNIEnv *env, const std::shared_ptr<GlView> &gl_view) {
 
 void SuperVideo::prepare(JNIEnv *env, const char *path) {
     videoEngine->prepare(env, path);
-    if (mode == 0) {
-        videoEncoder = VideoEncoder::getEncoder(env, "/storage/emulated/0/000/test_video.mp4", 1080, 1920, false);
-    }
 }
 
 void SuperVideo::switchCamera() {
@@ -45,19 +42,15 @@ void SuperVideo::pause() {
 
 void SuperVideo::stop() {
     videoEngine->stop();
-    if (videoEncoder) {
-        videoEncoder->stop();
-    }
 }
 
 void SuperVideo::encodeFrame(uint8_t *frame) {
-    if (videoEncoder) {
-        videoEncoder->encodeFrame(frame);
+    if (auto *engine = dynamic_cast<RecordEngine *>(videoEngine)) {
+        engine->encodeFrame(frame);
     }
 }
 
 SuperVideo::~SuperVideo() {
     DELETEOBJ(videoEngine)
-    DELETEOBJ(videoEncoder)
     LOGI("~ Super_Video");
 }

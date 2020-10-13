@@ -44,8 +44,6 @@ private:
     VideoEngine *videoEngine{nullptr};
     bool initialize{false};
     const char *video_path{nullptr};
-    VideoEncoder *videoEncoder{nullptr};
-    int mode = 0;
 
 };
 

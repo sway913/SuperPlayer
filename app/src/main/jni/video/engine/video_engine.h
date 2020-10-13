@@ -31,6 +31,8 @@ public:
 
     virtual void pause() = 0;
 
+    virtual void encodeFrame(uint8_t *frame);
+
     virtual ~VideoEngine();
 
     static VideoEngine *getVideoEngine(int mode);
