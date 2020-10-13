@@ -40,18 +40,18 @@ FFVideoEncoder::FFVideoEncoder(int w, int h, const char *path) {
     codec_ctx->codec_type = AVMEDIA_TYPE_VIDEO;
     codec_ctx->pix_fmt = AV_PIX_FMT_YUV420P;
 
-    codec_ctx->width = w;
-    codec_ctx->height = h;
+    codec_ctx->width = h;
+    codec_ctx->height = w;
 
     codec_ctx->bit_rate = 4000000;
-    codec_ctx->gop_size = 30;
+    codec_ctx->gop_size = 250;
 //    codec_ctx->thread_count = 2;
 
     codec_ctx->time_base.num = 1;
     codec_ctx->time_base.den = 25;
 
-    codec_ctx->codec_tag = 0;
-    codec_ctx->has_b_frames = 0;
+//    codec_ctx->codec_tag = 0;
+//    codec_ctx->has_b_frames = 0;
 
     codec_ctx->qmin = 10;
     codec_ctx->qmax = 51;
@@ -64,14 +64,16 @@ FFVideoEncoder::FFVideoEncoder(int w, int h, const char *path) {
 
     AVDictionary *param = nullptr;
     if (codec_ctx->codec_id == AV_CODEC_ID_H264) {
-        av_opt_set(codec_ctx->priv_data, "preset", "ultrafast", 0);
-        av_opt_set(codec_ctx->priv_data, "profile", "baseline", 0);
-        av_opt_set(codec_ctx->priv_data, "crf", "35", 0);
-        //av_dict_set(&param, "profile", "baseline", 0);
+//        av_opt_set(codec_ctx->priv_data, "preset", "slow", 0);
+//        av_opt_set(codec_ctx->priv_data, "tune", "zerolatency", 0);
+//        av_opt_set(codec_ctx->priv_data, "crf", "35", 0);
+//        av_dict_set(&param, "profile", "baseline", 0);
+        av_dict_set(&param, "preset", "slow", 0);
+        av_dict_set(&param, "tune", "zerolatency", 0);
     }
 
 //    av_dump_format(fmt_ctx, 0, path, 1);
-    if (avcodec_open2(codec_ctx, av_codec, nullptr) < 0) {
+    if (avcodec_open2(codec_ctx, av_codec, &param) < 0) {
         LOGI("ffencode fail to open encoder");
         return;
     }
@@ -93,6 +95,7 @@ FFVideoEncoder::FFVideoEncoder(int w, int h, const char *path) {
 
     av_packet = static_cast<AVPacket *>(av_mallocz(sizeof(AVPacket)));
     av_init_packet(av_packet);
+//    av_new_packet(av_packet, pic_size);
     out_y_size = codec_ctx->width * codec_ctx->height;
     thread_handler = std::async(std::launch::async, &FFVideoEncoder::looper, this);
 }
@@ -112,9 +115,11 @@ void FFVideoEncoder::looper() {
         if (!data_queue->pop(buf)) {
             continue;
         }
-        av_frame->data[0] = buf;
-        av_frame->data[1] = buf + out_y_size;
-        av_frame->data[2] = buf + out_y_size * 5 / 4;
+//        av_frame->data[0] = buf;
+//        av_frame->data[1] = buf + out_y_size;
+//        av_frame->data[2] = buf + out_y_size * 5 / 4;
+        NV21_TO_yuv420P(av_frame, buf, codec_ctx->width, codec_ctx->height);
+//        do_filter(buf, codec_ctx->width * codec_ctx->height, ROTATE_270_CROP_LT_MIRROR_LR);
         av_frame->pts = frame_cnt * (video_st->time_base.den) / ((video_st->time_base.num) * 25);
         frame_cnt++;
         int got_pic = 0;
@@ -149,7 +154,11 @@ int FFVideoEncoder::flush() {
     LOGI("encoder flush");
     int ret, got_pkt = 1;
     while (got_pkt) {
+        av_packet->data = nullptr;
+        av_packet->size = 0;
+        av_init_packet(av_packet);
         ret = avcodec_encode_video2(codec_ctx, av_packet, nullptr, &got_pkt);
+        av_frame_free(nullptr);
         if (ret == 0 && got_pkt) {
             av_packet->stream_index = 0;
             int write_ret = av_write_frame(fmt_ctx, av_packet);
@@ -166,9 +175,146 @@ int FFVideoEncoder::flush() {
     return true;
 }
 
+void FFVideoEncoder::do_filter(const uint8_t *picture_buf, int in_y_size, int format) {
+    //   y值在H方向开始行
+    int y_height_start_index = 0;
+    //   uv值在H方向开始行
+    int uv_height_start_index = y_height_start_index / 2;
+
+    if (format == ROTATE_90_CROP_LT) {
+
+        for (int i = y_height_start_index; i < codec_ctx->height; i++) {
+
+            for (int j = 0; j < codec_ctx->width; j++) {
+
+                int index = codec_ctx->width * i + j;
+                uint8_t value = *(picture_buf + index);
+                *(av_frame->data[0] + j * codec_ctx->coded_height + (codec_ctx->height - (i - y_height_start_index) - 1)) = value;
+            }
+        }
+
+        for (int i = uv_height_start_index; i < codec_ctx->height / 2; i++) {
+            for (int j = 0; j < codec_ctx->width / 2; j++) {
+                int index = codec_ctx->width / 2 * i + j;
+                uint8_t v = *(picture_buf + in_y_size + index);
+                uint8_t u = *(picture_buf + in_y_size * 5 / 4 + index);
+                *(av_frame->data[2] + (j * codec_ctx->height / 2 + (codec_ctx->height / 2 - (i - uv_height_start_index) - 1))) = v;
+                *(av_frame->data[1] + (j * codec_ctx->height / 2 + (codec_ctx->height / 2 - (i - uv_height_start_index) - 1))) = u;
+            }
+        }
+    } else if (format == ROTATE_0_CROP_LT) {
+
+
+        for (int i = y_height_start_index; i < codec_ctx->height; i++) {
+
+            for (int j = 0; j < codec_ctx->width; j++) {
+
+                int index = codec_ctx->width * i + j;
+                uint8_t value = *(picture_buf + index);
+
+                *(av_frame->data[0] + (i - y_height_start_index) * codec_ctx->width +
+                  j) = value;
+            }
+        }
+
+
+        for (int i = uv_height_start_index; i < codec_ctx->height / 2; i++) {
+            for (int j = 0; j < codec_ctx->width / 2; j++) {
+
+                int index = codec_ctx->width / 2 * i + j;
+                uint8_t v = *(picture_buf + in_y_size + index);
+
+                uint8_t u = *(picture_buf + in_y_size * 5 / 4 + index);
+                *(av_frame->data[2] +
+                  ((i - uv_height_start_index) * codec_ctx->width / 2 + j)) = v;
+                *(av_frame->data[1] +
+                  ((i - uv_height_start_index) * codec_ctx->width / 2 + j)) = u;
+            }
+        }
+    } else if (format == ROTATE_270_CROP_LT_MIRROR_LR) {
+
+        int y_width_start_index = codec_ctx->width - codec_ctx->width;
+        int uv_width_start_index = y_width_start_index / 2;
+
+        for (int i = 0; i < codec_ctx->height; i++) {
+
+            for (int j = y_width_start_index; j < codec_ctx->width; j++) {
+
+                int index = codec_ctx->width * (codec_ctx->height - i - 1) + j;
+                uint8_t value = *(picture_buf + index);
+                *(av_frame->data[0] + (codec_ctx->width - (j - y_width_start_index) - 1)
+                                      * codec_ctx->height +
+                  i) = value;
+            }
+        }
+        for (int i = 0; i < codec_ctx->height / 2; i++) {
+            for (int j = uv_width_start_index; j < codec_ctx->width / 2; j++) {
+                int index = codec_ctx->width / 2 * (codec_ctx->height / 2 - i - 1) + j;
+                uint8_t v = *(picture_buf + in_y_size + index);
+                uint8_t u = *(picture_buf + in_y_size * 5 / 4 + index);
+                *(av_frame->data[2] + (codec_ctx->width / 2 - (j - uv_width_start_index) - 1)
+                                      * codec_ctx->height / 2 +
+                  i) = v;
+                *(av_frame->data[1] + (codec_ctx->width / 2 - (j - uv_width_start_index) - 1)
+                                      * codec_ctx->height / 2 +
+                  i) = u;
+            }
+        }
+    }
+
+}
+
 void FFVideoEncoder::stop() {
     end = true;
     JOIN(thread_handler);
+}
+
+int FFVideoEncoder::NV21_TO_yuv420P(AVFrame *dst, uint8_t *nv21, int w, int h) {
+    int framesize = w * h;
+    int i = 0, j = 0;
+    auto *nv12 = new uint8_t[w * h * 3 / 2];
+    memcpy(nv12, nv21, framesize);
+
+    for (i = 0; i < framesize; i++) {
+        nv12[i] = nv21[i];
+    }
+
+    for (j = 0; j < framesize / 2; j += 2) {
+        nv12[framesize + j - 1] = nv21[j + framesize];
+    }
+
+    for (j = 0; j < framesize / 2; j += 2) {
+        nv12[framesize + j] = nv21[j + framesize - 1];
+    }
+
+
+
+
+    int ySize = w * h;
+
+//y
+    for (i = 0; i < ySize; i++) {
+        dst->data[0][i] = nv12[i];
+    }
+
+//u
+    i = 0;
+    for (j = 0; j < ySize / 2; j += 2) {
+        dst->data[1][i] = nv12[ySize + j];
+        i++;
+    }
+
+//v
+    i = 0;
+    for (j = 1; j < ySize / 2; j += 2) {
+        dst->data[2][i] = nv12[ySize + j];
+        i++;
+    }
+
+    delete[] nv12;
+
+    return 0;
+
 }
 
 FFVideoEncoder::~FFVideoEncoder() {

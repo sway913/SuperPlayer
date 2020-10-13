@@ -16,6 +16,22 @@ extern "C" {
 
 }
 
+
+#define ROTATE_0_CROP_LT 0
+
+/**
+ * 旋转90度剪裁左上
+ */
+#define ROTATE_90_CROP_LT 1
+/**
+ * 暂时没处理
+ */
+#define ROTATE_180 2
+/**
+ * 旋转270(-90)裁剪左上，左右镜像
+ */
+#define ROTATE_270_CROP_LT_MIRROR_LR 3
+
 class FFVideoEncoder : public VideoEncoder {
 
 public:
@@ -47,6 +63,10 @@ private:
     void looper();
 
     int flush();
+
+    void do_filter(const uint8_t *pic_data, int in_y_size, int format);
+
+    static int NV21_TO_yuv420P(AVFrame *dst, uint8_t *src, int w, int h);
 
 };
 
