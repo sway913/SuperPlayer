@@ -80,7 +80,7 @@ void MovieWriterFilter::bindFrameBuffer(int w, int h) {
 }
 
 void MovieWriterFilter::startRecord(JNIEnv *env, const char *video_path) {
-    videoEncoder = VideoEncoder::getEncoder(env, video_path, width, height, false);
+    videoEncoder = VideoEncoder::getEncoder(env, video_path, 1080, 1920, false);
 }
 
 void MovieWriterFilter::stopRecord() {

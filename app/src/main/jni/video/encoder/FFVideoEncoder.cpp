@@ -115,11 +115,20 @@ void FFVideoEncoder::looper() {
         if (!data_queue->pop(buf)) {
             continue;
         }
+
+        auto *dst = new uint8_t[codec_ctx->width * codec_ctx->height * 3 / 2];
+        NV21_TO_yuv420P(dst, buf, codec_ctx->width, codec_ctx->height);
+//        do_filter(buf, codec_ctx->width * codec_ctx->height, ROTATE_270_CROP_LT_MIRROR_LR);
+
+        av_frame->data[0] = dst;
+        av_frame->data[1] = dst + out_y_size;
+        av_frame->data[2] = dst + out_y_size * 5 / 4;
+
+//        rotateYUV420Degree270(buf, dst, codec_ctx->width, codec_ctx->height);
 //        av_frame->data[0] = buf;
 //        av_frame->data[1] = buf + out_y_size;
 //        av_frame->data[2] = buf + out_y_size * 5 / 4;
-        NV21_TO_yuv420P(av_frame, buf, codec_ctx->width, codec_ctx->height);
-//        do_filter(buf, codec_ctx->width * codec_ctx->height, ROTATE_270_CROP_LT_MIRROR_LR);
+
         av_frame->pts = frame_cnt * (video_st->time_base.den) / ((video_st->time_base.num) * 25);
         frame_cnt++;
         int got_pic = 0;
@@ -136,6 +145,7 @@ void FFVideoEncoder::looper() {
             }
         }
         delete[] buf;
+        delete[] dst;
     }
     if (flush() < 0) {
         return;
@@ -176,6 +186,8 @@ int FFVideoEncoder::flush() {
 }
 
 void FFVideoEncoder::do_filter(const uint8_t *picture_buf, int in_y_size, int format) {
+    int w = codec_ctx->height;
+    int h = codec_ctx->width;
     //   y值在H方向开始行
     int y_height_start_index = 0;
     //   uv值在H方向开始行
@@ -183,80 +195,80 @@ void FFVideoEncoder::do_filter(const uint8_t *picture_buf, int in_y_size, int fo
 
     if (format == ROTATE_90_CROP_LT) {
 
-        for (int i = y_height_start_index; i < codec_ctx->height; i++) {
+        for (int i = y_height_start_index; i < h; i++) {
 
             for (int j = 0; j < codec_ctx->width; j++) {
 
                 int index = codec_ctx->width * i + j;
                 uint8_t value = *(picture_buf + index);
-                *(av_frame->data[0] + j * codec_ctx->coded_height + (codec_ctx->height - (i - y_height_start_index) - 1)) = value;
+                *(av_frame->data[0] + j * codec_ctx->coded_height + (h - (i - y_height_start_index) - 1)) = value;
             }
         }
 
-        for (int i = uv_height_start_index; i < codec_ctx->height / 2; i++) {
-            for (int j = 0; j < codec_ctx->width / 2; j++) {
-                int index = codec_ctx->width / 2 * i + j;
+        for (int i = uv_height_start_index; i < h / 2; i++) {
+            for (int j = 0; j < w / 2; j++) {
+                int index = w / 2 * i + j;
                 uint8_t v = *(picture_buf + in_y_size + index);
                 uint8_t u = *(picture_buf + in_y_size * 5 / 4 + index);
-                *(av_frame->data[2] + (j * codec_ctx->height / 2 + (codec_ctx->height / 2 - (i - uv_height_start_index) - 1))) = v;
-                *(av_frame->data[1] + (j * codec_ctx->height / 2 + (codec_ctx->height / 2 - (i - uv_height_start_index) - 1))) = u;
+                *(av_frame->data[2] + (j * h / 2 + (h / 2 - (i - uv_height_start_index) - 1))) = v;
+                *(av_frame->data[1] + (j * h / 2 + (h / 2 - (i - uv_height_start_index) - 1))) = u;
             }
         }
     } else if (format == ROTATE_0_CROP_LT) {
 
 
-        for (int i = y_height_start_index; i < codec_ctx->height; i++) {
+        for (int i = y_height_start_index; i < h; i++) {
 
-            for (int j = 0; j < codec_ctx->width; j++) {
+            for (int j = 0; j < w; j++) {
 
-                int index = codec_ctx->width * i + j;
+                int index = w * i + j;
                 uint8_t value = *(picture_buf + index);
 
-                *(av_frame->data[0] + (i - y_height_start_index) * codec_ctx->width +
+                *(av_frame->data[0] + (i - y_height_start_index) * w +
                   j) = value;
             }
         }
 
 
-        for (int i = uv_height_start_index; i < codec_ctx->height / 2; i++) {
-            for (int j = 0; j < codec_ctx->width / 2; j++) {
+        for (int i = uv_height_start_index; i < h / 2; i++) {
+            for (int j = 0; j < w / 2; j++) {
 
-                int index = codec_ctx->width / 2 * i + j;
+                int index = w / 2 * i + j;
                 uint8_t v = *(picture_buf + in_y_size + index);
 
                 uint8_t u = *(picture_buf + in_y_size * 5 / 4 + index);
                 *(av_frame->data[2] +
-                  ((i - uv_height_start_index) * codec_ctx->width / 2 + j)) = v;
+                  ((i - uv_height_start_index) * w / 2 + j)) = v;
                 *(av_frame->data[1] +
-                  ((i - uv_height_start_index) * codec_ctx->width / 2 + j)) = u;
+                  ((i - uv_height_start_index) * w / 2 + j)) = u;
             }
         }
     } else if (format == ROTATE_270_CROP_LT_MIRROR_LR) {
 
-        int y_width_start_index = codec_ctx->width - codec_ctx->width;
+        int y_width_start_index = w - w;
         int uv_width_start_index = y_width_start_index / 2;
 
-        for (int i = 0; i < codec_ctx->height; i++) {
+        for (int i = 0; i < h; i++) {
 
-            for (int j = y_width_start_index; j < codec_ctx->width; j++) {
+            for (int j = y_width_start_index; j < w; j++) {
 
-                int index = codec_ctx->width * (codec_ctx->height - i - 1) + j;
+                int index = w * (h - i - 1) + j;
                 uint8_t value = *(picture_buf + index);
-                *(av_frame->data[0] + (codec_ctx->width - (j - y_width_start_index) - 1)
-                                      * codec_ctx->height +
+                *(av_frame->data[0] + (w - (j - y_width_start_index) - 1)
+                                      * h +
                   i) = value;
             }
         }
-        for (int i = 0; i < codec_ctx->height / 2; i++) {
-            for (int j = uv_width_start_index; j < codec_ctx->width / 2; j++) {
-                int index = codec_ctx->width / 2 * (codec_ctx->height / 2 - i - 1) + j;
+        for (int i = 0; i < h / 2; i++) {
+            for (int j = uv_width_start_index; j < w / 2; j++) {
+                int index = w / 2 * (h / 2 - i - 1) + j;
                 uint8_t v = *(picture_buf + in_y_size + index);
                 uint8_t u = *(picture_buf + in_y_size * 5 / 4 + index);
-                *(av_frame->data[2] + (codec_ctx->width / 2 - (j - uv_width_start_index) - 1)
-                                      * codec_ctx->height / 2 +
+                *(av_frame->data[2] + (w / 2 - (j - uv_width_start_index) - 1)
+                                      * h / 2 +
                   i) = v;
-                *(av_frame->data[1] + (codec_ctx->width / 2 - (j - uv_width_start_index) - 1)
-                                      * codec_ctx->height / 2 +
+                *(av_frame->data[1] + (w / 2 - (j - uv_width_start_index) - 1)
+                                      * h / 2 +
                   i) = u;
             }
         }
@@ -269,7 +281,7 @@ void FFVideoEncoder::stop() {
     JOIN(thread_handler);
 }
 
-int FFVideoEncoder::NV21_TO_yuv420P(AVFrame *dst, uint8_t *nv21, int w, int h) {
+int FFVideoEncoder::NV21_TO_yuv420P(uint8_t *dst, uint8_t *nv21, int w, int h) {
     int framesize = w * h;
     int i = 0, j = 0;
     auto *nv12 = new uint8_t[w * h * 3 / 2];
@@ -288,32 +300,35 @@ int FFVideoEncoder::NV21_TO_yuv420P(AVFrame *dst, uint8_t *nv21, int w, int h) {
     }
 
 
-
-
     int ySize = w * h;
 
 //y
     for (i = 0; i < ySize; i++) {
-        dst->data[0][i] = nv12[i];
+        dst[i] = nv12[i];
     }
 
 //u
     i = 0;
     for (j = 0; j < ySize / 2; j += 2) {
-        dst->data[1][i] = nv12[ySize + j];
+        dst[ySize + i] = nv12[ySize + j];
         i++;
     }
 
 //v
     i = 0;
     for (j = 1; j < ySize / 2; j += 2) {
-        dst->data[2][i] = nv12[ySize + j];
+        dst[ySize * 5 / 4 + i] = nv12[ySize + j];
         i++;
     }
 
     delete[] nv12;
 
     return 0;
+
+}
+
+void FFVideoEncoder::rotateYUV420Degree270(uint8_t *dst, uint8_t *src, int width, int height) {
+
 
 }
 

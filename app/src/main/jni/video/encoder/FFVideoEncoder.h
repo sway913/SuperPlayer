@@ -66,7 +66,9 @@ private:
 
     void do_filter(const uint8_t *pic_data, int in_y_size, int format);
 
-    static int NV21_TO_yuv420P(AVFrame *dst, uint8_t *src, int w, int h);
+    static int NV21_TO_yuv420P(uint8_t *dst, uint8_t *src, int w, int h);
+
+    static void rotateYUV420Degree270(uint8_t *dst, uint8_t *src, int w, int h);
 
 };
 
