@@ -13,9 +13,11 @@ target_link_libraries(
         soundtouch
         sox
         png
+        yuv
 )
 
 ADD_SUBDIRECTORY(oboe-1.3)
 ADD_SUBDIRECTORY(soundtouch)
 ADD_SUBDIRECTORY(sox)
 ADD_SUBDIRECTORY(libpng)
+ADD_SUBDIRECTORY(libyuv)
