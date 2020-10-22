@@ -7,6 +7,7 @@
 
 #include "VideoEncoder.h"
 #include "../utils/thread_safe_queue.h"
+#include "../../thirdpart/oboe-1.3/samples/RhythmGame/src/main/cpp/utils/LockFreeQueue.h"
 #include <future>
 
 extern "C" {
@@ -16,29 +17,17 @@ extern "C" {
 
 }
 
-
-#define ROTATE_0_CROP_LT 0
-
-/**
- * 旋转90度剪裁左上
- */
-#define ROTATE_90_CROP_LT 1
-/**
- * 暂时没处理
- */
-#define ROTATE_180 2
-/**
- * 旋转270(-90)裁剪左上，左右镜像
- */
-#define ROTATE_270_CROP_LT_MIRROR_LR 3
-
 class FFVideoEncoder : public VideoEncoder {
 
 public:
 
-    FFVideoEncoder(int w, int h, const char *path);
+    FFVideoEncoder(int w, int h, const char *path_);
+
+    void start();
 
     void encodeFrame(uint8_t *data) override;
+
+    int encode(AVCodecContext *pCodecCtx, AVFrame *pAvFrame, AVPacket *pAvPacket);
 
     void stop() override;
 
@@ -46,7 +35,7 @@ public:
 
 private:
 
-    BlockQueue<uint8_t *> *data_queue{nullptr};
+    LockFreeQueue<uint8_t *, 16> *data_queue{nullptr};
     AVFormatContext *fmt_ctx{nullptr};
     AVOutputFormat *fmt{nullptr};
     AVStream *video_st{nullptr};
@@ -54,21 +43,23 @@ private:
     AVCodec *av_codec{nullptr};
     AVPacket *av_packet{nullptr};
     AVFrame *av_frame{nullptr};
-    int pic_size{0};
-    int out_y_size{0};
     int frame_cnt{0};
     std::future<void> thread_handler{};
     bool end{false};
 
     void looper();
 
-    int flush();
+    int input_width{0};
+    int input_height{0};
 
-    void do_filter(const uint8_t *pic_data, int in_y_size, int format);
+    int output_width{0};
+    int output_height{0};
 
-    static int NV21_TO_yuv420P(uint8_t *dst, uint8_t *src, int w, int h);
+    const char *path{nullptr};
 
-    static void rotateYUV420Degree270(uint8_t *dst, uint8_t *src, int w, int h);
+    uint64_t startTime{0};
+    struct timeval tv {};
+
 
 };
 
