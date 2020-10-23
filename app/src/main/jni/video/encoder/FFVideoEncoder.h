@@ -14,6 +14,7 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libavutil/opt.h>
+#include <libavutil/imgutils.h>
 
 }
 
@@ -56,6 +57,8 @@ private:
     int output_height{0};
 
     const char *path{nullptr};
+
+    uint8_t *dst_buf{nullptr};
 
     uint64_t startTime{0};
     struct timeval tv {};

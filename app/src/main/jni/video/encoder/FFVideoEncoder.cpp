@@ -96,13 +96,15 @@ void FFVideoEncoder::start() {
     }
 
     av_frame = av_frame_alloc();
-    int pic_size = avpicture_get_size(codec_ctx->pix_fmt, codec_ctx->width, codec_ctx->height);
-    auto *buf = (uint8_t *) av_malloc(pic_size);
-    avpicture_fill((AVPicture *) av_frame, buf, codec_ctx->pix_fmt, codec_ctx->width, codec_ctx->height);
+//    int pic_size = avpicture_get_size(codec_ctx->pix_fmt, codec_ctx->width, codec_ctx->height);
+//    avpicture_fill((AVPicture *) av_frame, buf, codec_ctx->pix_fmt, codec_ctx->width, codec_ctx->height);
 
-    av_packet = static_cast<AVPacket *>(av_mallocz(sizeof(AVPacket)));
+    int pic_size = av_image_get_buffer_size(codec_ctx->pix_fmt, codec_ctx->width, codec_ctx->height, 1);
+    dst_buf = (uint8_t *) av_malloc(pic_size);
+    av_image_fill_arrays(av_frame->data, av_frame->linesize, dst_buf, codec_ctx->pix_fmt, codec_ctx->width, codec_ctx->height, 1);
+    av_packet = av_packet_alloc();//static_cast<AVPacket *>(av_mallocz(sizeof(AVPacket)));
     av_init_packet(av_packet);
-//    av_new_packet(av_packet, pic_size);
+//    av_new_packet(av_packet, pic_size * 3);
     thread_handler = std::async(std::launch::async, &FFVideoEncoder::looper, this);
 }
 
@@ -116,20 +118,25 @@ void FFVideoEncoder::encodeFrame(uint8_t *data) {
 }
 
 int FFVideoEncoder::encode(AVCodecContext *pCodecCtx, AVFrame *pAvFrame, AVPacket *pAvPacket) {
-    int got_pic = 0;
-    int ret = avcodec_encode_video2(pCodecCtx, pAvPacket, pAvFrame, &got_pic);
-    if (ret < 0) {
-        LOGI("fail to encode");
+    int ret = avcodec_send_frame(pCodecCtx, pAvFrame);
+    if(ret < 0) {
+        LOGI("fail to send frame");
+        return -1;
     }
-    if (got_pic && ret == 0) {
+
+    while (!ret) {
+        ret = avcodec_receive_packet(pCodecCtx, pAvPacket);
+        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+            return 0;
+        } else if (ret < 0) {
+            //error during encoding
+            return -1;
+        }
         pAvPacket->stream_index = video_st->index;
         ret = av_write_frame(fmt_ctx, pAvPacket);
         av_packet_unref(pAvPacket);
-        if (ret < 0) {
-            LOGI("write failed  %s", av_err2str(ret));
-        }
     }
-    return 1;
+    return 0;
 }
 
 void FFVideoEncoder::looper() {
@@ -142,18 +149,16 @@ void FFVideoEncoder::looper() {
             continue;
         }
 
-        auto *dst = new uint8_t[output_width * output_width * 3 / 2];
-
-        uint8_t *i420_y = dst;
-        uint8_t *i420_u = dst + output_width * output_height;
-        uint8_t *i420_v = dst + output_width * output_height * 5 / 4;
+        uint8_t *i420_y = dst_buf;
+        uint8_t *i420_u = dst_buf + output_width * output_height;
+        uint8_t *i420_v = dst_buf + output_width * output_height * 5 / 4;
 
 
         libyuv::ConvertToI420(buf, input_width * input_height,
                               i420_y, output_height,
                               i420_u, output_height / 2,
                               i420_v, output_height / 2,
-                              100, 100,
+                              (input_width - output_width) / 2, (input_height - output_height) / 2,
                               input_width, input_height,
                               output_width, output_height,
                               libyuv::kRotate270, libyuv::FOURCC_NV21);
@@ -172,7 +177,6 @@ void FFVideoEncoder::looper() {
         frame_cnt++;
         encode(codec_ctx, av_frame, av_packet);
         delete[] buf;
-        delete[] dst;
     }
 
 }
@@ -182,43 +186,34 @@ void FFVideoEncoder::stop() {
     end = true;
     JOIN(thread_handler);
 
-//    while (!data_queue->empty()) {
-//        uint8_t *buf = nullptr;
-//        if (!data_queue->pop(buf)) {
-//            continue;
-//        }
-//        auto *dst = new uint8_t[codec_ctx->width * codec_ctx->height * 3 / 2];
-//        NV21_TO_yuv420P(dst, buf, codec_ctx->width, codec_ctx->height);
-//        yuv_rotate_270(buf, dst, height, width);
-//        uint8_t *i420_y = buf;
-//        uint8_t *i420_u = buf + width * height;
-//        uint8_t *i420_v = buf + width * height * 5 / 4;
-//
-//        av_frame->data[0] = i420_y;
-//        av_frame->data[1] = i420_u;
-//        av_frame->data[2] = i420_v;
-//
-//        gettimeofday(&tv, nullptr);
-//        int64_t usec = tv.tv_sec * 1000 * 1000 + tv.tv_usec;
-//        if (startTime == 0) {
-//            startTime = usec;
-//        }
-//        av_frame->pts = frame_cnt * (video_st->time_base.den) / ((video_st->time_base.num) * 25); //usec - startTime;
-//        frame_cnt++;
-//        encode(codec_ctx, av_frame, av_packet);
-//        delete[] buf;
-//        delete[] dst;
-//    }
-
     encode(codec_ctx, nullptr, av_packet);
     av_write_trailer(fmt_ctx);
-    if (video_st) {
-        avcodec_close(video_st->codec);
-        av_free(av_frame);
+
+    if(codec_ctx) {
+        avcodec_close(codec_ctx);
+        avcodec_free_context(&codec_ctx);
+        codec_ctx = nullptr;
     }
 
-    avio_close(fmt_ctx->pb);
-    avformat_free_context(fmt_ctx);
+    if(fmt_ctx) {
+        avio_close(fmt_ctx->pb);
+        avformat_free_context(fmt_ctx);
+        fmt_ctx = nullptr;
+    }
+
+    if (dst_buf) {
+        av_free(dst_buf);
+        dst_buf = nullptr;
+    }
+
+    if(av_frame) {
+        av_free(av_frame);
+        av_frame = nullptr;
+    }
+
+    if (av_packet) {
+        av_packet_free(&av_packet);
+    }
     DELETEOBJ(data_queue)
 }
 
