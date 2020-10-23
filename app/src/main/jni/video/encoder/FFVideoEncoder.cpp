@@ -29,7 +29,7 @@ void FFVideoEncoder::start() {
     }
     fmt = fmt_ctx->oformat;
 
-    av_codec = avcodec_find_encoder(AV_CODEC_ID_H264);
+    av_codec = avcodec_find_encoder(AVCodecID::AV_CODEC_ID_H264);
     if (!av_codec) {
         LOGI("h264_encoder h264_encoder can't find encoder");
         return;
@@ -47,13 +47,13 @@ void FFVideoEncoder::start() {
         LOGI("h264_encoder codec ctx null");
     }
 
-    codec_ctx->codec_id = AV_CODEC_ID_H264;
+    codec_ctx->codec_id = AVCodecID::AV_CODEC_ID_H264;
     codec_ctx->codec_type = AVMEDIA_TYPE_VIDEO;
     codec_ctx->pix_fmt = AV_PIX_FMT_YUV420P;
     codec_ctx->width = output_height;
     codec_ctx->height = output_width;
     codec_ctx->bit_rate = 400000;
-    codec_ctx->gop_size = 250;
+    codec_ctx->gop_size = 30;
     codec_ctx->time_base.num = 1;
     codec_ctx->time_base.den = 25;
 
@@ -92,7 +92,7 @@ void FFVideoEncoder::start() {
 
     fmt_ctx->video_codec_id = codec_ctx->codec_id;
     if (avformat_write_header(fmt_ctx, nullptr) < 0) {
-        LOGI("h264_encoder avformat_write_header error   %s  file %s", av_err2str(ret), path);
+        LOGI("h264_encoder avformat_write_header error %s  file %s", av_err2str(ret), path);
     }
 
     av_frame = av_frame_alloc();
